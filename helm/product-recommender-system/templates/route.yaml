@@ -1,0 +1,8 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "product-recommender-system.fullname" . }}
+spec:
+  to:
+    kind: Service
+    name: {{ include "product-recommender-system.fullname" . }}

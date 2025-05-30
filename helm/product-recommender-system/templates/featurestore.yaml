@@ -1,0 +1,139 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: feast-data-stores
+stringData:
+  sql: |
+    path: postgresql+psycopg://${user}:${password}@${host}:${port}/${dbname}
+    cache_ttl_seconds: 60
+    sqlalchemy_config_kwargs:
+        echo: false
+        pool_pre_ping: true
+  postgres: |
+    host: ${host}
+    port: 5432
+    database: ${dbname}
+    db_schema: public
+    user: ${user}
+    password: ${password}
+    # sslmode: verify-full
+    # sslkey_path: /var/lib/postgresql/certs/tls.key
+    # sslcert_path: /var/lib/postgresql/certs/tls.crt
+    # sslrootcert_path: system
+
+---
+apiVersion: feast.dev/v1alpha1
+kind: FeatureStore
+metadata:
+  name: feast-rec-sys
+spec:
+  feastProject: {{ .Values.feast.project }}
+  feastProjectDir:
+    git:
+      url: https://github.com/RHEcosystemAppEng/rec-sys-app
+      ref: main
+  services:
+    offlineStore:
+      persistence:
+        file:
+          type: duckdb
+      server:
+        env:
+          - name: MPLCONFIGDIR
+            value: /tmp
+        envFrom:
+          - secretRef:
+              name: pgvector
+    onlineStore:
+      persistence:
+        store:
+          type: postgres
+          secretRef:
+            name: feast-data-stores
+      server:
+        envFrom:
+        - secretRef:
+            name: pgvector
+        env:
+        - name: MPLCONFIGDIR
+          value: /tmp
+        resources:
+          requests:
+            cpu: 150m
+            memory: 128Mi
+    registry:
+      local:
+        persistence:
+          store:
+            type: sql
+            secretRef:
+              name: feast-data-stores
+        server:
+          env:
+            - name: MPLCONFIGDIR
+              value: /tmp
+          envFrom:
+            - secretRef:
+                name: pgvector
+    ui:
+      envFrom:
+        - secretRef:
+            name: pgvector
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: feast-apply-job
+  labels:
+    feast.dev/name: feast-rec-sys
+    feast.dev/service-type: job
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: wait-for-reg
+          image: {{ .Values.applicationImage }}
+          env:
+          {{- include "product-recommender-system.feastEnv" . | nindent 10 }}
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              url="https://$FEAST_REGISTRY_URL/health"
+              echo "Waiting for $url..."
+              until curl -ksf "$url"; do
+                echo "Still waiting for $url ..."
+                sleep 10
+              done
+              echo "$url is ready."
+      containers:
+        - name: feast-0
+          image: {{ .Values.applicationImage }}
+          command:
+            - /bin/bash
+            - -c
+            - ./entry_point.sh && cd feature_repo && feast apply
+          imagePullPolicy: IfNotPresent
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+          {{- include "product-recommender-system.feastEnv" . | nindent 10 }}
+          volumeMounts:
+          - name: tls-secret
+            mountPath: /app/feature_repo/secrets/tls.crt
+            subPath: tls.crt
+            readOnly: true
+      volumes:
+      - name: tls-secret
+        secret:
+          secretName: {{ .Values.feast.secret }}
+          items:
+          - key: tls.crt
+            path: tls.crt
+      serviceAccountName: feast-feast-rec-sys
+  backoffLimit: 4

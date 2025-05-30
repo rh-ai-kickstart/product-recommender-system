@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "product-recommender-system.fullname" . }}
+  labels:
+    {{- include "product-recommender-system.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "product-recommender-system.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "product-recommender-system.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      initContainers:
+        - name: wait-for-kafka
+          image: {{ .Values.frontendImage }}
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+          {{- include "product-recommender-system.feastEnv" . | nindent 10 }}
+          command:
+            - python3
+            - -c
+            - |
+              import os, time
+              from kafka import KafkaAdminClient
+              while True:
+                try:
+                  KafkaAdminClient(bootstrap_servers=os.getenv("KAFKA_SERVICE_ADDR")).list_topics()
+                  break
+                except:
+                  print("Still waiting for kafka")
+                  time.sleep(10)
+              print("Kafka ready")
+      containers:
+      - name: rec-sys-ui
+        image: {{ .Values.frontendImage }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        {{- with .Values.env }}
+        env:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- include "product-recommender-system.feastEnv" . | nindent 8 }}
+        volumeMounts:
+          - name: tls-secret
+            mountPath: /app/tls.crt
+            subPath: tls.crt
+            readOnly: true
+      volumes:
+      - name: tls-secret
+        secret:
+          secretName: {{ .Values.feast.secret }}
+          items:
+          - key: tls.crt
+            path: tls.crt

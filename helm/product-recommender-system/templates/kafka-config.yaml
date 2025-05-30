@@ -1,0 +1,138 @@
+{{- $root := . }}
+
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: {{ .Values.kafka.cluster.name }}
+  annotations:
+    strimzi.io/node-pools: enabled
+    strimzi.io/kraft: enabled
+spec:
+  kafka:
+    version: 4.0.0
+    metadataVersion: 4.0-IV3
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls
+        port: 9093
+        type: internal
+        tls: true
+    config:
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+      default.replication.factor: 3
+      min.insync.replicas: 2
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnect
+metadata:
+  annotations:
+    strimzi.io/use-connector-resources: 'true'
+  name: connect-cluster
+spec:
+  bootstrapServers: '{{ .Values.kafka.cluster.name }}-kafka-bootstrap.{{ .Release.Namespace }}.svc.cluster.local:9093'
+  build:
+    output:
+      image: 'image-registry.openshift-image-registry.svc:5000/{{ $root.Release.Namespace }}/connect-cluster:latest'
+      type: docker
+    plugins:
+      - artifacts:
+          - type: zip
+            url: 'https://github.com/Aiven-Open/jdbc-connector-for-apache-kafka/releases/download/v6.10.0/jdbc-connector-for-apache-kafka-6.10.0.zip'
+        name: jdbc
+  config:
+    config.providers: secrets
+    config.providers.secrets.class: io.strimzi.kafka.KubernetesSecretConfigProvider
+    config.storage.replication.factor: -1
+    config.storage.topic: connect-cluster-configs
+    group.id: connect-cluster
+    offset.storage.replication.factor: -1
+    offset.storage.topic: connect-cluster-offsets
+    status.storage.replication.factor: -1
+    status.storage.topic: connect-cluster-status
+  replicas: 1
+  tls:
+    trustedCertificates:
+      - pattern: '*.crt'
+        secretName: {{ .Values.kafka.cluster.name }}-cluster-ca-cert
+  version: 4.0.0
+
+{{- range .Values.kafka.nodepools }}
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaNodePool
+metadata:
+  name: {{ .name }}
+  labels:
+    strimzi.io/cluster: {{ $root.Values.kafka.cluster.name }}
+spec:
+  replicas: 3
+  {{- with .roles }}
+  roles:
+    {{- toYaml . | nindent 4}}
+  {{- end }}
+  storage:
+    type: jbod
+    volumes:
+      - id: 0
+        type: ephemeral
+        kraftMetadata: shared
+{{- end }}
+
+{{- range .Values.kafka.topics }}
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: {{ .name }}
+  labels:
+    strimzi.io/cluster: {{ $root.Values.kafka.cluster.name }}
+spec:
+  partitions: 3
+  replicas: 1
+  config:
+    retention.ms: 604800000
+    segment.bytes: 1073741824
+{{- end }}
+
+{{- range .Values.kafka.connectors }}
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  labels:
+    strimzi.io/cluster: connect-cluster
+  name: {{ .name }}
+spec:
+  class: io.aiven.connect.jdbc.JdbcSinkConnector
+  config:
+    value.converter: org.apache.kafka.connect.json.JsonConverter
+    topics: {{ .topics }}
+    value.converter.schemas.enable: true
+    connection.password: "${secrets:{{ $root.Release.Namespace }}/{{ $root.Values.kafka.dbSecretName }}:password}"
+    key.converter: org.apache.kafka.connect.storage.StringConverter
+    batch.size: 3
+    pk.mode: none
+    insert.mode: insert
+    table.name.format: {{ .tableNameFormat }}
+    connection.user: "${secrets:{{ $root.Release.Namespace }}/{{ $root.Values.kafka.dbSecretName }}:user}"
+    auto.create: true
+    auto.evolve: true
+    key.converter.schemas.enable: false
+    connection.url: "${secrets:{{ $root.Release.Namespace }}/{{ $root.Values.kafka.dbSecretName }}:jdbc-uri}"
+    transforms: "TimestampConverter"
+    transforms.TimestampConverter.type: "org.apache.kafka.connect.transforms.TimestampConverter$Value"
+    transforms.TimestampConverter.format: "YYYY-MM-DD hh:mm:ss.s"
+    transforms.TimestampConverter.target.type: "Timestamp"
+    transforms.TimestampConverter.field: "timestamp"
+  tasksMax: 1
+{{- end }}

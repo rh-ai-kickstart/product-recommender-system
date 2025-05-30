@@ -1,0 +1,22 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: strimzi-local-role
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: strimzi-local-rolebinding
+subjects:
+  - kind: ServiceAccount
+    name: strimzi-cluster-operator
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: strimzi-local-role
+  apiGroup: rbac.authorization.k8s.io
