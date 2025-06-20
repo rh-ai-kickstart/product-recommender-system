@@ -1,0 +1,16 @@
+.slick-slider {
+  overflow: visible; /* Ensures no overflow issues */
+}
+
+/* .slick-list {
+  margin-left: 0px; /* Adjust gutter width */
+} */
+
+.slick-slide {
+  margin-left: 10px; /* Adjust gutter width */
+}
+
+.slick-slide > div {
+  /* Optional: Style individual slides */
+  padding: 8px;
+}
