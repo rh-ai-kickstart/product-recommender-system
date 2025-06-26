@@ -6,6 +6,7 @@ from datetime import date
 import numpy as np
 import config
 from routes import auth, products, recommendations, cart, orders, wishlist, feedback, health
+from routes import test
 
 app = FastAPI()
 
@@ -22,6 +23,7 @@ app.add_middleware(
 )
 
 # Include Routers
+app.include_router(test.router)
 app.include_router(health.router)
 app.include_router(auth.router)
 app.include_router(products.router)

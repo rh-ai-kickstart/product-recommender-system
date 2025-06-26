@@ -1,12 +1,35 @@
 from sqlalchemy import Integer, String, Date, Float, ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, declarative_base
 import datetime
+from sqlalchemy.types import TypeDecorator, VARCHAR
 
 Base = declarative_base()
 
+
+class Int26(TypeDecorator):
+    """Stores a 26-char numeric ID in a VARCHAR(26) but
+    always presents it as a Python int."""
+    impl = VARCHAR(26)
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return None
+        # Ensure we’re writing a 26-digit string
+        s = str(value)
+        if len(s) != 26 or not s.isdigit() or not s.startswith("1122"):
+            raise ValueError("user_id must be a 26-digit integer starting with 1122")
+        return s
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return None
+        return int(value)
+
+
 class User(Base):
     __tablename__ = "users"
-    user_id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(Int26, primary_key=True, index=True)
     email: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
     age: Mapped[int] = mapped_column(Integer)
     gender: Mapped[str] = mapped_column(String)
