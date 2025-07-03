@@ -1,0 +1,26 @@
+.slick-slider {
+  overflow: visible; /* Ensures no overflow issues */
+}
+
+/* .slick-list {
+  margin-left: 0px; /* Adjust gutter width */
+} */
+
+.slick-slide {
+  margin-left: 10px; /* Adjust gutter width */
+}
+
+.slick-slide > div {
+  /* Optional: Style individual slides */
+  padding: 8px;
+}
+
+.slider-container {
+  width: 100%;
+  overflow-x: hidden; /* prevents horizontal scrolling */
+  position: relative; /* required for absolute-positioned arrows */
+  box-sizing: border-box;
+  padding: 0 40px; /* or whatever you need for spacing around arrows */
+  overflow-y: hidden;
+  padding-bottom: 30px;
+}
