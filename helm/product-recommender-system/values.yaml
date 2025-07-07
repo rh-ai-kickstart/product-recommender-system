@@ -166,6 +166,7 @@ pipelineJobImage: quay.io/ecosystem-appeng/rec-sys-workflow:0.0.6b
 frontendImage: quay.io/ecosystem-appeng/rec-sys-ui:0.0.4
 applicationImage: quay.io/ecosystem-appeng/rec-sys-app:0.0.44
 backendImage: quay.io/ikatav/rec-sys-backend:0.0.1b
+modelRegistryCreatorImage: quay.io/rh-ee-ofridman/model-registry-python-oc:latest # A custom image that contains openshift client and model registry client
 
 dbName: product_recommender_system
 
@@ -263,6 +264,7 @@ modelRegistry:
   enabled: true
   name: modelregistry-sample
   namespace: rhoai-model-registries
+  accessrole: registry-user-modelregistry-sample
   
   # Model Registry spec configuration
   spec:
