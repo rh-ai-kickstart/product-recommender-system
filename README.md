@@ -131,6 +131,17 @@ Depend on the scale and speed required, for small amount of users have minimus o
    make install NAMESPACE=<namespace>
    ```
 
+### Specify a Custom Dataset
+
+By default, a dataset is automatically generated when the application is installed on the cluster.
+
+To use a custom dataset instead, provide a URL by setting the `DATASET_URL` property during installation:
+
+```bash
+# Replace <custom_dataset_url> with the desired dataset URL
+make install DATASET_URL=<custom_dataset_url>
+```
+
 ## Uninstall 
 To uninstall the recommender system and clean up resources:
 
