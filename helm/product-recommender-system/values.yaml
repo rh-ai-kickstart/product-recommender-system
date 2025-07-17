@@ -162,10 +162,10 @@ tolerations: []
 
 affinity: {}
 
-pipelineJobImage: quay.io/ecosystem-appeng/rec-sys-workflow:0.0.7
+pipelineJobImage: quay.io/ecosystem-appeng/rec-sys-workflow:v1.0.3
 frontendImage: quay.io/ecosystem-appeng/rec-sys-ui:0.0.4
-applicationImage: quay.io/ecosystem-appeng/rec-sys-app:v1.0.3
-backendImage: quay.io/ikatav/rec-sys-backend:0.0.3
+applicationImage: quay.io/ecosystem-appeng/rec-sys-app:v1.0.1
+backendImage: quay.io/fercoli/rec-sys-backend:0.0.14
 
 dbName: product_recommender_system
 
