@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as PreferencesRouteImport } from './routes/preferences'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
@@ -22,6 +23,11 @@ import { Route as ProtectedProductProductIdRouteImport } from './routes/_protect
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PreferencesRoute = PreferencesRouteImport.update({
+  id: '/preferences',
+  path: '/preferences',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -67,6 +73,7 @@ const ProtectedProductProductIdRoute =
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
+  '/preferences': typeof PreferencesRoute
   '/signup': typeof SignupRoute
   '/account': typeof ProtectedAccountRoute
   '/catalog': typeof ProtectedCatalogRoute
@@ -77,6 +84,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/preferences': typeof PreferencesRoute
   '/signup': typeof SignupRoute
   '/account': typeof ProtectedAccountRoute
   '/catalog': typeof ProtectedCatalogRoute
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_protected': typeof ProtectedRouteRouteWithChildren
   '/login': typeof LoginRoute
+  '/preferences': typeof PreferencesRoute
   '/signup': typeof SignupRoute
   '/_protected/account': typeof ProtectedAccountRoute
   '/_protected/catalog': typeof ProtectedCatalogRoute
@@ -100,11 +109,17 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    |
     | '/login'
     | '/signup'
+
     | '/account'
+
     | '/catalog'
+
+    | '/preferences'
     | '/search'
+
     | '/'
     | '/product/$productId'
     | '/product'
@@ -114,18 +129,25 @@ export interface FileRouteTypes {
     | '/signup'
     | '/account'
     | '/catalog'
-    | '/search'
+    | '/preferences' | '/search'
     | '/'
     | '/product/$productId'
     | '/product'
   id:
+    |
     | '__root__'
+
     | '/_protected'
+
     | '/login'
     | '/signup'
     | '/_protected/account'
+
     | '/_protected/catalog'
+
+    | '/preferences'
     | '/_protected/search'
+
     | '/_protected/'
     | '/_protected/product/$productId'
     | '/_protected/product/'
@@ -134,6 +156,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PreferencesRoute: typeof PreferencesRoute
   SignupRoute: typeof SignupRoute
 }
 
@@ -144,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/preferences': {
+      id: '/preferences'
+      path: '/preferences'
+      fullPath: '/preferences'
+      preLoaderRoute: typeof PreferencesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -230,6 +260,7 @@ const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
   LoginRoute: LoginRoute,
+  PreferencesRoute: PreferencesRoute,
   SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
