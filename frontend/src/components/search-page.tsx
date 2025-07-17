@@ -1,16 +1,13 @@
 import { Skeleton, Title } from "@patternfly/react-core";
 import { GalleryView } from "./Gallery";
-import { FakerProducts } from "./faker-products";
 import { fetchSearch } from "../services/products";
 import { useQuery } from "@tanstack/react-query";
 
 export function SearchPage() {
-  const { data, isLoading } = useQuery({
+  const { data, isError, isLoading } = useQuery({
     queryKey: ["catalog"], // A unique key for this query
     queryFn: fetchSearch, // The async function to fetch data
   });
-
-  const products = data ? data : FakerProducts();
 
   return (
     <div>
@@ -18,7 +15,7 @@ export function SearchPage() {
       {isLoading ? (
         <Skeleton style={{ height: 200 }} />
       ) : (
-        <GalleryView products={products} />
+        isError ? <div>Error fetching products</div> : <GalleryView products={data ?? []} />
       )}
     </div>
   );

@@ -1,24 +1,21 @@
 import { FlexItem, Skeleton, Title } from "@patternfly/react-core";
-import { FakerProducts } from "./faker-products";
 import { fetchRecommendations } from "../services/products";
 import { useQuery } from "@tanstack/react-query";
 import { GalleryView } from "./Gallery";
 
 export function LandingPage() {
-  const { data: recommendationItems, isLoading: isRecommendationsLoading } = useQuery({
+  const { data, isError, isLoading } = useQuery({
     queryKey: ["recommnedations"], // A unique key for this query
     queryFn: fetchRecommendations, // The async function to fetch data
   });
 
-  const products = recommendationItems ? recommendationItems : FakerProducts();
-
   return (
       <FlexItem>
         <Title headingLevel={"h1"} style={{ paddingBottom: 20 }}>Product Recommendations</Title>
-        {isRecommendationsLoading ? (
+        {isLoading ? (
           <Skeleton style={{ height: 200 }} />
         ) : (
-          <GalleryView products={products} />
+          isError ? <div>Error fetching recommendations</div> : <GalleryView products={data ?? []} />
         )}
       </FlexItem>
   );
