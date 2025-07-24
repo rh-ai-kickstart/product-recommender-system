@@ -1,8 +1,8 @@
-import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useAuth as useAuthContext } from '../contexts/AuthProvider';
-import { apiRequest } from '../services/api';
-import type { LoginRequest, SignUpRequest, AuthResponse } from '../types';
+// import { apiRequest } from '../services/api';
+import type { LoginRequest, SignUpRequest} from '../types';
 
 /**
  * Hook for login with automatic redirect

@@ -11,14 +11,14 @@ import {
   InputGroupItem,
   Alert,
 } from '@patternfly/react-core';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form';
 import { EyeIcon, EyeSlashIcon, PaperPlaneIcon } from '@patternfly/react-icons';
 import { useState } from 'react';
 import { useSignup } from '../hooks/useAuth';
 
 export const SimpleSignupPage: React.FunctionComponent = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const signupMutation = useSignup();
   const [passwordHidden, setPasswordHidden] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');

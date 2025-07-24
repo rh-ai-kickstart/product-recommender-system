@@ -2,9 +2,7 @@
 import { useAuth } from '../contexts/AuthProvider';
 import { useProduct, useProductSearch } from './useProducts';
 import {
-  usePersonalizedRecommendations,
-  useExistingUserRecommendations,
-  useNewUserRecommendations,
+  usePersonalizedRecommendations
 } from './useRecommendations';
 import type { ProductData } from '../types';
 import { useCart, useAddToCart } from './useCart';

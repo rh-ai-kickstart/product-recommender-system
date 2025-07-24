@@ -188,7 +188,7 @@ spec:
         image: "{{ .Values.backendImage }}"
         imagePullPolicy: {{ .Values.backend.pullPolicy }}
         command: ["python", "init_backend.py"]
-        workingDir: /app
+        workingDir: /app/backend
         env:
           {{- if .Values.env }}
           {{- toYaml .Values.env | nindent 12 }}

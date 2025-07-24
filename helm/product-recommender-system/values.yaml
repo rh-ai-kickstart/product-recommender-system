@@ -162,13 +162,11 @@ tolerations: []
 
 affinity: {}
 
-# TODO understand if the back and the fornt in the same image or not
-frontendImage: quay.io/ecosystem-appeng/rec-sys-ui:0.0.4 
 
 pipelineJobImage: quay.io/rh-ai-kickstart/rec-sys-workflow:v1.0.6
 applicationImage: quay.io/rh-ai-kickstart/rec-sys-app:v1.0.4
 # Note the backend uses rec-sys-app as library.
-backendImage: quay.io/rh-ai-kickstart/rec-sys-backend:v1.0.2
+backendImage: quay.io/hacohen/product-recommender:1.0.0 # TODO: change to quay.io/rh-ai-kickstart/...
 
 dbName: product_recommender_system
 

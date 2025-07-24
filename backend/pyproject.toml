@@ -25,6 +25,7 @@ dependencies = [
     "python-multipart",
     "Pillow>=10.0.0",
     "recsysapp",
+    "httpx>=0.28.1",
 ]
 
 [project.optional-dependencies]

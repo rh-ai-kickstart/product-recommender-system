@@ -41,13 +41,13 @@ export const useOptimisticCart = () => {
       // Return a context object with the snapshotted value
       return { previousCart };
     },
-    onError: (err, newItem, context) => {
+    onError: (_err, newItem, context) => {
       // If the mutation fails, use the context returned from onMutate to roll back
       if (context?.previousCart) {
         queryClient.setQueryData(['cart', newItem.user_id], context.previousCart);
       }
     },
-    onSettled: (data, error, newItem) => {
+    onSettled: (_data, _error, newItem) => {
       // Always refetch after error or success
       queryClient.invalidateQueries({ queryKey: ['cart', newItem.user_id] });
     },
@@ -65,12 +65,12 @@ export const useOptimisticCart = () => {
 
       return { previousCart };
     },
-    onError: (err, item, context) => {
+    onError: (_err, item, context) => {
       if (context?.previousCart) {
         queryClient.setQueryData(['cart', item.user_id], context.previousCart);
       }
     },
-    onSettled: (data, error, item) => {
+    onSettled: (_data, _error, item) => {
       queryClient.invalidateQueries({ queryKey: ['cart', item.user_id] });
     },
   });
@@ -107,12 +107,12 @@ export const useOptimisticWishlist = () => {
 
       return { previousWishlist };
     },
-    onError: (err, { userId }, context) => {
+    onError: (_err, { userId }, context) => {
       if (context?.previousWishlist) {
         queryClient.setQueryData(['wishlist', userId], context.previousWishlist);
       }
     },
-    onSettled: (data, error, { userId }) => {
+    onSettled: (_data, _error, { userId }) => {
       queryClient.invalidateQueries({ queryKey: ['wishlist', userId] });
     },
   });
@@ -130,12 +130,12 @@ export const useOptimisticWishlist = () => {
 
       return { previousWishlist };
     },
-    onError: (err, { userId }, context) => {
+    onError: (_err, { userId }, context) => {
       if (context?.previousWishlist) {
         queryClient.setQueryData(['wishlist', userId], context.previousWishlist);
       }
     },
-    onSettled: (data, error, { userId }) => {
+    onSettled: (_data, _error, { userId }) => {
       queryClient.invalidateQueries({ queryKey: ['wishlist', userId] });
     },
   });

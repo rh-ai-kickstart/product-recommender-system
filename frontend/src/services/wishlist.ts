@@ -7,7 +7,7 @@ export const fetchWishlist = async (userId?: string): Promise<ProductData[]> => 
   // Use placeholder user_id for now, similar to current implementation
   const endpoint = userId ? `/api/wishlist/${userId}` : '/api/wishlist/{user_id}';
 
-  const context = ServiceLogger.logServiceCall('fetchWishlist');
+  // const context = ServiceLogger.logServiceCall('fetchWishlist');
 
   try {
     return await apiRequest<ProductData[]>(endpoint, 'fetchWishlist');
