@@ -1,30 +1,33 @@
-from fastapi import APIRouter, HTTPException, Depends, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from pydantic import BaseModel
+import random
+import string
+from datetime import date
+
+from database.db import get_db
+from database.models_sql import User
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-import random, string
-from datetime import date
-import os
-from models import SignUpRequest, LoginRequest, AuthResponse, User as UserResponse
-from database.models_sql import User
-from database.db import get_db
+from models import AuthResponse, LoginRequest, SignUpRequest
+from models import User as UserResponse
 from services.kafka_service import KafkaService  # Kafka send
 from services.security import (
+    ALGORITHM,
+    SECRET_KEY,
+    create_access_token,
     hash_password,
     verify_password,
-    create_access_token,
-    SECRET_KEY,
-    ALGORITHM,
 )
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 # OAuth2 scheme for Bearer token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
+
 # Utility: generate a 27-digit user ID
 def generate_user_id() -> str:
-    return ''.join(random.choices(string.digits, k=27))
+    return "".join(random.choices(string.digits, k=27))
+
 
 # Dependency: get current user from JWT
 async def get_current_user(
@@ -50,7 +53,9 @@ async def get_current_user(
         raise credentials_exception
     return user
 
+
 router = APIRouter(prefix="/auth", tags=["auth"])
+
 
 @router.post(
     "/signup",
@@ -129,7 +134,6 @@ async def login(
         views=[],
     )
     return AuthResponse(user=user_response, token=token)
-
 
 
 @router.get(

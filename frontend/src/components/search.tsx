@@ -18,12 +18,12 @@ export const Search: React.FunctionComponent = () => {
 
   return (
     <SearchInput
-      placeholder="Find a product"
+      placeholder='Find a product'
       value={value}
       onChange={(_event, value) => onChange(value)}
       onSearch={onSearch}
       onClear={() => onChange('')}
-      className="pf-v6-u-w-100"
+      className='pf-v6-u-w-100'
     />
   );
 };

@@ -1,52 +1,52 @@
 .preferences-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem;
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-    min-height: 100vh;
-  }
-  
-  .preferences-container h2 {
-    margin-bottom: 2rem;
-    color: #333;
-  }
-  
-  .category-button {
-    padding: 0.75rem 1.5rem;
-    margin: 0.5rem;
-    border: 2px solid #007bff;
-    border-radius: 30px;
-    background-color: white;
-    color: #007bff;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .category-button:hover {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .category-button.selected {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .continue-button {
-    margin-top: 2rem;
-    padding: 0.75rem 2rem;
-    background-color: #28a745;
-    color: white;
-    font-size: 1rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  
-  .continue-button:hover {
-    background-color: #218838;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+}
+
+.preferences-container h2 {
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.category-button {
+  padding: 0.75rem 1.5rem;
+  margin: 0.5rem;
+  border: 2px solid #007bff;
+  border-radius: 30px;
+  background-color: white;
+  color: #007bff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.category-button:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.category-button.selected {
+  background-color: #007bff;
+  color: white;
+}
+
+.continue-button {
+  margin-top: 2rem;
+  padding: 0.75rem 2rem;
+  background-color: #28a745;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.continue-button:hover {
+  background-color: #218838;
+}

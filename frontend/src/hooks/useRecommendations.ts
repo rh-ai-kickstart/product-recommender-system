@@ -23,7 +23,9 @@ export const usePersonalizedRecommendations = () => {
     queryKey: ['recommendations', 'personalized', user?.user_id],
     queryFn: () => {
       if (!user?.user_id) {
-        throw new Error('User authentication required for personalized recommendations');
+        throw new Error(
+          'User authentication required for personalized recommendations'
+        );
       }
 
       if (hasInteractionHistory) {

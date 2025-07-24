@@ -14,8 +14,9 @@ export const useSetPreferences = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (preferences: PreferencesRequest) => setPreferences(preferences),
-    onSuccess: (authResponse) => {
+    mutationFn: (preferences: PreferencesRequest) =>
+      setPreferences(preferences),
+    onSuccess: authResponse => {
       // Update preferences cache
       queryClient.setQueryData(['preferences'], authResponse.user.preferences);
 

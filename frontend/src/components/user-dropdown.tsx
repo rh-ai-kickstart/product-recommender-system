@@ -45,21 +45,26 @@ export const UserDropdown: React.FunctionComponent = () => {
       }}
       toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
         <MenuToggle
-          icon={<Avatar size="sm" src="/vite.svg" alt="User avatar" />}
+          icon={<Avatar size='sm' src='/vite.svg' alt='User avatar' />}
           ref={toggleRef}
           onClick={toggle}
-          aria-label="User menu"
+          aria-label='User menu'
         >
           {displayName}
         </MenuToggle>
       )}
     >
       <DropdownList>
-        <DropdownItem key="account" to="/account" component="button" icon={<UserIcon />}>
+        <DropdownItem
+          key='account'
+          to='/account'
+          component='button'
+          icon={<UserIcon />}
+        >
           My Account
         </DropdownItem>
         <DropdownItem
-          key="logout"
+          key='logout'
           icon={<SignOutAltIcon />}
           onClick={handleLogout}
           isDisabled={logoutMutation.isPending}

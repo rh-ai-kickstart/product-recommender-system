@@ -4,7 +4,9 @@ export interface PreferencesRequest {
   preferences: string;
 }
 
-export const setPreferences = async (preferences: PreferencesRequest): Promise<any> => {
+export const setPreferences = async (
+  preferences: PreferencesRequest
+): Promise<any> => {
   ServiceLogger.logServiceCall('setPreferences', { preferences });
   return apiRequest<any>('/api/users/preferences', 'setPreferences', {
     method: 'POST',

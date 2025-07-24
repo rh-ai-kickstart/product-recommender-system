@@ -78,7 +78,7 @@ metadata:
   labels:
     pipelines.kubeflow.org/v2_component: 'true'
 spec:
-  serviceAccountName: pipeline-runner-dspa    
+  serviceAccountName: pipeline-runner-dspa
   initContainers:
     - name: wait-for-pipeline
       image: {{ .Values.pipelineJobImage }}

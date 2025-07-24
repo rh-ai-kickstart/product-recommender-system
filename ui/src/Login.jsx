@@ -36,19 +36,26 @@ const Login = ({ onLogin }) => {
     }
   };
 
-  const getButtonClass = (buttonType) => {
-    if (!mode) return buttonType === 'login' ? 'default-login' : 'default-signup';
+  const getButtonClass = buttonType => {
+    if (!mode)
+      return buttonType === 'login' ? 'default-login' : 'default-signup';
     return mode === buttonType ? 'active' : 'inactive';
   };
 
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <div className="toggle-buttons">
-          <button onClick={() => setMode('login')} className={getButtonClass('login')}>
+    <div className='login-container'>
+      <div className='login-box'>
+        <div className='toggle-buttons'>
+          <button
+            onClick={() => setMode('login')}
+            className={getButtonClass('login')}
+          >
             Login
           </button>
-          <button onClick={() => setMode('signup')} className={getButtonClass('signup')}>
+          <button
+            onClick={() => setMode('signup')}
+            className={getButtonClass('signup')}
+          >
             Sign Up
           </button>
         </div>
@@ -57,22 +64,22 @@ const Login = ({ onLogin }) => {
           <>
             <h2>{mode === 'login' ? 'Login' : 'Sign Up'}</h2>
             <input
-              className="login-input"
-              placeholder="Email"
+              className='login-input'
+              placeholder='Email'
               value={email}
               onChange={e => setEmail(e.target.value)}
             />
 
-            <div className="password-wrapper">
+            <div className='password-wrapper'>
               <input
-                className="login-input"
+                className='login-input'
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Password"
+                placeholder='Password'
                 value={password}
                 onChange={e => setPassword(e.target.value)}
               />
               <span
-                className="toggle-password"
+                className='toggle-password'
                 onClick={() => setShowPassword(prev => !prev)}
                 title={showPassword ? 'Hide password' : 'Show password'}
               >
@@ -83,21 +90,23 @@ const Login = ({ onLogin }) => {
             {mode === 'signup' && (
               <>
                 <input
-                  className="login-input"
-                  type="number"
-                  placeholder="Age"
+                  className='login-input'
+                  type='number'
+                  placeholder='Age'
                   value={age}
                   onChange={e => setAge(e.target.value)}
                 />
                 <select
                   value={gender}
                   onChange={e => setGender(e.target.value)}
-                  className="dropdown-input"
+                  className='dropdown-input'
                 >
-                  <option value="" disabled>Select Gender</option>
-                  <option value="M">M</option>
-                  <option value="F">F</option>
-                  <option value="Other">Other</option>
+                  <option value='' disabled>
+                    Select Gender
+                  </option>
+                  <option value='M'>M</option>
+                  <option value='F'>F</option>
+                  <option value='Other'>Other</option>
                 </select>
               </>
             )}

@@ -25,7 +25,7 @@ export function AccountPage() {
   if (isLoading) {
     return (
       <PageSection>
-        <Spinner size="lg" />
+        <Spinner size='lg' />
       </PageSection>
     );
   }
@@ -33,7 +33,7 @@ export function AccountPage() {
   if (!isAuthenticated || !user) {
     return (
       <PageSection>
-        <Alert variant="warning" title="Authentication Required">
+        <Alert variant='warning' title='Authentication Required'>
           Please log in to view your account page.
         </Alert>
       </PageSection>
@@ -49,25 +49,33 @@ export function AccountPage() {
         </Title>
         <Card style={{ marginTop: '20px' }}>
           <CardBody>
-            <Title headingLevel="h2" size="lg">
+            <Title headingLevel='h2' size='lg'>
               Profile Information
             </Title>
             <DescriptionList isHorizontal>
               <DescriptionListGroup>
                 <DescriptionListTerm>Email</DescriptionListTerm>
-                <DescriptionListDescription>{user.email}</DescriptionListDescription>
+                <DescriptionListDescription>
+                  {user.email}
+                </DescriptionListDescription>
               </DescriptionListGroup>
               <DescriptionListGroup>
                 <DescriptionListTerm>User ID</DescriptionListTerm>
-                <DescriptionListDescription>{user.user_id}</DescriptionListDescription>
+                <DescriptionListDescription>
+                  {user.user_id}
+                </DescriptionListDescription>
               </DescriptionListGroup>
               <DescriptionListGroup>
                 <DescriptionListTerm>Age</DescriptionListTerm>
-                <DescriptionListDescription>{user.age}</DescriptionListDescription>
+                <DescriptionListDescription>
+                  {user.age}
+                </DescriptionListDescription>
               </DescriptionListGroup>
               <DescriptionListGroup>
                 <DescriptionListTerm>Gender</DescriptionListTerm>
-                <DescriptionListDescription>{user.gender}</DescriptionListDescription>
+                <DescriptionListDescription>
+                  {user.gender}
+                </DescriptionListDescription>
               </DescriptionListGroup>
               <DescriptionListGroup>
                 <DescriptionListTerm>Member Since</DescriptionListTerm>

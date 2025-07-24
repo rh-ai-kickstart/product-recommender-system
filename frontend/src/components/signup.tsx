@@ -45,7 +45,9 @@ export const SimpleSignupPage: React.FunctionComponent = () => {
         });
       } catch (error) {
         setErrorMessage(
-          error instanceof Error ? error.message : 'Signup failed. Please try again.'
+          error instanceof Error
+            ? error.message
+            : 'Signup failed. Please try again.'
         );
       }
     },
@@ -58,20 +60,24 @@ export const SimpleSignupPage: React.FunctionComponent = () => {
   const signupForm = (
     <>
       {errorMessage && (
-        <Alert variant="danger" title="Signup Error" style={{ marginBottom: '1rem' }}>
+        <Alert
+          variant='danger'
+          title='Signup Error'
+          style={{ marginBottom: '1rem' }}
+        >
           {errorMessage}
         </Alert>
       )}
       <Form
         isWidthLimited
-        onSubmit={(e) => {
+        onSubmit={e => {
           e.preventDefault();
           e.stopPropagation();
           void form.handleSubmit();
         }}
       >
         <form.Field
-          name="email"
+          name='email'
           validators={{
             onChange: ({ value }) => {
               if (!value) {
@@ -84,12 +90,12 @@ export const SimpleSignupPage: React.FunctionComponent = () => {
             },
           }}
         >
-          {(field) => (
-            <FormGroup label="Email" isRequired fieldId="simple-form-email-02">
+          {field => (
+            <FormGroup label='Email' isRequired fieldId='simple-form-email-02'>
               <TextInput
                 isRequired
-                type="email"
-                id="simple-form-email-02"
+                type='email'
+                id='simple-form-email-02'
                 name={field.name}
                 value={field.state.value}
                 onChange={(_event, value) => field.handleChange(value)}
@@ -102,7 +108,13 @@ export const SimpleSignupPage: React.FunctionComponent = () => {
                 }
               />
               {field.state.meta.errors.length > 0 && (
-                <div style={{ color: '#c9190b', fontSize: '14px', marginTop: '4px' }}>
+                <div
+                  style={{
+                    color: '#c9190b',
+                    fontSize: '14px',
+                    marginTop: '4px',
+                  }}
+                >
                   {field.state.meta.errors[0]}
                 </div>
               )}
@@ -110,7 +122,7 @@ export const SimpleSignupPage: React.FunctionComponent = () => {
           )}
         </form.Field>
         <form.Field
-          name="password"
+          name='password'
           validators={{
             onChange: ({ value }) => {
               if (!value) {
@@ -135,14 +147,18 @@ export const SimpleSignupPage: React.FunctionComponent = () => {
             },
           }}
         >
-          {(field) => (
-            <FormGroup label="Password" isRequired fieldId="simple-form-password-02">
+          {field => (
+            <FormGroup
+              label='Password'
+              isRequired
+              fieldId='simple-form-password-02'
+            >
               <InputGroup>
                 <InputGroupItem isFill>
                   <TextInput
                     isRequired
                     type={passwordHidden ? 'password' : 'text'}
-                    id="simple-form-password-02"
+                    id='simple-form-password-02'
                     name={field.name}
                     value={field.state.value}
                     onChange={(_event, value) => field.handleChange(value)}
@@ -157,15 +173,25 @@ export const SimpleSignupPage: React.FunctionComponent = () => {
                 </InputGroupItem>
                 <InputGroupItem>
                   <Button
-                    variant="control"
+                    variant='control'
                     onClick={() => setPasswordHidden(!passwordHidden)}
-                    aria-label={passwordHidden ? showPasswordAriaLabel : hidePasswordAriaLabel}
+                    aria-label={
+                      passwordHidden
+                        ? showPasswordAriaLabel
+                        : hidePasswordAriaLabel
+                    }
                     icon={passwordHidden ? <EyeIcon /> : <EyeSlashIcon />}
                   />
                 </InputGroupItem>
               </InputGroup>
               {field.state.meta.errors.length > 0 && (
-                <div style={{ color: '#c9190b', fontSize: '14px', marginTop: '4px' }}>
+                <div
+                  style={{
+                    color: '#c9190b',
+                    fontSize: '14px',
+                    marginTop: '4px',
+                  }}
+                >
                   {field.state.meta.errors[0]}
                 </div>
               )}
@@ -173,17 +199,17 @@ export const SimpleSignupPage: React.FunctionComponent = () => {
           )}
         </form.Field>
         <form.Field
-          name="age"
+          name='age'
           validators={{
             onChange: ({ value }) => (!value ? 'Age is required' : undefined),
           }}
         >
-          {(field) => (
-            <FormGroup label="Age" isRequired fieldId="simple-form-number">
+          {field => (
+            <FormGroup label='Age' isRequired fieldId='simple-form-number'>
               <TextInput
                 isRequired
-                type="number"
-                id="simple-form-number"
+                type='number'
+                id='simple-form-number'
                 name={field.name}
                 value={field.state.value}
                 onChange={(_event, value) => field.handleChange(value)}
@@ -192,39 +218,40 @@ export const SimpleSignupPage: React.FunctionComponent = () => {
           )}
         </form.Field>
         <form.Field
-          name="gender"
+          name='gender'
           validators={{
-            onChange: ({ value }) => (!value ? 'Gender is required' : undefined),
+            onChange: ({ value }) =>
+              !value ? 'Gender is required' : undefined,
           }}
         >
-          {(field) => (
+          {field => (
             <FormGroup
-              role="radiogroup"
+              role='radiogroup'
               isInline
-              fieldId="limit-width-form-radio-group"
-              label="Gender"
+              fieldId='limit-width-form-radio-group'
+              label='Gender'
             >
               <Radio
-                label="Male"
+                label='Male'
                 name={field.name}
-                id="radio-male"
-                value="Male"
+                id='radio-male'
+                value='Male'
                 isChecked={field.state.value === 'Male'}
                 onChange={() => field.handleChange('Male')}
               />
               <Radio
-                label="Female"
+                label='Female'
                 name={field.name}
-                id="radio-female"
-                value="Female"
+                id='radio-female'
+                value='Female'
                 isChecked={field.state.value === 'Female'}
                 onChange={() => field.handleChange('Female')}
               />
               <Radio
-                label="Other"
+                label='Other'
                 name={field.name}
-                id="radio-other"
-                value="Other"
+                id='radio-other'
+                value='Other'
                 isChecked={field.state.value === 'Other'}
                 onChange={() => field.handleChange('Other')}
               />
@@ -233,15 +260,21 @@ export const SimpleSignupPage: React.FunctionComponent = () => {
         </form.Field>
         <ActionGroup>
           <form.Subscribe
-            selector={(state) => [state.canSubmit, state.isSubmitting, state.isPristine]}
+            selector={state => [
+              state.canSubmit,
+              state.isSubmitting,
+              state.isPristine,
+            ]}
           >
             {([canSubmit, isSubmitting]) => (
               <Button
                 icon={<PaperPlaneIcon />}
-                variant="primary"
-                type="submit"
+                variant='primary'
+                type='submit'
                 isLoading={isSubmitting || signupMutation.isPending}
-                isDisabled={isSubmitting || signupMutation.isPending || !canSubmit}
+                isDisabled={
+                  isSubmitting || signupMutation.isPending || !canSubmit
+                }
               >
                 {isSubmitting || signupMutation.isPending
                   ? 'Creating Account...'
@@ -249,7 +282,7 @@ export const SimpleSignupPage: React.FunctionComponent = () => {
               </Button>
             )}
           </form.Subscribe>
-          <Button variant="link" onClick={handleCancel}>
+          <Button variant='link' onClick={handleCancel}>
             Cancel
           </Button>
         </ActionGroup>
@@ -259,12 +292,15 @@ export const SimpleSignupPage: React.FunctionComponent = () => {
 
   const logIntoAccountMessage = (
     <LoginMainFooterBandItem>
-      Already have an account? <Link to="/login">Login.</Link>
+      Already have an account? <Link to='/login'>Login.</Link>
     </LoginMainFooterBandItem>
   );
 
   return (
-    <LoginPage loginTitle="Sign up for an account" signUpForAccountMessage={logIntoAccountMessage}>
+    <LoginPage
+      loginTitle='Sign up for an account'
+      signUpForAccountMessage={logIntoAccountMessage}
+    >
       {signupForm}
     </LoginPage>
   );

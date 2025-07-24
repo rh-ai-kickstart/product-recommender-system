@@ -64,11 +64,11 @@ backend:
     type: ClusterIP
     port: 8000
     targetPort: 8000
-  
+
   # Pod restart configuration
   restartPolicy: Always
   backoffLimit: 12
-  
+
   # Health check configuration
   healthCheck:
     livenessProbe:
@@ -81,7 +81,7 @@ backend:
       initialDelaySeconds: 15
       periodSeconds: 10
       timeoutSeconds: 5
-  
+
   # Resource configuration for the backend
   resources:
     limits:
@@ -90,7 +90,7 @@ backend:
     requests:
       cpu: "200m"
       memory: "512Mi"
-  
+
   # Additional environment variables specific to backend
   additionalEnv:
     - name: DATABASE_URL
@@ -100,12 +100,12 @@ backend:
           key: uri
   # - name: EXAMPLE_VAR
   #   value: "example-value"
-  
+
   # Additional volume mounts specific to backend
   additionalVolumeMounts: []
   # - name: config-volume
   #   mountPath: /etc/config
-  
+
   # Additional volumes specific to backend
   additionalVolumes: []
   # - name: config-volume
@@ -163,7 +163,7 @@ tolerations: []
 affinity: {}
 
 # TODO understand if the back and the fornt in the same image or not
-frontendImage: quay.io/ecosystem-appeng/rec-sys-ui:0.0.4 
+frontendImage: quay.io/ecosystem-appeng/rec-sys-ui:0.0.4
 
 pipelineJobImage: quay.io/rh-ai-kickstart/rec-sys-workflow:v1.0.6
 applicationImage: quay.io/rh-ai-kickstart/rec-sys-app:v1.0.4
@@ -267,7 +267,7 @@ modelRegistry:
   name: modelregistry-sample
   namespace: rhoai-model-registries
   accessrole: registry-user-modelregistry-sample
-  
+
   # Model Registry spec configuration
   spec:
     grpc:
@@ -297,7 +297,7 @@ modelRegistry:
     rest:
       port: 8080
       serviceRoute: disabled
-  
+
   # Database configuration
   database:
     # Database credentials
@@ -305,19 +305,19 @@ modelRegistry:
       databaseName: "model_registry"
       databasePassword: "TheBlurstOfTimes" # notsecret
       databaseUser: "mlmduser" # notsecret
-    
+
     # Database service configuration
     service:
       port: 3306
       targetPort: 3306
       type: ClusterIP
-    
+
     # Database storage configuration
     storage:
       accessModes:
         - ReadWriteOnce
       storageSize: 5Gi
-    
+
     # Database deployment configuration
     deployment:
       replicas: 1
@@ -325,17 +325,17 @@ modelRegistry:
       imagePullPolicy: IfNotPresent
       strategy:
         type: Recreate
-      
+
       # Health check configuration
       livenessProbe:
         initialDelaySeconds: 15
         periodSeconds: 10
         timeoutSeconds: 5
-      
+
       readinessProbe:
         initialDelaySeconds: 10
         timeoutSeconds: 5
-      
+
       # MySQL specific configuration
       mysql:
         datadir: /var/lib/mysql/datadir

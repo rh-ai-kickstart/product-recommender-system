@@ -1,23 +1,22 @@
 # routes/preferences.py
-from fastapi import APIRouter, Depends, status, HTTPException
-from pydantic import BaseModel
-from database.models_sql import User
-from services.kafka_service import KafkaService
-from routes.auth import get_current_user
-from models import AuthResponse, User as UserResponse
-from sqlalchemy.ext.asyncio import AsyncSession
 from database.db import get_db
-from services.security import (
-    create_access_token,
-    SECRET_KEY,
-    ALGORITHM,
-)
+from database.models_sql import User
+from fastapi import APIRouter, Depends, status
+from models import AuthResponse
+from models import User as UserResponse
+from pydantic import BaseModel
+from routes.auth import get_current_user
+from services.kafka_service import KafkaService
+from services.security import create_access_token
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/users", tags=["users"])
+
 
 # Pydantic model for incoming preferences update
 class PreferencesRequest(BaseModel):
     preferences: str
+
 
 # POST /users/preferences
 @router.post(

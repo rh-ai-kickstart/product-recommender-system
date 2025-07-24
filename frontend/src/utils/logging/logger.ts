@@ -21,7 +21,7 @@ const logger = pino({
     },
   },
   formatters: {
-    level: (label) => {
+    level: label => {
       return { level: label };
     },
   },
@@ -48,7 +48,11 @@ export class ApiLogger {
     return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  static startRequest(operation: string, endpoint: string, params?: any): LogContext {
+  static startRequest(
+    operation: string,
+    endpoint: string,
+    params?: any
+  ): LogContext {
     const requestId = this.generateRequestId();
     const startTime = performance.now();
 
@@ -67,7 +71,11 @@ export class ApiLogger {
     return { operation, endpoint, startTime, requestId };
   }
 
-  static logResponse(context: LogContext, response: Response, dataSize?: string | number) {
+  static logResponse(
+    context: LogContext,
+    response: Response,
+    dataSize?: string | number
+  ) {
     const duration = performance.now() - context.startTime;
 
     logger.info(
@@ -184,7 +192,11 @@ export class ServiceLogger {
     );
   }
 
-  static logServiceWarning(serviceName: string, message: string, details?: any) {
+  static logServiceWarning(
+    serviceName: string,
+    message: string,
+    details?: any
+  ) {
     logger.warn(
       {
         service: serviceName,

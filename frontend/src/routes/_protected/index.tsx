@@ -9,7 +9,10 @@ export const Route = createFileRoute('/_protected/')({
 function Recommendations() {
   return (
     <PageSection>
-      <Flex direction={{ default: 'column' }} spaceItems={{ default: 'spaceItemsXl' }}>
+      <Flex
+        direction={{ default: 'column' }}
+        spaceItems={{ default: 'spaceItemsXl' }}
+      >
         <LandingPage />
       </Flex>
     </PageSection>

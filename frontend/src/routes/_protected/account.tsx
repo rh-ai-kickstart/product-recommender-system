@@ -35,9 +35,9 @@ const options: TreeViewDataItem[] = [
 function Account() {
   return (
     <Sidebar>
-      <SidebarPanel variant="sticky">
+      <SidebarPanel variant='sticky'>
         <TreeView
-          aria-label="account navigation"
+          aria-label='account navigation'
           data={options}
           allExpanded={true}
           hasGuides={true}
@@ -46,7 +46,10 @@ function Account() {
       </SidebarPanel>
       <SidebarContent>
         <PageSection>
-          <Flex direction={{ default: 'column' }} spaceItems={{ default: 'spaceItemsMd' }}>
+          <Flex
+            direction={{ default: 'column' }}
+            spaceItems={{ default: 'spaceItemsMd' }}
+          >
             <AccountPage />
           </Flex>
         </PageSection>

@@ -112,5 +112,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     refetchUser: () => refetchUser(),
   };
 
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
 };

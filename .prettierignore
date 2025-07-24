@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+*.min.js
+*.min.css
+
+# Generated files
+package-lock.json
+*.lock
+.cache/
+
+# IDE and system files
+.vscode/
+.idea/
+.DS_Store
+
+# Backend files (handled by Python formatters)
+backend/
+*.py
+
+# Helm templates (special syntax)
+helm/
+
+# Generated files
+routeTree.gen.ts
+
+# Large data files
+*.log
+*.csv
+*.json.gz

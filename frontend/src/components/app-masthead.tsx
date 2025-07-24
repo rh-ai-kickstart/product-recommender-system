@@ -33,11 +33,11 @@ export function AppMasthead({
   const toggle =
     showSidebarToggle && onSidebarToggle ? (
       <PageToggleButton
-        variant="plain"
-        aria-label="Global navigation"
+        variant='plain'
+        aria-label='Global navigation'
         isSidebarOpen={isSidebarOpen}
         onSidebarToggle={onSidebarToggle}
-        id="main-padding-nav-toggle"
+        id='main-padding-nav-toggle'
       >
         <BarsIcon />
       </PageToggleButton>
@@ -47,17 +47,17 @@ export function AppMasthead({
     <Toolbar isFullHeight>
       <ToolbarContent>
         <ToolbarGroup
-          className="pf-v6-u-w-100 pf-v6-u-w-75-on-md pf-v6-u-px-xl-on-md"
-          variant="filter-group"
+          className='pf-v6-u-w-100 pf-v6-u-w-75-on-md pf-v6-u-px-xl-on-md'
+          variant='filter-group'
           align={{ default: 'alignCenter' }}
         >
-          <ToolbarItem className="pf-v6-u-w-100">
+          <ToolbarItem className='pf-v6-u-w-100'>
             <Search />
           </ToolbarItem>
         </ToolbarGroup>
         <ToolbarGroup
-          variant="action-group"
-          className="pf-v6-u-display-none pf-v6-u-display-block-on-md"
+          variant='action-group'
+          className='pf-v6-u-display-none pf-v6-u-display-block-on-md'
         >
           <ToolbarItem>
             <UserDropdown />
@@ -79,7 +79,7 @@ export function AppMasthead({
       <MastheadMain>
         {showSidebarToggle && <MastheadToggle>{toggle}</MastheadToggle>}
         <MastheadBrand data-codemods>
-          <Title headingLevel="h4">{title}</Title>
+          <Title headingLevel='h4'>{title}</Title>
         </MastheadBrand>
       </MastheadMain>
       <MastheadContent>{toolbar}</MastheadContent>

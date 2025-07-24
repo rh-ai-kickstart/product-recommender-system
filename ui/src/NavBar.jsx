@@ -14,17 +14,23 @@ const NavBar = ({ user, onLogout }) => {
   const toggleMenu = () => setMenuOpen(prev => !prev);
 
   return (
-    <nav className="navbar">
-      <div className="navbar-logo">🧠 Recommender</div>
+    <nav className='navbar'>
+      <div className='navbar-logo'>🧠 Recommender</div>
 
-      <button className="hamburger" onClick={toggleMenu}>
+      <button className='hamburger' onClick={toggleMenu}>
         ☰
       </button>
 
       <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
-        <Link to="/" onClick={() => setMenuOpen(false)}>Dashboard</Link>
-        <Link to="/search" onClick={() => setMenuOpen(false)}>Search</Link>
-        <Link to="/history" onClick={() => setMenuOpen(false)}>History</Link>
+        <Link to='/' onClick={() => setMenuOpen(false)}>
+          Dashboard
+        </Link>
+        <Link to='/search' onClick={() => setMenuOpen(false)}>
+          Search
+        </Link>
+        <Link to='/history' onClick={() => setMenuOpen(false)}>
+          History
+        </Link>
         <button onClick={handleLogout}>Logout</button>
       </div>
     </nav>

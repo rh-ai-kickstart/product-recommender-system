@@ -17,7 +17,7 @@ export const Carousel = ({ products }: { products: ProductData[] }) => {
     const { onClick } = props;
     return (
       <div className={'slick-arrow slick-next'} onClick={onClick}>
-        <Button variant="plain" icon={<AngleRightIcon />}></Button>
+        <Button variant='plain' icon={<AngleRightIcon />}></Button>
       </div>
     );
   }
@@ -26,7 +26,7 @@ export const Carousel = ({ products }: { products: ProductData[] }) => {
     const { onClick } = props;
     return (
       <div className={'slick-arrow slick-prev'} onClick={onClick}>
-        <Button variant="plain" icon={<AngleLeftIcon />}></Button>
+        <Button variant='plain' icon={<AngleLeftIcon />}></Button>
       </div>
     );
   }
@@ -69,10 +69,10 @@ export const Carousel = ({ products }: { products: ProductData[] }) => {
   };
 
   return (
-    <div className="slider-container">
-      <Slider className="" {...settings}>
+    <div className='slider-container'>
+      <Slider className='' {...settings}>
         {products.map((product, index) => (
-          <div className="pf-v6-u-p-sm" key={index}>
+          <div className='pf-v6-u-p-sm' key={index}>
             <ProductCard product={product} index={index} />
           </div>
         ))}

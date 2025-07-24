@@ -5,12 +5,12 @@ const Preferences = ({ onContinue }) => {
   const categories = ['Electronics', 'Books', 'Clothing', 'Home', 'Sports'];
   const [selected, setSelected] = useState(null);
 
-  const selectCategory = (category) => {
+  const selectCategory = category => {
     setSelected(prev => (prev === category ? null : category));
   };
 
   return (
-    <div className="preferences-container">
+    <div className='preferences-container'>
       <h2>Select Your Main Interest</h2>
       <div>
         {categories.map(cat => (
@@ -24,7 +24,7 @@ const Preferences = ({ onContinue }) => {
         ))}
       </div>
       <button
-        className="continue-button"
+        className='continue-button'
         onClick={() => onContinue(selected)}
         disabled={!selected}
       >

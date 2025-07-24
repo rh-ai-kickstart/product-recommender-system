@@ -22,11 +22,13 @@ hooks/
 ## 🔐 Authentication Hooks (`useAuth.ts`)
 
 ### Overview
+
 Dedicated hooks for authentication operations with automatic navigation and error handling.
 
 ### Available Hooks
 
 #### `useLogin()`
+
 ```typescript
 import { useLogin } from '../hooks/useAuth';
 
@@ -43,7 +45,7 @@ const LoginComponent = () => {
   };
 
   return (
-    <Button 
+    <Button
       onClick={handleSubmit}
       isLoading={loginMutation.isPending}
       isDisabled={loginMutation.isPending}
@@ -55,6 +57,7 @@ const LoginComponent = () => {
 ```
 
 #### `useSignup()`
+
 ```typescript
 import { useSignup } from '../hooks/useAuth';
 
@@ -76,7 +79,7 @@ const SignupComponent = () => {
   };
 
   return (
-    <Button 
+    <Button
       onClick={handleSubmit}
       isLoading={signupMutation.isPending}
       isDisabled={signupMutation.isPending}
@@ -88,6 +91,7 @@ const SignupComponent = () => {
 ```
 
 #### `useLogout()`
+
 ```typescript
 import { useLogout } from '../hooks/useAuth';
 
@@ -99,7 +103,7 @@ const UserDropdown = () => {
   };
 
   return (
-    <DropdownItem 
+    <DropdownItem
       onClick={handleLogout}
       isDisabled={logoutMutation.isPending}
     >
@@ -110,6 +114,7 @@ const UserDropdown = () => {
 ```
 
 ### Authentication Benefits
+
 - ✅ **Automatic redirect handling** - respects `?redirect` parameter
 - ✅ **Loading states** - built-in `isPending` for UI feedback
 - ✅ **Error handling** - proper error propagation
@@ -117,6 +122,7 @@ const UserDropdown = () => {
 - ✅ **Type safety** - full TypeScript support
 
 ### Context vs Hooks
+
 ```typescript
 // ❌ Don't use context directly in components
 import { useAuth } from '../contexts/AuthProvider';
@@ -127,7 +133,7 @@ import { useAuth, useLogin, useLogout } from '../hooks/useAuth';
 const MyComponent = () => {
   // ✅ Get user state from context
   const { user, isAuthenticated } = useAuth();
-  
+
   // ✅ Use dedicated hooks for actions
   const loginMutation = useLogin();
   const logoutMutation = useLogout();
@@ -137,9 +143,11 @@ const MyComponent = () => {
 ## 🎯 Personalized Recommendations (`useRecommendations.ts`)
 
 ### Philosophy: **Personalization-First**
+
 This app is designed around personalized experiences. All recommendations are tailored to the individual user based on their preferences and interaction history.
 
 ### User Flow
+
 1. **Sign up** → User creates account
 2. **Preferences selection** → User picks interests/categories (future feature)
 3. **Personalized homepage** → See recommendations based on preferences
@@ -148,7 +156,9 @@ This app is designed around personalized experiences. All recommendations are ta
 ### Available Hooks
 
 #### `usePersonalizedRecommendations()` - **Primary Hook**
+
 **Use for**: Homepage, catalog, any "browse products" experience
+
 ```typescript
 import { usePersonalizedRecommendations } from '../hooks/useRecommendations';
 
@@ -161,7 +171,7 @@ const HomePage = () => {
 
   if (isLoading) return <ProductSkeleton />;
   if (error) return <ErrorMessage />;
-  
+
   return (
     <div>
       <h1>Recommended for You</h1>
@@ -172,26 +182,32 @@ const HomePage = () => {
 ```
 
 **Smart Logic:**
+
 - ✅ **New users**: Gets preference-based recommendations
-- ✅ **Existing users**: Gets history-based recommendations  
+- ✅ **Existing users**: Gets history-based recommendations
 - ✅ **Auto-selection**: Chooses the right algorithm automatically
 - ✅ **Auth required**: Only works for logged-in users
 
 #### `useExistingUserRecommendations(userId)` - **Advanced Users**
+
 **Use for**: Users with rich interaction history
+
 ```typescript
 const { data } = useExistingUserRecommendations(user.user_id);
 // Returns ML-powered recommendations based on past behavior
 ```
 
 #### `useNewUserRecommendations(numRecommendations)` - **New Users**
+
 **Use for**: Users without interaction history (cold start)
+
 ```typescript
 const { data } = useNewUserRecommendations(10);
 // Returns preference-based recommendations for new users
 ```
 
 ### No Anonymous Browsing
+
 Unlike traditional e-commerce sites, this app **requires authentication** for the core browsing experience. This enables:
 
 - ✅ **Better recommendations** from day one
@@ -204,7 +220,9 @@ Unlike traditional e-commerce sites, this app **requires authentication** for th
 ### Two Patterns for Different Use Cases
 
 #### `useProductActions` - Detail Pages
+
 **Use for**: Product detail pages where you need full control
+
 ```typescript
 import { useProductActions } from '../hooks/useComposite';
 
@@ -212,7 +230,7 @@ const ProductDetailPage = ({ productId }) => {
   const {
     // State
     isInCart, isInWishlist, isAuthenticated,
-    // Actions  
+    // Actions
     addToCart, toggleWishlist, recordClick,
     // Loading states
     isAddingToCart, isTogglingWishlist
@@ -220,14 +238,14 @@ const ProductDetailPage = ({ productId }) => {
 
   return (
     <div>
-      <Button 
+      <Button
         onClick={() => addToCart(1)}
         isLoading={isAddingToCart}
       >
         {isInCart ? 'In Cart' : 'Add to Cart'}
       </Button>
-      
-      <Button 
+
+      <Button
         onClick={toggleWishlist}
         isLoading={isTogglingWishlist}
       >
@@ -238,8 +256,10 @@ const ProductDetailPage = ({ productId }) => {
 };
 ```
 
-#### `useProductCardActions` - List Items  
+#### `useProductCardActions` - List Items
+
 **Use for**: Product cards in lists (homepage, search, recommendations)
+
 ```typescript
 import { useProductCardActions } from '../hooks/useComposite';
 
@@ -249,16 +269,16 @@ const ProductCard = ({ product }) => {
   return (
     <div className="product-card">
       <h3 onClick={actions.recordClick}>{product.name}</h3>
-      
-      <Button 
+
+      <Button
         onClick={() => actions.addToCart(1)}
         isLoading={actions.isAddingToCart}
         size="sm"
       >
         Add to Cart
       </Button>
-      
-      <IconButton 
+
+      <IconButton
         onClick={actions.toggleWishlist}
         isLoading={actions.isTogglingWishlist}
         icon={actions.isInWishlist ? FilledHeartIcon : HeartIcon}
@@ -269,7 +289,9 @@ const ProductCard = ({ product }) => {
 ```
 
 ### Performance Benefits
+
 `useProductCardActions` is optimized for lists:
+
 - **Shared queries**: Cart/wishlist data fetched once for entire list
 - **Lightweight**: Only essential actions for card interactions
 - **Efficient**: Minimal re-renders when cart/wishlist updates
@@ -277,9 +299,11 @@ const ProductCard = ({ product }) => {
 ## 🔗 List-Level Hooks
 
 ### Complete List Solutions
+
 Get data + actions in one hook for entire lists:
 
 #### `useRecommendationsWithActions`
+
 ```typescript
 import { useRecommendationsWithActions } from '../hooks/useComposite';
 
@@ -296,8 +320,8 @@ const HomePage = () => {
   return (
     <div className="products-grid">
       {productsWithActions.map(product => (
-        <ProductCard 
-          key={product.id} 
+        <ProductCard
+          key={product.id}
           product={product}
           actions={product.actions} // Pre-attached actions!
         />
@@ -308,10 +332,11 @@ const HomePage = () => {
 ```
 
 #### `useSearchWithActions`
+
 ```typescript
 const SearchResults = ({ query }) => {
   const { productsWithActions, isLoading } = useSearchWithActions(query);
-  
+
   // Each product has pre-attached cart/wishlist actions
   return <ProductGrid products={productsWithActions} />;
 };
@@ -326,13 +351,13 @@ All hooks benefit from global defaults set in `QueryClientProvider`:
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,     // 5 minutes
-      gcTime: 10 * 60 * 1000,       // 10 minutes  
-      retry: intelligentRetryLogic,  // Don't retry 4xx errors
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+      retry: intelligentRetryLogic, // Don't retry 4xx errors
       refetchOnWindowFocus: false,
     },
     mutations: {
-      retry: 1,                      // Only retry once
+      retry: 1, // Only retry once
       networkMode: 'online',
     },
   },
@@ -340,6 +365,7 @@ const queryClient = new QueryClient({
 ```
 
 **Benefits:**
+
 - No need to specify `staleTime`, `gcTime`, `retry` in individual hooks
 - Consistent behavior across the app
 - Easy to modify globally
@@ -347,6 +373,7 @@ const queryClient = new QueryClient({
 ## 🚀 Best Practices
 
 ### 1. Import from Hooks Index
+
 ```typescript
 // ✅ Good - uses barrel export
 import { useProduct, useAddToCart, useLogin } from '../hooks';
@@ -357,6 +384,7 @@ import { useAddToCart } from '../hooks/useCart';
 ```
 
 ### 2. Use Appropriate Hook for Context
+
 ```typescript
 // ✅ Personalized browsing (primary pattern)
 const { products, isLoading } = usePersonalizedRecommendations();
@@ -364,7 +392,7 @@ const { products, isLoading } = usePersonalizedRecommendations();
 // ✅ Product detail pages
 const { addToCart, isAddingToCart } = useProductActions(productId);
 
-// ✅ Product cards in lists  
+// ✅ Product cards in lists
 const actions = useProductCardActions(productId);
 
 // ✅ Complete list with actions
@@ -372,18 +400,20 @@ const { productsWithActions } = useRecommendationsWithActions();
 ```
 
 ### 3. Handle Loading and Error States
+
 ```typescript
 const ProductList = () => {
   const { products, isLoading, error } = usePersonalizedRecommendations();
 
   if (isLoading) return <ProductSkeleton />;
   if (error) return <ErrorMessage error={error} />;
-  
+
   return <ProductGrid products={products} />;
 };
 ```
 
 ### 4. Authentication-First Design
+
 ```typescript
 const HomePage = () => {
   const { isAuthenticated } = useAuth();
@@ -397,4 +427,4 @@ const HomePage = () => {
 };
 ```
 
-This architecture provides a clean separation between data fetching, state management, and user interactions while maintaining excellent performance and a personalization-first user experience. 
+This architecture provides a clean separation between data fetching, state management, and user interactions while maintaining excellent performance and a personalization-first user experience.

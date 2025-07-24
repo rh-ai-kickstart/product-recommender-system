@@ -1,4 +1,8 @@
-import { ApiLogger, ServiceLogger, type ApiRequestOptions } from '../utils/logging/logger';
+import {
+  ApiLogger,
+  ServiceLogger,
+  type ApiRequestOptions,
+} from '../utils/logging/logger';
 
 // Enhanced API fetch utility using the new logger
 export async function apiRequest<T>(
@@ -36,7 +40,9 @@ export async function apiRequest<T>(
 
       ApiLogger.logError(
         context,
-        new Error(`HTTP ${response.status}: ${response.statusText}. ${errorDetails}`),
+        new Error(
+          `HTTP ${response.status}: ${response.statusText}. ${errorDetails}`
+        ),
         response
       );
       throw new Error(

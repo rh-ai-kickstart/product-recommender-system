@@ -35,13 +35,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
   return (
     <Card
       id={cardId}
-      component="div"
+      component='div'
       isClickable
       key={index}
       style={{ height: 400, overflowY: auto }}
     >
       <CardHeader
-        className="v6-featured-posts-card-header-img"
+        className='v6-featured-posts-card-header-img'
         selectableActions={{
           to: `/product/${product.id}`,
           selectableActionId: actionId,

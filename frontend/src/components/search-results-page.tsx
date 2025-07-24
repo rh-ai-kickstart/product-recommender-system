@@ -1,4 +1,9 @@
-import { PageSection, Title, EmptyState, EmptyStateBody } from '@patternfly/react-core';
+import {
+  PageSection,
+  Title,
+  EmptyState,
+  EmptyStateBody,
+} from '@patternfly/react-core';
 import { GalleryView } from './Gallery';
 import { GallerySkeleton } from './gallery-skeleton';
 import { useProductSearch } from '../hooks';
@@ -16,10 +21,12 @@ export function SearchResultsPage({ query }: SearchResultsPageProps) {
     return (
       <PageSection hasBodyWrapper={false}>
         <EmptyState>
-          <Title headingLevel="h4" size="lg">
+          <Title headingLevel='h4' size='lg'>
             No search query provided
           </Title>
-          <EmptyStateBody>Please enter a search term to find products.</EmptyStateBody>
+          <EmptyStateBody>
+            Please enter a search term to find products.
+          </EmptyStateBody>
         </EmptyState>
       </PageSection>
     );
@@ -40,10 +47,12 @@ export function SearchResultsPage({ query }: SearchResultsPageProps) {
     return (
       <PageSection hasBodyWrapper={false}>
         <EmptyState>
-          <Title headingLevel="h4" size="lg">
+          <Title headingLevel='h4' size='lg'>
             Error searching for products
           </Title>
-          <EmptyStateBody>There was an error while searching. Please try again.</EmptyStateBody>
+          <EmptyStateBody>
+            There was an error while searching. Please try again.
+          </EmptyStateBody>
         </EmptyState>
       </PageSection>
     );
@@ -57,11 +66,12 @@ export function SearchResultsPage({ query }: SearchResultsPageProps) {
         </Title>
         {products.length === 0 ? (
           <EmptyState>
-            <Title headingLevel="h4" size="lg">
+            <Title headingLevel='h4' size='lg'>
               No products found
             </Title>
             <EmptyStateBody>
-              No products match your search for "{query}". Try different keywords.
+              No products match your search for "{query}". Try different
+              keywords.
             </EmptyStateBody>
           </EmptyState>
         ) : (

@@ -11,11 +11,12 @@ export function LandingPage() {
   if (!isAuthenticated) {
     return (
       <PageSection hasBodyWrapper={false}>
-        <Title headingLevel="h1" style={{ marginTop: '15px' }}>
+        <Title headingLevel='h1' style={{ marginTop: '15px' }}>
           Welcome to Product Recommendations
         </Title>
-        <Alert variant="info" title="Authentication Required">
-          Please log in to see personalized product recommendations tailored just for you!
+        <Alert variant='info' title='Authentication Required'>
+          Please log in to see personalized product recommendations tailored
+          just for you!
         </Alert>
       </PageSection>
     );
@@ -24,7 +25,7 @@ export function LandingPage() {
   if (isLoading) {
     return (
       <PageSection>
-        <Spinner size="lg" />
+        <Spinner size='lg' />
       </PageSection>
     );
   }
@@ -32,9 +33,9 @@ export function LandingPage() {
   if (error) {
     return (
       <PageSection>
-        <Alert variant="danger" title="Error">
-          Sorry, we couldn't load your personalized recommendations right now. Please try again
-          later.
+        <Alert variant='danger' title='Error'>
+          Sorry, we couldn't load your personalized recommendations right now.
+          Please try again later.
         </Alert>
       </PageSection>
     );

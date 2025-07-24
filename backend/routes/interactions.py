@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Depends, status
-from pydantic import BaseModel
-from uuid import uuid4
 from datetime import datetime, timezone
-from sqlalchemy.ext.asyncio import AsyncSession
+from uuid import uuid4
 
 from database.db import get_db
-from routes.auth import get_current_user
 from database.models_sql import User
+from fastapi import APIRouter, Depends, status
+from pydantic import BaseModel
+from routes.auth import get_current_user
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/interactions", tags=["interactions"])
+
 
 class InteractionRequest(BaseModel):
     item_id: str
@@ -17,6 +18,7 @@ class InteractionRequest(BaseModel):
     review_title: str
     review_content: str
     quantity: int
+
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def log_interaction(
@@ -28,19 +30,21 @@ async def log_interaction(
     timestamp = datetime.now(timezone.utc)
 
     # Simulated log (to be replaced with Kafka in the future)
-    print({
-        "interaction_id": interaction_id,
-        "user_id": user.user_id,
-        "item_id": interaction.item_id,
-        "interaction_type": interaction.interaction_type,
-        "rating": interaction.rating,
-        "review_title": interaction.review_title,
-        "review_content": interaction.review_content,
-        "quantity": interaction.quantity,
-        "timestamp": timestamp.isoformat()
-    })
+    print(
+        {
+            "interaction_id": interaction_id,
+            "user_id": user.user_id,
+            "item_id": interaction.item_id,
+            "interaction_type": interaction.interaction_type,
+            "rating": interaction.rating,
+            "review_title": interaction.review_title,
+            "review_content": interaction.review_content,
+            "quantity": interaction.quantity,
+            "timestamp": timestamp.isoformat(),
+        }
+    )
 
     return {
         "message": "Interaction logged (simulated)",
-        "interaction_id": interaction_id
+        "interaction_id": interaction_id,
     }

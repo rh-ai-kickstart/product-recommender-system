@@ -1,0 +1,60 @@
+repos:
+  # Warning-only Python linting (won't block commits)
+  - repo: local
+    hooks:
+      - id: flake8-warn
+        name: Flake8 (warning only)
+        entry: bash -c 'flake8 --max-line-length=99 --extend-ignore=E203,W503 . || true'
+        language: system
+        files: .*\.py$
+        pass_filenames: false
+
+  # Warning-only ESLint (won't block commits)
+  - repo: local
+    hooks:
+      - id: eslint-warn
+        name: ESLint (warning only)
+        entry: bash -c 'cd frontend && npm run lint || true'
+        language: system
+        files: ^frontend/.*\.(js|jsx|ts|tsx)$
+        pass_filenames: false
+
+  # Prettier formatting for frontend files
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: 'v4.0.0-alpha.8'
+    hooks:
+      - id: prettier
+        files: ^(ui/.*|frontend/.*)\.(js|jsx|ts|tsx|json|css|scss|md|html)$
+        exclude: ^(ui/node_modules/.*|frontend/node_modules/.*)$
+
+  # Basic file checks (these can still block for critical issues)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 'v5.0.0'
+    hooks:
+      - id: check-yaml  # Validates YAML syntax
+        args: ['--allow-multiple-documents']
+        exclude: ^helm/.*\.yaml$  # Exclude Helm templates - they're checked separately
+      - id: check-json  # Validates JSON syntax
+        exclude: ^(ui/.*|frontend/.*)$  # Exclude frontend - handled by ESLint
+      - id: trailing-whitespace
+        exclude: ^(ui/.*|frontend/.*\.json$|frontend/.*\.js$|frontend/.*\.jsx$|frontend/.*\.ts$|frontend/.*\.tsx$)  # Exclude frontend files - different conventions
+      - id: end-of-file-fixer
+        exclude: ^(ui/.*|frontend/.*)$  # Exclude frontend directories - React doesn't use end-of-file newlines
+
+  # Warning-only Helm linting (won't block commits)
+  - repo: local
+    hooks:
+      - id: helm-lint-warn
+        name: Helm Lint (warning only)
+        entry: bash -c 'helm lint helm/product-recommender-system/ || true'
+        language: system
+        files: ^helm/.*$
+        pass_filenames: false
+
+  # Install pre-push hook for commit limits (blocks >5 commits)
+  - repo: local
+    hooks:
+      - id: commit-limit-check
+        name: Commit Limit Check
+        entry: bash scripts/pre-push-commit-limit.sh
+        language: system

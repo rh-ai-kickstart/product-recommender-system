@@ -8,97 +8,97 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
-import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
-import { Route as ProtectedSearchRouteImport } from './routes/_protected/search'
-import { Route as ProtectedCatalogRouteImport } from './routes/_protected/catalog'
-import { Route as ProtectedAccountRouteImport } from './routes/_protected/account'
-import { Route as ProtectedProductIndexRouteImport } from './routes/_protected/product/index'
-import { Route as ProtectedProductProductIdRouteImport } from './routes/_protected/product/$productId'
+import { Route as rootRouteImport } from './routes/__root';
+import { Route as SignupRouteImport } from './routes/signup';
+import { Route as LoginRouteImport } from './routes/login';
+import { Route as ProtectedRouteRouteImport } from './routes/_protected/route';
+import { Route as ProtectedIndexRouteImport } from './routes/_protected/index';
+import { Route as ProtectedSearchRouteImport } from './routes/_protected/search';
+import { Route as ProtectedCatalogRouteImport } from './routes/_protected/catalog';
+import { Route as ProtectedAccountRouteImport } from './routes/_protected/account';
+import { Route as ProtectedProductIndexRouteImport } from './routes/_protected/product/index';
+import { Route as ProtectedProductProductIdRouteImport } from './routes/_protected/product/$productId';
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ProtectedRouteRoute = ProtectedRouteRouteImport.update({
   id: '/_protected',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ProtectedIndexRoute = ProtectedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ProtectedRouteRoute,
-} as any)
+} as any);
 const ProtectedSearchRoute = ProtectedSearchRouteImport.update({
   id: '/search',
   path: '/search',
   getParentRoute: () => ProtectedRouteRoute,
-} as any)
+} as any);
 const ProtectedCatalogRoute = ProtectedCatalogRouteImport.update({
   id: '/catalog',
   path: '/catalog',
   getParentRoute: () => ProtectedRouteRoute,
-} as any)
+} as any);
 const ProtectedAccountRoute = ProtectedAccountRouteImport.update({
   id: '/account',
   path: '/account',
   getParentRoute: () => ProtectedRouteRoute,
-} as any)
+} as any);
 const ProtectedProductIndexRoute = ProtectedProductIndexRouteImport.update({
   id: '/product/',
   path: '/product/',
   getParentRoute: () => ProtectedRouteRoute,
-} as any)
+} as any);
 const ProtectedProductProductIdRoute =
   ProtectedProductProductIdRouteImport.update({
     id: '/product/$productId',
     path: '/product/$productId',
     getParentRoute: () => ProtectedRouteRoute,
-  } as any)
+  } as any);
 
 export interface FileRoutesByFullPath {
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
-  '/account': typeof ProtectedAccountRoute
-  '/catalog': typeof ProtectedCatalogRoute
-  '/search': typeof ProtectedSearchRoute
-  '/': typeof ProtectedIndexRoute
-  '/product/$productId': typeof ProtectedProductProductIdRoute
-  '/product': typeof ProtectedProductIndexRoute
+  '/login': typeof LoginRoute;
+  '/signup': typeof SignupRoute;
+  '/account': typeof ProtectedAccountRoute;
+  '/catalog': typeof ProtectedCatalogRoute;
+  '/search': typeof ProtectedSearchRoute;
+  '/': typeof ProtectedIndexRoute;
+  '/product/$productId': typeof ProtectedProductProductIdRoute;
+  '/product': typeof ProtectedProductIndexRoute;
 }
 export interface FileRoutesByTo {
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
-  '/account': typeof ProtectedAccountRoute
-  '/catalog': typeof ProtectedCatalogRoute
-  '/search': typeof ProtectedSearchRoute
-  '/': typeof ProtectedIndexRoute
-  '/product/$productId': typeof ProtectedProductProductIdRoute
-  '/product': typeof ProtectedProductIndexRoute
+  '/login': typeof LoginRoute;
+  '/signup': typeof SignupRoute;
+  '/account': typeof ProtectedAccountRoute;
+  '/catalog': typeof ProtectedCatalogRoute;
+  '/search': typeof ProtectedSearchRoute;
+  '/': typeof ProtectedIndexRoute;
+  '/product/$productId': typeof ProtectedProductProductIdRoute;
+  '/product': typeof ProtectedProductIndexRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/_protected': typeof ProtectedRouteRouteWithChildren
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
-  '/_protected/account': typeof ProtectedAccountRoute
-  '/_protected/catalog': typeof ProtectedCatalogRoute
-  '/_protected/search': typeof ProtectedSearchRoute
-  '/_protected/': typeof ProtectedIndexRoute
-  '/_protected/product/$productId': typeof ProtectedProductProductIdRoute
-  '/_protected/product/': typeof ProtectedProductIndexRoute
+  __root__: typeof rootRouteImport;
+  '/_protected': typeof ProtectedRouteRouteWithChildren;
+  '/login': typeof LoginRoute;
+  '/signup': typeof SignupRoute;
+  '/_protected/account': typeof ProtectedAccountRoute;
+  '/_protected/catalog': typeof ProtectedCatalogRoute;
+  '/_protected/search': typeof ProtectedSearchRoute;
+  '/_protected/': typeof ProtectedIndexRoute;
+  '/_protected/product/$productId': typeof ProtectedProductProductIdRoute;
+  '/_protected/product/': typeof ProtectedProductIndexRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
+  fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
     | '/login'
     | '/signup'
@@ -107,8 +107,8 @@ export interface FileRouteTypes {
     | '/search'
     | '/'
     | '/product/$productId'
-    | '/product'
-  fileRoutesByTo: FileRoutesByTo
+    | '/product';
+  fileRoutesByTo: FileRoutesByTo;
   to:
     | '/login'
     | '/signup'
@@ -117,7 +117,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/'
     | '/product/$productId'
-    | '/product'
+    | '/product';
   id:
     | '__root__'
     | '/_protected'
@@ -128,90 +128,90 @@ export interface FileRouteTypes {
     | '/_protected/search'
     | '/_protected/'
     | '/_protected/product/$productId'
-    | '/_protected/product/'
-  fileRoutesById: FileRoutesById
+    | '/_protected/product/';
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
-  LoginRoute: typeof LoginRoute
-  SignupRoute: typeof SignupRoute
+  ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren;
+  LoginRoute: typeof LoginRoute;
+  SignupRoute: typeof SignupRoute;
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/signup';
+      path: '/signup';
+      fullPath: '/signup';
+      preLoaderRoute: typeof SignupRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/login';
+      path: '/login';
+      fullPath: '/login';
+      preLoaderRoute: typeof LoginRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/_protected': {
-      id: '/_protected'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof ProtectedRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/_protected';
+      path: '';
+      fullPath: '';
+      preLoaderRoute: typeof ProtectedRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/_protected/': {
-      id: '/_protected/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof ProtectedIndexRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
+      id: '/_protected/';
+      path: '/';
+      fullPath: '/';
+      preLoaderRoute: typeof ProtectedIndexRouteImport;
+      parentRoute: typeof ProtectedRouteRoute;
+    };
     '/_protected/search': {
-      id: '/_protected/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof ProtectedSearchRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
+      id: '/_protected/search';
+      path: '/search';
+      fullPath: '/search';
+      preLoaderRoute: typeof ProtectedSearchRouteImport;
+      parentRoute: typeof ProtectedRouteRoute;
+    };
     '/_protected/catalog': {
-      id: '/_protected/catalog'
-      path: '/catalog'
-      fullPath: '/catalog'
-      preLoaderRoute: typeof ProtectedCatalogRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
+      id: '/_protected/catalog';
+      path: '/catalog';
+      fullPath: '/catalog';
+      preLoaderRoute: typeof ProtectedCatalogRouteImport;
+      parentRoute: typeof ProtectedRouteRoute;
+    };
     '/_protected/account': {
-      id: '/_protected/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof ProtectedAccountRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
+      id: '/_protected/account';
+      path: '/account';
+      fullPath: '/account';
+      preLoaderRoute: typeof ProtectedAccountRouteImport;
+      parentRoute: typeof ProtectedRouteRoute;
+    };
     '/_protected/product/': {
-      id: '/_protected/product/'
-      path: '/product'
-      fullPath: '/product'
-      preLoaderRoute: typeof ProtectedProductIndexRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
+      id: '/_protected/product/';
+      path: '/product';
+      fullPath: '/product';
+      preLoaderRoute: typeof ProtectedProductIndexRouteImport;
+      parentRoute: typeof ProtectedRouteRoute;
+    };
     '/_protected/product/$productId': {
-      id: '/_protected/product/$productId'
-      path: '/product/$productId'
-      fullPath: '/product/$productId'
-      preLoaderRoute: typeof ProtectedProductProductIdRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
+      id: '/_protected/product/$productId';
+      path: '/product/$productId';
+      fullPath: '/product/$productId';
+      preLoaderRoute: typeof ProtectedProductProductIdRouteImport;
+      parentRoute: typeof ProtectedRouteRoute;
+    };
   }
 }
 
 interface ProtectedRouteRouteChildren {
-  ProtectedAccountRoute: typeof ProtectedAccountRoute
-  ProtectedCatalogRoute: typeof ProtectedCatalogRoute
-  ProtectedSearchRoute: typeof ProtectedSearchRoute
-  ProtectedIndexRoute: typeof ProtectedIndexRoute
-  ProtectedProductProductIdRoute: typeof ProtectedProductProductIdRoute
-  ProtectedProductIndexRoute: typeof ProtectedProductIndexRoute
+  ProtectedAccountRoute: typeof ProtectedAccountRoute;
+  ProtectedCatalogRoute: typeof ProtectedCatalogRoute;
+  ProtectedSearchRoute: typeof ProtectedSearchRoute;
+  ProtectedIndexRoute: typeof ProtectedIndexRoute;
+  ProtectedProductProductIdRoute: typeof ProtectedProductProductIdRoute;
+  ProtectedProductIndexRoute: typeof ProtectedProductIndexRoute;
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
@@ -221,17 +221,17 @@ const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
   ProtectedIndexRoute: ProtectedIndexRoute,
   ProtectedProductProductIdRoute: ProtectedProductProductIdRoute,
   ProtectedProductIndexRoute: ProtectedProductIndexRoute,
-}
+};
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
-  ProtectedRouteRouteChildren,
-)
+  ProtectedRouteRouteChildren
+);
 
 const rootRouteChildren: RootRouteChildren = {
   ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();

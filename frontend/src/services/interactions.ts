@@ -18,15 +18,23 @@ export const logInteraction = async (
   interaction: InteractionRequest
 ): Promise<InteractionResponse> => {
   ServiceLogger.logServiceCall('logInteraction', { interaction });
-  return apiRequest<InteractionResponse>('/api/interactions', 'logInteraction', {
-    method: 'POST',
-    body: interaction,
-  });
+  return apiRequest<InteractionResponse>(
+    '/api/interactions',
+    'logInteraction',
+    {
+      method: 'POST',
+      body: interaction,
+    }
+  );
 };
 
 export const recordProductClick = async (productId: string): Promise<void> => {
   ServiceLogger.logServiceCall('recordProductClick', { productId });
-  return apiRequest<void>(`/api/products/${productId}/interactions/click`, 'recordProductClick', {
-    method: 'POST',
-  });
+  return apiRequest<void>(
+    `/api/products/${productId}/interactions/click`,
+    'recordProductClick',
+    {
+      method: 'POST',
+    }
+  );
 };

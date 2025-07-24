@@ -5,7 +5,7 @@ import type { ProductData } from '../types';
 
 export const GalleryView = ({ products }: { products: ProductData[] }) => {
   return (
-    <div className="gallery-container">
+    <div className='gallery-container'>
       <Gallery hasGutter>
         {products.map((product, index) => (
           <GalleryItem>

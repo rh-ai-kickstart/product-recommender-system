@@ -67,15 +67,15 @@ export const ProductDetails = () => {
                   <FlexItem>
                     <StarRatings
                       rating={product.rating}
-                      starRatedColor="black"
+                      starRatedColor='black'
                       numberOfStars={5}
-                      name="rating"
-                      starDimension="18px"
-                      starSpacing="1px"
+                      name='rating'
+                      starDimension='18px'
+                      starSpacing='1px'
                     />{' '}
                     {product.rating}
                   </FlexItem>
-                  <FlexItem headers="h1">${product.price}</FlexItem>
+                  <FlexItem headers='h1'>${product.price}</FlexItem>
                   <FlexItem>{product.description}</FlexItem>
                 </Flex>
               </CardBody>
@@ -83,7 +83,7 @@ export const ProductDetails = () => {
                 <Flex>
                   <FlexItem>
                     <Button
-                      variant="secondary"
+                      variant='secondary'
                       onClick={() => addToCart(1)}
                       isLoading={isAddingToCart}
                       isDisabled={isAddingToCart}
@@ -92,7 +92,7 @@ export const ProductDetails = () => {
                     </Button>
                   </FlexItem>
                   <FlexItem>
-                    <Button variant="primary" onClick={handleBuyNow}>
+                    <Button variant='primary' onClick={handleBuyNow}>
                       Buy Now
                     </Button>
                   </FlexItem>

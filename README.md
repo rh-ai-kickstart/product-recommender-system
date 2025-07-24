@@ -1,11 +1,11 @@
-# AI Kickstart - Product Recommender System 
+# AI Kickstart - Product Recommender System
 
 Welcome to the Product Recommender System Kickstart!
 Use this to quickly get a recommendation engine with user-item relationships up and running in your environment.
 
-To see how it's done, jump straight to [installation](#install). 
+To see how it's done, jump straight to [installation](#install).
 
-## Description 
+## Description
 The Product Recommender System Kickstart enables the rapid establishment of a scalable and personalized product recommendation service.
 
 The system recommends items to users based on their previous interactions with products and the behavior of similar users.
@@ -21,7 +21,7 @@ To find products in the application you can do a:
 * Search items by Image (find similar items in the store).
 
 
-## See it in action 
+## See it in action
 
 *This section is optional but recommended*
 <!-- TODO do it at the end show UI gif of the usage -->
@@ -53,7 +53,7 @@ Reorders candidates according to business logic and priorities.
 
 #### Batch scoring
 * After completing the training of the Encoders, embed all items and users, then push them in the PGVector database as embedding.
-* Because we use batch scoring, we calculates for each user the top k recommended items using the item embeddings 
+* Because we use batch scoring, we calculates for each user the top k recommended items using the item embeddings
 * Pushes this top k items for each user to the online store Feature Store.
 
 ### Infernece
@@ -77,16 +77,16 @@ Reorders candidates according to business logic and priorities.
 
 ## Requirements
 
-### Minimum hardware requirements 
+### Minimum hardware requirements
 
 Depend on the scale and speed required, for small amount of users have minimus of:
 * No GPU required; for larger scale and faster preformance, use GPUs.
 * 4 CPU cores.
 * 16 Gi of RAM.
 * Storage: 8 Gi (depend on the input dataset).
-## References 
+## References
 
-### Required software 
+### Required software
 
 * `oc` command installed
 * `helm` command installed
@@ -144,7 +144,7 @@ spec:
 
 * Standard user. No elevated cluster permissions required
 
-## Install 
+## Install
 
 1. Fork and clone the repository:
    ```bash
@@ -187,7 +187,7 @@ To use a custom dataset instead, provide a URL by setting the `DATASET_URL` prop
 make install DATASET_URL=<custom_dataset_url>
 ```
 
-## Uninstall 
+## Uninstall
 To uninstall the recommender system and clean up resources:
 
 1. Navigate to the helm directory:
@@ -199,6 +199,56 @@ To uninstall the recommender system and clean up resources:
    ```bash
    # Replace <namespace> with your namespace
    make uninstall NAMESPACE=<namespace>
+
+## Code Quality
+
+This project enforces code quality standards using pre-commit hooks that automatically run before each commit. This ensures consistent code style and catches common issues early.
+
+**Setup (required for all contributors):**
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+Once installed, the hooks will automatically run when you commit changes. If any issues are found, they will warn you but still allow the commit to proceed. However, pushes with >5 commits will be blocked.
+
+**What's automatically checked:**
+- **Python**: Code style (flake8), formatting (black), import sorting (isort)
+- **JavaScript/TypeScript**: Linting (ESLint) and formatting (Prettier)
+- **YAML**: Syntax validation and formatting
+- **Helm**: Chart structure and template validation
+- **General**: Trailing whitespace, missing newlines, large files
+- **Frontend files**: Formatted with Prettier (React conventions)
+
+**Run checks manually:**
+```bash
+pre-commit run --all-files    # Check all files
+pre-commit run flake8         # Run specific tool
+```
+
+**Individual tools (if needed):**
+```bash
+# Python tools (install if needed)
+pip install flake8 black isort
+flake8 .          # Check code style and errors
+black .           # Auto-format Python code
+isort .           # Sort and organize imports
+
+# Frontend tools (run in ui/ or frontend/ directory)
+npm run format    # Format with Prettier
+npm run lint      # Check with ESLint
+```
+
+**Benefits:**
+- Consistent code style across the team
+- Catch bugs and issues before they reach main branch
+- Automatic code formatting saves time
+- Enforced standards improve code readability
+
+**Commit limits:**
+- **Local pushes**: BLOCKS pushes with >5 commits (install with: `pre-commit run install-pre-push-hook --hook-stage manual`)
+- **Pull requests**: GitHub Actions shows warnings for >5 commits
+- Enforces clean git history by requiring commit squashing
 
 ## Run Tests
 

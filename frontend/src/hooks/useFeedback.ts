@@ -9,7 +9,9 @@ export const useSubmitFeedback = () => {
     mutationFn: (feedback: Feedback) => submitFeedback(feedback),
     onSuccess: (_, feedback) => {
       // Invalidate product data since rating may have changed
-      queryClient.invalidateQueries({ queryKey: ['products', feedback.productId] });
+      queryClient.invalidateQueries({
+        queryKey: ['products', feedback.productId],
+      });
 
       // Invalidate product search results that might show this product
       queryClient.invalidateQueries({ queryKey: ['products', 'search'] });
