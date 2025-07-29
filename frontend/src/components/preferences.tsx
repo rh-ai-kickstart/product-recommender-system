@@ -10,41 +10,56 @@ import {
   GalleryItem,
   Skeleton,
 } from "@patternfly/react-core";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { addPreferences, fetchNewPreferences } from "../services/products";
-import { useNavigate } from "@tanstack/react-router";
+import { usePreferences, useSetPreferences } from "../hooks";
 
 export function PreferencePage() {
   const [selected, setSelected] = useState<string[]>([]);
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const preferencesMutation = useSetPreferences();
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const { data, isError, isLoading } = useQuery({
-    queryKey: ["new-preferences"], // A unique key for this query
-    queryFn: fetchNewPreferences, // The async function to fetch data
-  });
+  const { data, isLoading, isError } = usePreferences();
 
   const handleCancel = () => {
     setSelected([]);
   };
 
-  const handleSubmit = useMutation<string, void>({
-    mutationFn: async () => {
-      // Ensure addPreferences returns a Promise<string>
-      const formattedPreferences = selected.join("|");
-      return await addPreferences(formattedPreferences);
-    },
-    onSuccess: async () => {
-      void queryClient.invalidateQueries({ queryKey: ["new-preferences"] });
-      setSelected([]);
-      console.log("Preferences added successfully");
-      navigate({ to: "/" });
-    },
-    onError: (error) => {
-      console.error("Error adding preferences:", error);
-    },
-  });
+  // const handleSubmit = useMutation<string, void>({
+  //   mutationFn: async () => {
+  //     // Ensure addPreferences returns a Promise<string>
+  //     const formattedPreferences = selected.join("|");
+  //     return await addPreferences(formattedPreferences);
+  //   },
+  //   onSuccess: async () => {
+  //     void queryClient.invalidateQueries({ queryKey: ["new-preferences"] });
+  //     setSelected([]);
+  //     console.log("Preferences added successfully");
+  //     navigate({ to: "/" });
+  //   },
+  //   onError: (error) => {
+  //     console.error("Error adding preferences:", error);
+  //   },
+  // });
+
+  const handleSubmit = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+
+    try {
+      setErrorMessage("");
+      console.log(selected.join("|"));
+      await preferencesMutation.mutateAsync({
+        preferences: selected.join("|"),
+      });
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Preferences failed to load. Please try again."
+      );
+    }
+  };
 
   return (
     <>
@@ -58,6 +73,7 @@ export function PreferencePage() {
             {data?.map((category) => (
               <GalleryItem key={category}>
                 <Card
+                  aria-label={`Select ${category}`}
                   isSelectable
                   isSelected={selected.includes(category)}
                   onClick={() => {
@@ -79,21 +95,18 @@ export function PreferencePage() {
                   }}
                   key={category}
                 >
-                  <CardHeader>
-                    <CardTitle>{category}</CardTitle>
-                  </CardHeader>
+                  <CardTitle>{category}</CardTitle>
                 </Card>
               </GalleryItem>
             ))}
           </Gallery>
-          <Flex style={{ marginTop: 24 }} justifyContent={{ default: "justifyContentFlexEnd" }}>
+          <Flex
+            style={{ marginTop: 24 }}
+            justifyContent={{ default: "justifyContentFlexEnd" }}
+          >
             <FlexItem>
               <ActionGroup>
-                <Button
-                  variant="primary"
-                  type="submit"
-                  onClick={() => handleSubmit.mutate()}
-                >
+                <Button variant="primary" type="submit" onClick={handleSubmit}>
                   Submit
                 </Button>
                 <Button variant="link" onClick={handleCancel}>

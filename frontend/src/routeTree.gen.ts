@@ -10,11 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
-import { Route as PreferencesRouteImport } from './routes/preferences'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as ProtectedIndexRouteImport } from './routes/_protected/index'
 import { Route as ProtectedSearchRouteImport } from './routes/_protected/search'
+import { Route as ProtectedPreferencesRouteImport } from './routes/_protected/preferences'
 import { Route as ProtectedCatalogRouteImport } from './routes/_protected/catalog'
 import { Route as ProtectedAccountRouteImport } from './routes/_protected/account'
 import { Route as ProtectedProductIndexRouteImport } from './routes/_protected/product/index'
@@ -23,11 +23,6 @@ import { Route as ProtectedProductProductIdRouteImport } from './routes/_protect
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PreferencesRoute = PreferencesRouteImport.update({
-  id: '/preferences',
-  path: '/preferences',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -47,6 +42,11 @@ const ProtectedIndexRoute = ProtectedIndexRouteImport.update({
 const ProtectedSearchRoute = ProtectedSearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => ProtectedRouteRoute,
+} as any)
+const ProtectedPreferencesRoute = ProtectedPreferencesRouteImport.update({
+  id: '/preferences',
+  path: '/preferences',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
 const ProtectedCatalogRoute = ProtectedCatalogRouteImport.update({
@@ -73,10 +73,10 @@ const ProtectedProductProductIdRoute =
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
-  '/preferences': typeof PreferencesRoute
   '/signup': typeof SignupRoute
   '/account': typeof ProtectedAccountRoute
   '/catalog': typeof ProtectedCatalogRoute
+  '/preferences': typeof ProtectedPreferencesRoute
   '/search': typeof ProtectedSearchRoute
   '/': typeof ProtectedIndexRoute
   '/product/$productId': typeof ProtectedProductProductIdRoute
@@ -84,10 +84,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
-  '/preferences': typeof PreferencesRoute
   '/signup': typeof SignupRoute
   '/account': typeof ProtectedAccountRoute
   '/catalog': typeof ProtectedCatalogRoute
+  '/preferences': typeof ProtectedPreferencesRoute
   '/search': typeof ProtectedSearchRoute
   '/': typeof ProtectedIndexRoute
   '/product/$productId': typeof ProtectedProductProductIdRoute
@@ -97,10 +97,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_protected': typeof ProtectedRouteRouteWithChildren
   '/login': typeof LoginRoute
-  '/preferences': typeof PreferencesRoute
   '/signup': typeof SignupRoute
   '/_protected/account': typeof ProtectedAccountRoute
   '/_protected/catalog': typeof ProtectedCatalogRoute
+  '/_protected/preferences': typeof ProtectedPreferencesRoute
   '/_protected/search': typeof ProtectedSearchRoute
   '/_protected/': typeof ProtectedIndexRoute
   '/_protected/product/$productId': typeof ProtectedProductProductIdRoute
@@ -109,17 +109,12 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    |
     | '/login'
     | '/signup'
-
     | '/account'
-
     | '/catalog'
-
     | '/preferences'
     | '/search'
-
     | '/'
     | '/product/$productId'
     | '/product'
@@ -129,25 +124,20 @@ export interface FileRouteTypes {
     | '/signup'
     | '/account'
     | '/catalog'
-    | '/preferences' | '/search'
+    | '/preferences'
+    | '/search'
     | '/'
     | '/product/$productId'
     | '/product'
   id:
-    |
     | '__root__'
-
     | '/_protected'
-
     | '/login'
     | '/signup'
     | '/_protected/account'
-
     | '/_protected/catalog'
-
-    | '/preferences'
+    | '/_protected/preferences'
     | '/_protected/search'
-
     | '/_protected/'
     | '/_protected/product/$productId'
     | '/_protected/product/'
@@ -156,7 +146,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
-  PreferencesRoute: typeof PreferencesRoute
   SignupRoute: typeof SignupRoute
 }
 
@@ -167,13 +156,6 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/preferences': {
-      id: '/preferences'
-      path: '/preferences'
-      fullPath: '/preferences'
-      preLoaderRoute: typeof PreferencesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -202,6 +184,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof ProtectedSearchRouteImport
+      parentRoute: typeof ProtectedRouteRoute
+    }
+    '/_protected/preferences': {
+      id: '/_protected/preferences'
+      path: '/preferences'
+      fullPath: '/preferences'
+      preLoaderRoute: typeof ProtectedPreferencesRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
     '/_protected/catalog': {
@@ -238,6 +227,7 @@ declare module '@tanstack/react-router' {
 interface ProtectedRouteRouteChildren {
   ProtectedAccountRoute: typeof ProtectedAccountRoute
   ProtectedCatalogRoute: typeof ProtectedCatalogRoute
+  ProtectedPreferencesRoute: typeof ProtectedPreferencesRoute
   ProtectedSearchRoute: typeof ProtectedSearchRoute
   ProtectedIndexRoute: typeof ProtectedIndexRoute
   ProtectedProductProductIdRoute: typeof ProtectedProductProductIdRoute
@@ -247,6 +237,7 @@ interface ProtectedRouteRouteChildren {
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
   ProtectedAccountRoute: ProtectedAccountRoute,
   ProtectedCatalogRoute: ProtectedCatalogRoute,
+  ProtectedPreferencesRoute: ProtectedPreferencesRoute,
   ProtectedSearchRoute: ProtectedSearchRoute,
   ProtectedIndexRoute: ProtectedIndexRoute,
   ProtectedProductProductIdRoute: ProtectedProductProductIdRoute,
@@ -260,7 +251,6 @@ const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
   LoginRoute: LoginRoute,
-  PreferencesRoute: PreferencesRoute,
   SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport

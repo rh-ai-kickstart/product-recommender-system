@@ -36,7 +36,7 @@ export const useSignup = () => {
       await signup(userData);
     },
     onSuccess: () => {
-      navigate({ to: '/' });
+      navigate({ to: '/preferences' });
     },
   });
 };
