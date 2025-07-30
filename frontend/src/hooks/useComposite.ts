@@ -10,6 +10,7 @@ import {
   useRemoveFromWishlist,
 } from './useWishlist';
 import { useRecordProductClick } from './useInteractions';
+import { useCallback } from 'react';
 
 /**
  * Hook that provides all product-related actions for a specific product
@@ -38,18 +39,21 @@ export const useProductActions = (productId: string) => {
     wishlistQuery.data?.some(product => product.id.toString() === productId) ??
     false;
 
-  // Composite actions
-  const addToCart = (quantity: number = 1) => {
-    if (!userId) throw new Error('User must be authenticated to add to cart');
+  // Composite actions - memoized to prevent infinite loops
+  const addToCart = useCallback(
+    (quantity: number = 1) => {
+      if (!userId) throw new Error('User must be authenticated to add to cart');
 
-    return addToCartMutation.mutate({
-      user_id: userId,
-      product_id: productId,
-      quantity,
-    });
-  };
+      return addToCartMutation.mutate({
+        user_id: userId,
+        product_id: productId,
+        quantity,
+      });
+    },
+    [userId, productId, addToCartMutation]
+  );
 
-  const toggleWishlist = () => {
+  const toggleWishlist = useCallback(() => {
     if (!userId)
       throw new Error('User must be authenticated to modify wishlist');
 
@@ -58,11 +62,17 @@ export const useProductActions = (productId: string) => {
     } else {
       return addToWishlistMutation.mutate({ userId, productId });
     }
-  };
+  }, [
+    userId,
+    productId,
+    isInWishlist,
+    addToWishlistMutation,
+    removeFromWishlistMutation,
+  ]);
 
-  const recordClick = () => {
+  const recordClick = useCallback(() => {
     recordClickMutation.mutate(productId);
-  };
+  }, [productId, recordClickMutation]);
 
   return {
     // Data

@@ -8,6 +8,7 @@ import {
   type MenuToggleElement,
 } from '@patternfly/react-core';
 import { UserIcon, SignOutAltIcon } from '@patternfly/react-icons';
+import { Link } from '@tanstack/react-router';
 import { useAuth, useLogout } from '../hooks/useAuth';
 
 export const UserDropdown: React.FunctionComponent = () => {
@@ -57,12 +58,13 @@ export const UserDropdown: React.FunctionComponent = () => {
       <DropdownList>
         <DropdownItem
           key='account'
-          to='/account'
-          component='button'
-          icon={<UserIcon />}
-        >
-          My Account
-        </DropdownItem>
+          component={props => (
+            <Link to='/account' {...props} onClick={onSelect}>
+              <UserIcon style={{ marginRight: '8px' }} />
+              My Account
+            </Link>
+          )}
+        />
         <DropdownItem
           key='logout'
           icon={<SignOutAltIcon />}

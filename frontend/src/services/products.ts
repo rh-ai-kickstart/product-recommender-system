@@ -66,5 +66,26 @@ export const searchProductsByImage = async (
 
 export const fetchProduct = async (productId: string): Promise<ProductData> => {
   ServiceLogger.logServiceCall('fetchProduct', { productId });
-  return apiRequest<ProductData>(`/api/products/${productId}`, 'fetchProduct');
+
+  try {
+    // Make GET request to fetch single product
+    const product = await apiRequest<ProductData>(
+      `/api/products/${productId}`,
+      'fetchProduct'
+    );
+
+    return product;
+  } catch (error) {
+    // If API call fails, return fallback single product data
+    console.warn('Product fetch failed, using fallback data:', error);
+    return {
+      item_id: '1',
+      product_name: 'Page Not Found',
+      actual_price: 0.00,
+      rating: 0.0,
+      category: 'No Category',
+      about_product:
+        'Could not find product, please try again later.',
+    };
+  }
 };

@@ -1,4 +1,9 @@
-import React, { createContext, useContext, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useCallback,
+} from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authService, storeUserData } from '../services/auth';
 import type { User, LoginRequest, SignUpRequest, AuthResponse } from '../types';
@@ -15,9 +20,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
@@ -72,35 +77,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     },
   });
 
-  // Auth functions
-  const login = async (credentials: LoginRequest): Promise<void> => {
-    await loginMutation.mutateAsync(credentials);
-  };
+  // Auth functions - memoized to prevent infinite loops
+  const login = useCallback(
+    async (credentials: LoginRequest): Promise<void> => {
+      await loginMutation.mutateAsync(credentials);
+    },
+    [loginMutation]
+  );
 
-  const signup = async (userData: SignUpRequest): Promise<void> => {
-    await signupMutation.mutateAsync(userData);
-  };
+  const signup = useCallback(
+    async (userData: SignUpRequest): Promise<void> => {
+      await signupMutation.mutateAsync(userData);
+    },
+    [signupMutation]
+  );
 
-  const logout = (): void => {
+  const logout = useCallback((): void => {
     authService.logout();
     queryClient.setQueryData(['currentUser'], null);
     queryClient.removeQueries({ queryKey: ['currentUser'] });
     queryClient.clear(); // Clear all cached data on logout
-  };
+  }, [queryClient]);
 
   // Check authentication status on mount and when token changes
   useEffect(() => {
     if (!authService.isAuthenticated() && user) {
       logout();
     }
-  }, [user]);
+  }, [user, logout]);
 
   // Handle query errors (e.g., token expired)
   useEffect(() => {
     if (error && authService.isAuthenticated()) {
       logout();
     }
-  }, [error]);
+  }, [error, logout]);
 
   const contextValue: AuthContextType = {
     user: user || null,

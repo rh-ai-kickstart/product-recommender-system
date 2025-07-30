@@ -26,11 +26,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
   const price = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-  }).format(product.price);
+  }).format(product.actual_price);
   const rating = new Intl.NumberFormat('en-US', {
     minimumIntegerDigits: 1,
     minimumFractionDigits: 2,
-  }).format(product.rating);
+  }).format(product.rating ?? 0);
 
   return (
     <Card
@@ -43,27 +43,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
       <CardHeader
         className='v6-featured-posts-card-header-img'
         selectableActions={{
-          to: `/product/${product.id}`,
+          to: `/product/${product.item_id}`,
           selectableActionId: actionId,
           selectableActionAriaLabelledby: cardTitleId,
           name: 'homepage-card',
           isExternalLink: true,
         }}
         style={{
-          backgroundImage: `url(${product.imageUrl})`,
+          backgroundImage: `url(${product.img_link})`,
           height: 200,
         }}
       ></CardHeader>
       <Divider />
       <CardTitle id={cardTitleId}>
         <Flex style={{ justifyContent: 'space-between' }}>
-          <FlexItem>{product.title}</FlexItem>
+          <FlexItem>{product.product_name}</FlexItem>
           <FlexItem>
             {rating} <StarIcon />
           </FlexItem>
         </Flex>
       </CardTitle>
-      <CardBody style={{ color: '#707070' }}>{product.description}</CardBody>
+      <CardBody style={{ color: '#707070' }}>{product.about_product}</CardBody>
       <CardFooter style={{ color: '#1F1F1F' }}>{price}</CardFooter>
     </Card>
   );

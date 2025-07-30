@@ -8,7 +8,7 @@ export const GalleryView = ({ products }: { products: ProductData[] }) => {
     <div className='gallery-container'>
       <Gallery hasGutter>
         {products.map((product, index) => (
-          <GalleryItem>
+          <GalleryItem key={product.item_id || index}>
             <ProductCard product={product} index={index} />
           </GalleryItem>
         ))}

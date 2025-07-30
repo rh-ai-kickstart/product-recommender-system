@@ -17,7 +17,7 @@ export const usePersonalizedRecommendations = () => {
   // For now, we'll treat all authenticated users as "new" until we have
   // a way to determine if they have interaction history
   // In the future, this could check user.views.length or call an endpoint
-  const hasInteractionHistory = false; // TODO: Implement history check
+  const hasInteractionHistory = true; // TODO: Implement history check
 
   return useQuery({
     queryKey: ['recommendations', 'personalized', user?.user_id],

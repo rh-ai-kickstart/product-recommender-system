@@ -3,6 +3,7 @@ import {
   ServiceLogger,
   type ApiRequestOptions,
 } from '../utils/logging/logger';
+import { getToken } from './auth';
 
 // Enhanced API fetch utility using the new logger
 export async function apiRequest<T>(
@@ -14,10 +15,13 @@ export async function apiRequest<T>(
 
   try {
     const { method = 'GET', body, headers } = options;
+    const token = getToken();
+
     const requestOptions: RequestInit = {
       method,
       headers: {
         'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
         ...headers,
       },
     };
@@ -34,7 +38,7 @@ export async function apiRequest<T>(
       let errorDetails = '';
       try {
         errorDetails = await response.text();
-      } catch (e) {
+      } catch {
         errorDetails = 'Could not read error response';
       }
 
