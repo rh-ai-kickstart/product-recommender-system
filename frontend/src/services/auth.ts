@@ -5,7 +5,6 @@ import type {
   AuthResponse,
   AuthError,
 } from '../types';
-import AuthLogger from '../utils/logging/authLogger';
 
 const API_BASE = '/api';
 const TOKEN_KEY = 'auth_token';

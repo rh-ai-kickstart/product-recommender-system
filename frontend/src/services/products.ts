@@ -81,11 +81,10 @@ export const fetchProduct = async (productId: string): Promise<ProductData> => {
     return {
       item_id: '1',
       product_name: 'Page Not Found',
-      actual_price: 0.00,
+      actual_price: 0.0,
       rating: 0.0,
       category: 'No Category',
-      about_product:
-        'Could not find product, please try again later.',
+      about_product: 'Could not find product, please try again later.',
     };
   }
 };
