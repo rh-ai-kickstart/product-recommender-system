@@ -1,308 +1,182 @@
-# AI Kickstart - Product Recommender System
+# Product Recommender System Kickstart
 
-Welcome to the Product Recommender System Kickstart!
-Use this to quickly get a recommendation engine with user-item relationships up and running in your environment.
+A scalable, intelligent product recommendation platform with personalized user experiences, built for rapid deployment on Kubernetes/OpenShift.
 
-To see how it's done, jump straight to [installation](#install).
+## What is this?
 
-## Description
-The Product Recommender System Kickstart enables the rapid establishment of a scalable and personalized product recommendation service.
+This platform provides the tools to build and deploy an AI-powered product recommendation system that can:
 
-The system recommends items to users based on their previous interactions with products and the behavior of similar users.
+- **Personalize recommendations** - Advanced ML algorithms using two-tower architecture for user-item matching
+- **Handle new users** - Cold start recommendations using user preferences and demographics
+- **Multi-modal search** - Text-based semantic search and image similarity search
+- **Scale in production** - Kubernetes-ready architecture with microservices design
+- **Real-time inference** - Fast recommendations using pre-computed embeddings and vector search
 
-It supports recommendations for both existing and new users. New users are prompted to select their preferences to personalize their experience.
+### Key Features
 
-Users can interact with the user interface to view items, add items to their cart, make purchases, or submit reviews.
+- 🎯 **Smart Recommendations** - Two-tower ML model with user-item embeddings and similarity search
+- 🔍 **Advanced Search** - Semantic text search and visual similarity with image uploads
+- 🛒 **Complete E-commerce** - Shopping cart, wishlist, orders, and user feedback system
+- 🚀 **Production Ready** - Containerized deployment with Helm charts for Kubernetes/OpenShift
+- ⚡ **Real-time Performance** - Vector database (pgvector) for fast similarity search and caching
 
-### Main Features
-To find products in the application you can do a:
-* Scroll recommended items.
-* Search items by text (semantic search).
-* Search items by Image (find similar items in the store).
+## Quick Start
 
+### Installation
 
-## See it in action
+**Option 1: Basic installation**
+```bash
+git clone https://github.com/<your-username>/product-recommender-system.git
+cd product-recommender-system/helm
+make install NAMESPACE=recommender-system
+```
 
-*This section is optional but recommended*
-<!-- TODO do it at the end show UI gif of the usage -->
+**Option 2: Custom dataset**
+```bash
+cd helm/
+make install NAMESPACE=recommender-system DATASET_URL=<your-dataset-url>
+```
 
-## Architecture diagrams
-Components of Recommender System
+**Access your app:**
+- Frontend: Check your OpenShift routes after installation
+- Backend API: `<backend-route>/docs` for API documentation
 
-### Data Proprocessing
-<img src="figures/data_processing_pipeline.drawio.png" alt="Inference" width="80%">
+### Local Development
 
-### Training & Batch scoring
+```bash
+# Start backend
+cd backend && python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt && python init_backend.py
+uvicorn main:app --reload &
 
-#### Recommendation algorithm stages:
+# Start frontend (new React app)
+cd ../frontend && npm install && npm run dev
+```
 
-1. **Filtering**
-Removes invalid candidates based on user demographics (e.g., age, item availability in the region) and previously viewed items.
+📖 **[Full Installation Guide →](INSTALLING.md)**
 
-2. **Ranking**
-Identifies the most relevant top-k items based on previuos intercations between users and items (trained with two-tower algorithm).
+## Project Structure
 
-3. **Business Ordering**
-Reorders candidates according to business logic and priorities.
+```
+product-recommender-system/
+├── frontend/           # React + TypeScript UI with modern components
+├── backend/            # FastAPI server with ML recommendation engine
+├── helm/               # Kubernetes deployment and Helm charts
+├── figures/            # Architecture diagrams and documentation images
+├── services/           # Feast feature store and Kafka services
+└── ui/                 # Legacy UI (being phased out)
+```
 
-#### Training
-* Feast takes the Raw data (item table, user table, interaction table) and stores the items, users, and interactions as Feature Views.
-* Using the Two-Tower architecture technique, we train the item and user encoders based on the existing user-item interactions.
+## Architecture Overview
+
+The platform integrates several ML and data components:
+
+- **React Frontend** - Modern TypeScript interface for product browsing and recommendations
+- **FastAPI Backend** - ML-powered recommendation API with user management and e-commerce features
+- **Two-Tower ML Model** - Advanced neural architecture for user-item embedding and similarity
+- **Feast Feature Store** - Real-time and batch feature serving for ML models
+- **pgvector Database** - Vector similarity search for fast recommendations and semantic search
+- **Kafka Pipeline** - Real-time data processing for user interactions and feedback
+
+### Data Processing Pipeline
+<img src="figures/data_processing_pipeline.drawio.png" alt="Data Processing" width="80%">
+
+### Training & Batch Scoring
+
+#### Recommendation Algorithm Stages:
+
+1. **Filtering** - Removes invalid candidates based on user demographics and availability
+2. **Ranking** - Identifies top-k items using two-tower model trained on user-item interactions
+3. **Business Ordering** - Reorders recommendations based on business logic and priorities
 
 <img src="figures/training_and_batch_scoring.drawio.png" alt="Training & Batch scoring" width="80%">
 
-#### Batch scoring
-* After completing the training of the Encoders, embed all items and users, then push them in the PGVector database as embedding.
-* Because we use batch scoring, we calculates for each user the top k recommended items using the item embeddings
-* Pushes this top k items for each user to the online store Feature Store.
+### Real-time Inference
 
-### Infernece
-#### Exiting user case:
-* Sending a get request from the EDB vectorDB to get the embedding of the existing user.
-* Perform a similarity search on the item vectorDB to get the top k similar items.
-
-#### New user case:
-* The new users will be embedded into a vector representation.
-* The user vector will do a similarity search from the EDB PGVector to get the top k suggested items
+**Existing Users**: Fast lookup using pre-computed embeddings and similarity search
+**New Users**: Real-time embedding generation with preference-based cold start
 
 <img src="figures/Inference.drawio.png" alt="Inference" width="80%">
 
-### Search by Text & Search by Image
-1. Embed the user query into embeddings.
-2. Search the top-k clostest items that where generated with the same model at batch infernece time.
-3. Return to user the recommended items
-
-<img src="figures/search_by.drawio.png" alt="Inference" width="80%">
+### Multi-modal Search
+<img src="figures/search_by.drawio.png" alt="Search capabilities" width="80%">
 
 
-## Requirements
+## Getting Started Guides
 
-### Minimum hardware requirements
+### 👩‍💻 **For Developers**
+- **[Contributing Guide](CONTRIBUTING.md)** - Development setup and workflow
+- **[Backend API Reference](backend/README.md)** - Authentication, user management, and ML endpoints
+- **[Frontend Development](frontend/README.md)** - React TypeScript setup and component architecture
 
-Depend on the scale and speed required, for small amount of users have minimus of:
-* No GPU required; for larger scale and faster preformance, use GPUs.
-* 4 CPU cores.
-* 16 Gi of RAM.
-* Storage: 8 Gi (depend on the input dataset).
-## References
+### 🚀 **For Deployment**
+- **[Installation Guide](INSTALLING.md)** - Production deployment on Kubernetes/OpenShift
+- **[Helm Configuration](helm/README.md)** - Kubernetes deployment with Helm charts
 
-### Required software
+### 🔧 **For ML Engineers**
+- **[Feature Store Integration](backend/services/feast/)** - Feast setup for real-time and batch features
+- **[Model Architecture](backend/README.md)** - Two-tower neural network implementation
 
-* `oc` command installed
-* `helm` command installed
-* Red Hat OpenShift.
-* Red Hat OpenShift AI version 2.2 and above.
-* Red Hat Authorino Operator (stable update channel, version 1.2.1 or later)
-* Red Hat OpenShift Serverless Operator
-* Red Hat OpenShift Service Mesh Operator
+## Example Use Cases
 
-#### Make sure you have configured
-Under openshiftAI DataScienceCluster CR change modelregistry, and feastoperator to `Managed` state which by default are on `Removed`:
-```
-apiVersion: datasciencecluster.opendatahub.io/v1
-kind: DataScienceCluster
-metadata:
-  name: default-dsc
-...
-spec:
-  components:
-    codeflare:
-      managementState: Managed
-    kserve:
-      managementState: Managed
-      nim:
-        managementState: Managed
-      rawDeploymentServiceConfig: Headless
-      serving:
-        ingressGateway:
-          certificate:
-            secretName: rhoai-letscrypt-cert
-            type: Provided
-        managementState: Managed
-        name: knative-serving
-    modelregistry:
-      managementState: Managed
-      registriesNamespace: rhoai-model-registries
-    feastoperator:
-      managementState: Managed
-    trustyai:
-      managementState: Managed
-    kueue:
-      managementState: Managed
-    workbenches:
-      managementState: Managed
-      workbenchNamespace: rhods-notebooks
-    dashboard:
-      managementState: Managed
-    modelmeshserving:
-      managementState: Managed
-    datasciencepipelines:
-      managementState: Managed
+**E-commerce Recommendations**
+```python
+# Get personalized recommendations for existing user
+GET /recommendations/{user_id}
+
+# Real-time recommendations for new user
+POST /recommendations
+Authorization: Bearer {token}
+{"num_recommendations": 10}
 ```
 
-### Required permissions
+**Product Search**
+```python
+# Semantic text search
+POST /products/search
+{"query": "wireless headphones", "limit": 20}
 
-* Standard user. No elevated cluster permissions required
+# Image similarity search
+POST /products/search/image
+# Upload image file for similar product matching
+```
 
-## Install
+## Production Installation
 
-1. Fork and clone the repository:
-   ```bash
-   # Fork via GitHub UI, then:
-   git clone https://github.com/<your-username>/product-recommender-system.git
-   cd product-recommender-system
-   ```
-
-2. Navigate to the helm directory:
-   ```bash
-   cd helm/
-   ```
-
-3. Set the namespace environment variable to define on which namepsace the kickstart will be install:
-   ```bash
-   # Replace <namespace> with your desired namespace
-   export NAMESPACE=<namespace>
-   ```
-
-4. Install using make (this should take 8~ minutes with the default data, and with custom data maybe me less or more):
-   ```bash
-   # This will create the namespace and deploy all components
-   make install
-   ```
-
-* Or installing and defining a namespace together:
-   ```bash
-   # Replace <namespace> with your desired namespace and install in one command
-   make install NAMESPACE=<namespace>
-   ```
-
-### Specify a Custom Dataset
-
-By default, a dataset is automatically generated when the application is installed on the cluster.
-
-To use a custom dataset instead, provide a URL by setting the `DATASET_URL` property during installation:
+### Quick Installation
 
 ```bash
-# Replace <custom_dataset_url> with the desired dataset URL
-make install DATASET_URL=<custom_dataset_url>
+git clone https://github.com/<your-username>/product-recommender-system.git
+cd product-recommender-system/helm
+make install NAMESPACE=recommender-system
 ```
 
-## Uninstall
-To uninstall the recommender system and clean up resources:
+Installation typically takes 8-10 minutes with default dataset.
 
-1. Navigate to the helm directory:
-   ```bash
-   cd helm/
-   ```
+📖 **[Complete Installation Guide →](INSTALLING.md)**
 
-2. Uninstalling with namespace specified:
-   ```bash
-   # Replace <namespace> with your namespace
-   make uninstall NAMESPACE=<namespace>
-
-## Code Quality
-
-This project enforces code quality standards using pre-commit hooks that automatically run before each commit. This ensures consistent code style and catches common issues early.
-
-**Setup (required for all contributors):**
-```bash
-pip install pre-commit
-pre-commit install
-```
-
-Once installed, the hooks will automatically run when you commit changes. If any issues are found, they will warn you but still allow the commit to proceed. However, pushes with >5 commits will be blocked.
-
-**What's automatically checked:**
-- **Python**: Code style (flake8), formatting (black), import sorting (isort)
-- **YAML**: Syntax validation and formatting
-- **Helm**: Chart structure and template validation
-- **General**: Trailing whitespace, missing newlines, large files
-- **Frontend files**: Formatted with Prettier (React conventions)
-
-**Run checks manually:**
-```bash
-pre-commit run --all-files    # Check all files
-pre-commit run flake8         # Run specific tool
-```
-
-**Individual tools (if needed):**
-```bash
-# Python tools (install if needed)
-pip install flake8 black isort
-flake8 .          # Check code style and errors
-black .           # Auto-format Python code
-isort .           # Sort and organize imports
-```
-
-### Git Commit Best Practices
-
-To maintain a clean and readable project history, follow these git commit guidelines:
-
-
-**Types:**
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, no logic changes)
-- `refactor`: Code refactoring (no new features or bug fixes)
-- `test`: Adding or updating tests
-- `chore`: Build process, dependencies, or tooling changes
-
-**Examples:**
-```bash
-git commit -m "feat: add user authentication system"
-git commit -m "fix: resolve database connection timeout issue"
-git commit -m "docs: update installation instructions"
-git commit -m "style: format code with black and prettier"
-```
-
-**Best Practices:**
-- **Keep commits focused**: One logical change per commit
-- **Write clear and short messages**: Describe shortly what what added/changed
-- **Use present tense**: "Add feature" not "Added feature"
-
-**Amending commits in PRs:**
-If you need to make small changes to your last commit (e.g., fix typos, address review comments):
-```bash
-# Make your changes, then stage them
-git add -u
-
-# Amend the last commit without changing the message
-git commit --amend --no-edit
-
-# Force push safely (only affects your branch)
-git push --force-with-lease
-```
-
-Only use `--force-with-lease` on your own feature branches, never on shared branches like `main`.
-
-**Resolving merge conflicts:**
-⚠️ **Take extra care when resolving merge conflicts** - incorrect resolution can break functionality or lose important changes.
+## Development Commands
 
 ```bash
-# When you encounter a conflict during merge/rebase:
-git status                    # See which files have conflicts
+# Start everything locally
+cd backend && python init_backend.py
+uvicorn main:app --reload &
+cd ../frontend && npm run dev
 
-# Open conflicted files and look for conflict markers:
-# <<<<<<< HEAD
-# Your changes
-# =======
-# Their changes
-# >>>>>>> branch-name
+# Check production deployment status
+cd helm && make status NAMESPACE=<your-namespace>
 
-# After resolving conflicts in each file:
-git add <resolved-file>       # Stage resolved files
-git status                    # Verify all conflicts are resolved
-git commit                    # Complete the merge (or git rebase --continue)
+# Uninstall from cluster
+cd helm && make uninstall NAMESPACE=<your-namespace>
 ```
 
-**Conflict resolution best practices:**
-- **Understand both sides**: Read and understand what each conflicting change does
-- **Test after resolving**: Run tests to ensure functionality isn't broken
-- **Ask for help**: If unsure, consult the original author of conflicting code
-- **Review carefully**: Double-check that you haven't accidentally deleted important code
-- **Use merge tools**: Use IDE merge tools.
+## Community & Support
 
-## Run Tests
+- **🐛 Issues** - [Report bugs and request features](https://github.com/<your-username>/product-recommender-system/issues)
+- **💬 Discussions** - Ask questions about ML recommendations, deployment, or architecture
+- **🤝 Contributing** - See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines
+- **📚 Documentation** - Browse component READMEs and dedicated guides
 
-TODO
+## License
+
+Built with ❤️ for rapid ML recommendation system deployment

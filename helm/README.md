@@ -1,6 +1,10 @@
-# Product Recommender System - Helm Deployment
+# Helm Deployment
 
-This directory contains the Helm chart and deployment configuration for the Product Recommender System. The deployment is managed through a Makefile that provides various commands for installation, uninstallation, and status checking.
+This directory contains the Helm chart and deployment configuration for the Product Recommender System. 
+
+📖 **For complete installation instructions, see [INSTALLING.md](../INSTALLING.md)**
+
+The deployment is managed through a Makefile that provides various commands for installation, uninstallation, and status checking.
 
 ## Prerequisites
 
