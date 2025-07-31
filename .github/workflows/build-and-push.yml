@@ -13,9 +13,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: product-recommender-backend
-            context: backend
-            image-name: rec-sys-backend
+          - name: product-recommender-frontend-backend
+            context: .
+            image-name: product-recommender-frontend-backend
     defaults:
       run:
         working-directory: ${{ env.BACKEND_DIR }}
@@ -37,7 +37,7 @@ jobs:
       - name: Set version from run number
         id: version
         run: |
-          echo "tag=v1.0.${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
+          echo "tag=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Build and push ${{ matrix.name }}
         uses: docker/build-push-action@v5
@@ -45,6 +45,8 @@ jobs:
           context: ${{ matrix.context }}
           file: ${{ matrix.context }}/Containerfile
           push: true
-          tags: quay.io/rh-ai-kickstart/${{ matrix.image-name }}:${{ steps.version.outputs.tag }}
+          tags: |
+            quay.io/rh-ai-kickstart/${{ matrix.image-name }}:${{ steps.version.outputs.tag }}
+            quay.io/rh-ai-kickstart/${{ matrix.image-name }}:latest
           build-args: |
             IMAGE_TAG=${{ steps.version.outputs.tag }}

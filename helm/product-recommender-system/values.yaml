@@ -5,6 +5,7 @@
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
 
+# TODO: This image does not exist, check if it's needed here... 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
   repository: quay.io/ecosystem-appeng/product-recommender-system
@@ -125,6 +126,13 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+# OpenShift Route configuration
+route:
+  enabled: true
+  # host: your-app.apps.your-cluster.com  # Optional: specify custom hostname
+  tls:
+    enabled: true  # Enable HTTPS
+
 # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 livenessProbe:
   httpGet:
@@ -162,10 +170,10 @@ tolerations: []
 
 affinity: {}
 
-pipelineJobImage: quay.io/rh-ai-kickstart/rec-sys-workflow:v1.0.6
-applicationImage: quay.io/rh-ai-kickstart/rec-sys-app:v1.0.4
+pipelineJobImage: quay.io/rh-ai-kickstart/rec-sys-workflow:latest
+applicationImage: quay.io/rh-ai-kickstart/rec-sys-app:latest
 # Note the backend uses rec-sys-app as library.
-backendImage: quay.io/hacohen/product-recommender:1.0.0 # TODO: change to quay.io/rh-ai-kickstart/...
+frontendBackendImage: quay.io/rh-ai-kickstart/product-recommender-frontend-backend:latest
 
 dbName: product_recommender_system
 
