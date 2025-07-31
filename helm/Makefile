@@ -63,6 +63,13 @@ install: namespace depend
 # Uninstall the deployment and clean up
 .PHONY: uninstall
 uninstall:
+	# Remove Kafka topic finalizers to prevent namespace deletion from getting stuck
+	# This is necessary when the Strimzi operator is removed before the topics,
+	# leaving finalizers that prevent proper cleanup. The ||: ensures the command
+	# doesn't fail if the topics don't exist.
+	@echo "Removing Kafka topic finalizers..."
+	@oc patch kafkatopic interactions -n $(NAMESPACE) -p '{"metadata":{"finalizers":[]}}' --type=merge ||:
+	@oc patch kafkatopic new-users -n $(NAMESPACE) -p '{"metadata":{"finalizers":[]}}' --type=merge ||:
 	@echo "Uninstalling $(HELM_CHART) helm chart"
 	@helm -n $(NAMESPACE) uninstall $(HELM_CHART)
 	@echo "Removing pgvector and minio PVCs from $(NAMESPACE)"
