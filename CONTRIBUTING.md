@@ -315,23 +315,52 @@ make uninstall NAMESPACE=test-recommender
 
 ## Submitting Changes
 
-### 1. Branch Strategy
+### 1. Branch Naming
 
+Follow conventional branch naming as described in the [conventional branch spec](https://conventional-branch.github.io/#summary):
+
+**Format:** `<type>/<description>`
+
+**Types:**
+- `main` - The main development branch
+- `feature/` - For new features
+- `bugfix/` - For bug fixes
+- `hotfix/` - For urgent fixes that need immediate attention
+- `release/` - For branches preparing a release
+- `chore/` - For non-code tasks like dependency updates, documentation
+
+**Examples:**
 ```bash
-# Create feature branch
-git checkout -b feature/your-feature-name
+# Feature development
+git checkout -b feature/user-authentication
+git checkout -b feature/semantic-search-ui
 
-# Make your changes
-git add .
-git commit -m "feat: description of your changes"
+# Bug fixes
+git checkout -b bugfix/cart-total-calculation
+git checkout -b bugfix/database-connection-timeout
 
-# Push branch
-git push origin feature/your-feature-name
+# Urgent fixes
+git checkout -b hotfix/security-patch
+git checkout -b hotfix/critical-memory-leak
+
+# Release preparation
+git checkout -b release/v1.2.0
+git checkout -b release/v2.0.0-beta
+
+# Maintenance tasks
+git checkout -b chore/update-dependencies
+git checkout -b chore/update-documentation
 ```
+
+**Guidelines:**
+- Use lowercase with hyphens (kebab-case) for descriptions
+- Keep descriptions concise but descriptive
+- Use present tense: `feature/add-wishlist` not `feature/added-wishlist`
+- Avoid unnecessary words: `feature/user-auth` not `feature/add-user-authentication-feature`
 
 ### 2. Commit Messages
 
-Follow conventional commit format (as described in the [conventional commits spec](https://www.conventionalcommits.org/en/v1.0.0/#summary)):
+Follow conventional commit message format as described in the [conventional commits spec](https://www.conventionalcommits.org/en/v1.0.0/#summary):
 - `feat:` - New feature
 - `fix:` - Bug fix
 - `docs:` - Documentation changes
