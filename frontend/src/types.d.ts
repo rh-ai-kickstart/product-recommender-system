@@ -12,7 +12,6 @@ export interface ProductData {
   rating?: number;
 }
 
-
 export interface CartItem {
   userId: string;
   productId: string;
