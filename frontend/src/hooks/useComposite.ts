@@ -36,8 +36,9 @@ export const useProductActions = (productId: string) => {
   const isInCart =
     cartQuery.data?.some(item => item.product_id === productId) ?? false;
   const isInWishlist =
-    wishlistQuery.data?.some(product => product.item_id.toString() === productId) ??
-    false;
+    wishlistQuery.data?.some(
+      product => product.item_id.toString() === productId
+    ) ?? false;
 
   // Composite actions - memoized to prevent infinite loops
   const addToCart = useCallback(
@@ -127,8 +128,9 @@ export const useProductCardActions = (productId: string) => {
   const isInCart =
     cartQuery.data?.some(item => item.product_id === productId) ?? false;
   const isInWishlist =
-    wishlistQuery.data?.some(product => product.item_id.toString() === productId) ??
-    false;
+    wishlistQuery.data?.some(
+      product => product.item_id.toString() === productId
+    ) ?? false;
 
   // Lightweight actions (no product data fetching)
   const addToCart = (quantity: number = 1) => {
