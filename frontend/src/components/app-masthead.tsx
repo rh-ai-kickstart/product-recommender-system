@@ -13,7 +13,6 @@ import { Search } from './search';
 import { UserDropdown } from './user-dropdown';
 
 export function AppMasthead() {
-
   const toolbar = (
     <Toolbar isFullHeight>
       <ToolbarContent>

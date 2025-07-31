@@ -17,9 +17,7 @@ export const useLogin = () => {
     },
     onSuccess: () => {
       // Get redirect path from URL params or default to home
-      const searchParams = new URLSearchParams(window.location.search);
-      const redirectPath = searchParams.get('redirect') || '/';
-      navigate({ to: redirectPath });
+      navigate({ to: '/' });
     },
   });
 };

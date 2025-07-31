@@ -26,7 +26,7 @@ export const ProductDetails = () => {
     if (product && !isLoading) {
       recordClick();
     }
-  }, [product, isLoading, recordClick, productId]);
+  }, [product, isLoading, productId]); // Removed recordClick from deps to prevent infinite loop
 
   if (error || !product) {
     return <div>Error fetching product</div>;

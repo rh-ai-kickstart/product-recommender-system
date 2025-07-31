@@ -47,7 +47,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
           selectableActionId: actionId,
           selectableActionAriaLabelledby: cardTitleId,
           name: 'homepage-card',
-          isExternalLink: true,
+          isExternalLink: false,
         }}
         style={{
           backgroundImage: `url(${product.img_link})`,
