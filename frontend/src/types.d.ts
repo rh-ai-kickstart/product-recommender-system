@@ -1,17 +1,16 @@
 export interface ProductData {
-  item_id: string
-  product_name: string
-  category: string
-  about_product?: string
-  img_link?: string
-  discount_percentage?: number
-  discounted_price?: number
-  actual_price: number
-  product_link?: string
-  rating_count?: number
-  rating?: number
+  item_id: string;
+  product_name: string;
+  category: string;
+  about_product?: string;
+  img_link?: string;
+  discount_percentage?: number;
+  discounted_price?: number;
+  actual_price: number;
+  product_link?: string;
+  rating_count?: number;
+  rating?: number;
 }
-
 
 export interface CartItem {
   userId: string;

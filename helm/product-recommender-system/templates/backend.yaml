@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "product-recommender-system.fullname" . }}-backend
+  name: {{ include "product-recommender-system.fullname" . }}-frontend-backend
   labels:
     {{- include "product-recommender-system.labels" . | nindent 4 }}
     app.kubernetes.io/component: backend
@@ -41,8 +41,8 @@ spec:
               done
               echo "db-init job completed successfully!"
       containers:
-        - name: {{ .Chart.Name }}-backend
-          image: "{{ .Values.backendImage }}"
+        - name: {{ .Chart.Name }}-frontend-backend
+          image: "{{ .Values.frontendBackendImage }}"
           imagePullPolicy: {{ .Values.backend.pullPolicy }}
           ports:
             - name: http
@@ -124,14 +124,14 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "product-recommender-system.fullname" . }}-backend
+  name: {{ include "product-recommender-system.fullname" . }}-frontend-backend
   labels:
     {{- include "product-recommender-system.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "product-recommender-system.fullname" . }}-backend
+    name: {{ include "product-recommender-system.fullname" . }}-frontend-backend
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
@@ -185,7 +185,7 @@ spec:
             {{- end }}
       containers:
       - name: db-init
-        image: "{{ .Values.backendImage }}"
+        image: "{{ .Values.frontendBackendImage }}"
         imagePullPolicy: {{ .Values.backend.pullPolicy }}
         command: ["python", "init_backend.py"]
         workingDir: /app/backend
@@ -227,3 +227,28 @@ spec:
               path: tls.crt
         {{- end }}
       {{- end }}
+---
+{{- if .Values.route.enabled }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "product-recommender-system.fullname" . }}-frontend
+  labels:
+    {{- include "product-recommender-system.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+spec:
+  to:
+    kind: Service
+    name: {{ include "product-recommender-system.fullname" . }}-backend
+    weight: 100
+  port:
+    targetPort: http
+  {{- if .Values.route.tls.enabled }}
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  {{- end }}
+  {{- if .Values.route.host }}
+  host: {{ .Values.route.host }}
+  {{- end }}
+{{- end }}
