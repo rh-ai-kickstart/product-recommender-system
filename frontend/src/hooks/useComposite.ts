@@ -36,7 +36,7 @@ export const useProductActions = (productId: string) => {
   const isInCart =
     cartQuery.data?.some(item => item.product_id === productId) ?? false;
   const isInWishlist =
-    wishlistQuery.data?.some(product => product.id.toString() === productId) ??
+    wishlistQuery.data?.some(product => product.item_id.toString() === productId) ??
     false;
 
   // Composite actions - memoized to prevent infinite loops
@@ -127,7 +127,7 @@ export const useProductCardActions = (productId: string) => {
   const isInCart =
     cartQuery.data?.some(item => item.product_id === productId) ?? false;
   const isInWishlist =
-    wishlistQuery.data?.some(product => product.id.toString() === productId) ??
+    wishlistQuery.data?.some(product => product.item_id.toString() === productId) ??
     false;
 
   // Lightweight actions (no product data fetching)
@@ -209,7 +209,7 @@ export const useRecommendationsWithActions = () => {
       cartQuery.data?.some(item => item.product_id === productId) ?? false;
     const isInWishlist =
       wishlistQuery.data?.some(
-        product => product.id.toString() === productId
+        product => product.item_id.toString() === productId
       ) ?? false;
 
     return {
@@ -254,7 +254,7 @@ export const useRecommendationsWithActions = () => {
     productsWithActions:
       recommendationsQuery.data?.map((product: ProductData) => ({
         ...product,
-        actions: createProductActions(product.id.toString()),
+        actions: createProductActions(product.item_id.toString()),
       })) || [],
 
     // Global loading states
@@ -293,7 +293,7 @@ export const useSearchWithActions = (
       cartQuery.data?.some(item => item.product_id === productId) ?? false;
     const isInWishlist =
       wishlistQuery.data?.some(
-        product => product.id.toString() === productId
+        product => product.item_id.toString() === productId
       ) ?? false;
 
     return {
@@ -338,7 +338,7 @@ export const useSearchWithActions = (
     productsWithActions:
       searchQuery.data?.map((product: ProductData) => ({
         ...product,
-        actions: createProductActions(product.id.toString()),
+        actions: createProductActions(product.item_id.toString()),
       })) || [],
 
     // Global loading states
