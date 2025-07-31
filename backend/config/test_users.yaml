@@ -4,33 +4,33 @@
 
 test_users:
   - email: "demo1@example.com"
-    password: "demo123" 
+    password: "demo123"
     age: 28
     gender: "Female"
     preferences: "Electronics,Books"
     description: "Electronics & Books enthusiast"
-    
+
   - email: "demo2@example.com"
     password: "demo123"
     age: 35
-    gender: "Male" 
+    gender: "Male"
     preferences: "Sports,Home"
     description: "Sports & Home products"
-    
+
   - email: "demo3@example.com"
     password: "demo123"
     age: 24
     gender: "Other"
     preferences: "Clothing,Books,Electronics"
     description: "Clothing & Books & Electronics"
-    
+
   - email: "demo4@example.com"
     password: "demo123"
     age: 32
     gender: "Female"
-    preferences: "Electronics,Sports,Home" 
+    preferences: "Electronics,Sports,Home"
     description: "Electronics & Sports & Home"
-    
+
   - email: "demo5@example.com"
     password: "demo123"
     age: 29
@@ -42,11 +42,11 @@ test_users:
 config:
   # How many users to select from Feast dataset
   feast_users_to_select: 5
-  
+
   # Fallback user IDs if Feast is unavailable
   fallback_user_ids:
     - "demo1"
-    - "demo2" 
+    - "demo2"
     - "demo3"
     - "demo4"
-    - "demo5" 
+    - "demo5"

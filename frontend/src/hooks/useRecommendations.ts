@@ -14,22 +14,28 @@ import { useAuth } from '../contexts/AuthProvider';
 export const usePersonalizedRecommendations = () => {
   const { user, isAuthenticated } = useAuth();
 
-  // For now, we'll treat all authenticated users as "new" until we have
-  // a way to determine if they have interaction history
-  // In the future, this could check user.views.length or call an endpoint
-  const hasInteractionHistory = false; // TODO: Implement history check
+  // Check if user has interaction history
+  // For now, treat users with views/interactions as "existing", otherwise "new"
+  const hasInteractionHistory = user?.views && user.views.length > 0;
 
   return useQuery({
-    queryKey: ['recommendations', 'personalized', user?.user_id],
+    queryKey: [
+      'recommendations',
+      'personalized',
+      user?.user_id,
+      hasInteractionHistory,
+    ],
     queryFn: () => {
       if (!user?.user_id) {
-        throw new Error('User authentication required for personalized recommendations');
+        throw new Error(
+          'User authentication required for personalized recommendations'
+        );
       }
 
       if (hasInteractionHistory) {
         return fetchExistingUserRecommendations(user.user_id);
       } else {
-        return fetchNewUserRecommendations(10);
+        return fetchNewUserRecommendations(user.user_id, 10);
       }
     },
     enabled: isAuthenticated && !!user?.user_id,
@@ -46,9 +52,13 @@ export const useExistingUserRecommendations = (userId: string) => {
 };
 
 // Recommendations for users without interaction history (cold start)
-export const useNewUserRecommendations = (numRecommendations: number = 10) => {
+export const useNewUserRecommendations = (
+  userId: string,
+  numRecommendations: number = 10
+) => {
   return useQuery({
-    queryKey: ['recommendations', 'new-user', numRecommendations],
-    queryFn: () => fetchNewUserRecommendations(numRecommendations),
+    queryKey: ['recommendations', 'new-user', userId, numRecommendations],
+    queryFn: () => fetchNewUserRecommendations(userId, numRecommendations),
+    enabled: !!userId,
   });
 };

@@ -1,17 +1,17 @@
-from sqlalchemy import Integer, String, Date, Float, ForeignKey, DateTime
-from sqlalchemy.orm import Mapped, mapped_column, declarative_base
-import datetime
-from sqlalchemy.types import TypeDecorator, VARCHAR
+from sqlalchemy import Date, Integer, String
+from sqlalchemy.orm import Mapped, declarative_base, mapped_column
 
 Base = declarative_base()
 
 
 class User(Base):
     __tablename__ = "users"
-    
+
     user_id: Mapped[str] = mapped_column(String(27), primary_key=True, index=True)
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
-    password: Mapped[str] = mapped_column(String, nullable=True)  # raw (used only for mock data/gen)
+    password: Mapped[str] = mapped_column(
+        String, nullable=True
+    )  # raw (used only for mock data/gen)
     hashed_password: Mapped[str] = mapped_column(String, nullable=True)
     age: Mapped[int] = mapped_column(Integer, nullable=True)
     gender: Mapped[str] = mapped_column(String, nullable=True)
@@ -19,7 +19,7 @@ class User(Base):
     preferences: Mapped[str] = mapped_column(String, nullable=True)
 
 
-'''
+"""
 class Product(Base):
     __tablename__ = "products"
     item_id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -70,7 +70,7 @@ class Interactions(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
     product_id: Mapped[int] = mapped_column(ForeignKey("products.item_id"))
-    rating: Mapped[float] = mapped_column(Float)    
+    rating: Mapped[float] = mapped_column(Float)
     quantity: Mapped[int] = mapped_column(Integer)
 
 class NegInteractions(Base):
@@ -78,6 +78,6 @@ class NegInteractions(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
     product_id: Mapped[int] = mapped_column(ForeignKey("products.item_id"))
-    rating: Mapped[float] = mapped_column(Float)    
+    rating: Mapped[float] = mapped_column(Float)
 
-'''
+"""

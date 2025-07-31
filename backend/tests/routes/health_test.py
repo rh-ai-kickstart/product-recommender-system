@@ -1,33 +1,43 @@
 import pytest
-from httpx import AsyncClient, ASGITransport
-from main import app
+from httpx import ASGITransport, AsyncClient
+
 from database.db import get_db
+from main import app
 
 
 class FakeFailureSession:
     async def execute(self, stmt):
         raise Exception("DB failure")
 
+
 class FakeSuccessSession:
     async def execute(self, stmt):
         assert str(stmt) == "SELECT 1"
+
         class Result:
-            def scalar(self): return 1
+            def scalar(self):
+                return 1
+
         return Result()
+
 
 @pytest.fixture
 def override_get_db():
     def _make_override(session_cls):
         async def fake_get_db():
             yield session_cls()
+
         app.dependency_overrides[get_db] = fake_get_db
+
     yield _make_override
     app.dependency_overrides.clear()
+
 
 async def run_with_client(test_func):
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        return await test_func(ac)  
+        return await test_func(ac)
+
 
 @pytest.mark.asyncio
 async def test_liveness():

@@ -1,0 +1,63 @@
+name: PR Quality Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  code-quality-check:
+    runs-on: ubuntu-latest
+    name: Code Quality Check
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Python dependencies
+        run: |
+          pip install flake8 black isort
+
+      - name: Run flake8 (warning only)
+        run: |
+          echo "🔍 Running flake8 checks..."
+          cd backend && flake8 --max-line-length=99 --extend-ignore=E203,W503 . || {
+            echo "::warning::Flake8 found code style issues"
+            echo "Run 'cd backend && flake8 .' locally to see details"
+            exit 1
+          }
+
+      - name: Check code formatting
+        run: |
+          echo "🎨 Checking code formatting..."
+          cd backend && black --check --diff . || {
+            echo "::warning::Code formatting issues found"
+            echo "Run 'cd backend && black .' locally to fix formatting"
+            exit 1
+          }
+
+      - name: Check import sorting
+        run: |
+          echo "📦 Checking import sorting..."
+          cd backend && isort --check-only --diff . || {
+            echo "::warning::Import sorting issues found"
+            echo "Run 'cd backend && isort .' locally to fix imports"
+            exit 1
+          }
+      - name: Check Prettier formatting (frontend)
+        run: |
+          echo "Checking Prettier formatting in frontend..."
+          cd frontend && npx prettier --check . || {
+            echo "::error::Prettier formatting issues found in frontend."
+            echo "Run 'cd frontend && npx prettier --write .' locally to fix formatting."
+            exit 1
+          }

@@ -1,7 +1,8 @@
 import type { AuthResponse } from '../types';
 import { apiRequest, ServiceLogger } from './api';
 
-const categories = ['JuicerMixerGrinders',
+const categories = [
+  'JuicerMixerGrinders',
   'Kettles&HotWaterDispensers',
   'HomeStorage&Organization',
   'GraphicTablets',
@@ -96,40 +97,25 @@ const categories = ['JuicerMixerGrinders',
   'Fans',
   'WaterPurifiers&Accessories',
   'InstantWaterHeaters',
-  'Stationery']
+  'Stationery',
+];
 
 export interface PreferencesRequest {
   preferences: string;
 }
 
-// export const setPreferences = async (preferences: PreferencesRequest): Promise<string> => {
-//   ServiceLogger.logServiceCall('setPreferences', { preferences });
-//   return apiRequest<string>('/api/users/preferences', 'setPreferences', {
-//     method: 'POST',
-//     body: preferences,
-//   });
-// };
-
-// Update the setPreferences function to return AuthResponse instead of string
-export const setPreferences = async (preferences: PreferencesRequest): Promise<AuthResponse> => {
-  const token = localStorage.getItem('jwt'); // Or however you store your JWT
-
-  const response = await fetch('/api/users/preferences', {
+export const setPreferences = async (
+  preferences: PreferencesRequest
+): Promise<AuthResponse> => {
+  ServiceLogger.logServiceCall('setPreferences', { preferences });
+  return apiRequest<AuthResponse>('/api/users/preferences', 'setPreferences', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` }),
-    },
-    body: JSON.stringify(preferences),
+    body: preferences,
   });
-  if (!response.ok) {
-    throw new Error('Failed to set preferences');
-  }
-  return response.json();
 };
 
 export const fetchNewPreferences = async (): Promise<string> => {
-  return categories.join("|");
+  return categories.join('|');
 };
 
 export const getPreferences = async (): Promise<string> => {

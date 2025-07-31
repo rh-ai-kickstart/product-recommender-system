@@ -20,7 +20,7 @@ import { ApiLogger, ServiceLogger, logger } from '../utils/logging/logger';
 ```typescript
 export const myService = async (param: string) => {
   ServiceLogger.logServiceCall('myService', { param });
-  
+
   try {
     // Your service logic here
     const result = await doSomething(param);
@@ -37,20 +37,20 @@ export const myService = async (param: string) => {
 ```typescript
 const makeApiCall = async () => {
   const context = ApiLogger.startRequest('getUserData', '/api/users/123');
-  
+
   try {
     const response = await fetch('/api/users/123');
     ApiLogger.logResponseReceived(context, response);
-    
+
     if (!response.ok) {
       ApiLogger.logError(context, new Error('Failed to fetch'), response);
       throw new Error(`HTTP ${response.status}`);
     }
-    
+
     const data = await response.json();
     ApiLogger.logDataParsing(context, data);
     ApiLogger.logResponse(context, response, `${data.length} users`);
-    
+
     return data;
   } catch (error) {
     ApiLogger.logError(context, error);
@@ -67,11 +67,14 @@ import logger from '../utils/logger';
 // Info logging
 logger.info({ userId: 123, action: 'login' }, 'User logged in');
 
-// Warning logging  
+// Warning logging
 logger.warn({ route: '/api/slow' }, 'Slow API response detected');
 
 // Error logging
-logger.error({ error: error.message, stack: error.stack }, 'Database connection failed');
+logger.error(
+  { error: error.message, stack: error.stack },
+  'Database connection failed'
+);
 ```
 
 ## 📊 Log Structure
@@ -79,6 +82,7 @@ logger.error({ error: error.message, stack: error.stack }, 'Database connection 
 All logs include structured data that's easy to search and filter:
 
 ### Service Logs:
+
 ```json
 {
   "level": "info",
@@ -90,9 +94,10 @@ All logs include structured data that's easy to search and filter:
 ```
 
 ### API Logs:
+
 ```json
 {
-  "level": "info", 
+  "level": "info",
   "time": "2024-01-15T10:30:45.456Z",
   "phase": "success",
   "operation": "searchProducts",
@@ -111,9 +116,9 @@ The logger is configured in `logger.ts`:
 
 ```typescript
 const logger = pino({
-  level: import.meta.env.PROD ? 'info' : 'debug',  // Debug logs in dev mode
-  browser: { asObject: true },                      // Browser compatibility
-  timestamp: pino.stdTimeFunctions.isoTime         // ISO timestamps
+  level: import.meta.env.PROD ? 'info' : 'debug', // Debug logs in dev mode
+  browser: { asObject: true }, // Browser compatibility
+  timestamp: pino.stdTimeFunctions.isoTime, // ISO timestamps
 });
 ```
 
@@ -127,25 +132,28 @@ const logger = pino({
 ## 🔍 Viewing Logs
 
 ### Browser Console:
+
 1. Open Developer Tools (F12)
-2. Go to Console tab  
+2. Go to Console tab
 3. Look for structured log objects with emojis
 
 ### Filtering in Console:
+
 ```javascript
 // Filter by log level
-console.filter(log => log.level === 'error')
+console.filter(log => log.level === 'error');
 
 // Filter by operation
-console.filter(log => log.operation === 'searchProducts')
+console.filter(log => log.operation === 'searchProducts');
 
 // Filter by service
-console.filter(log => log.service === 'fetchRecommendations')
+console.filter(log => log.service === 'fetchRecommendations');
 ```
 
 ## 🏗️ Best Practices
 
 ### ✅ Do:
+
 - Log at service entry/exit points
 - Include relevant context (user ID, request ID, etc.)
 - Use structured data instead of string interpolation
@@ -153,6 +161,7 @@ console.filter(log => log.service === 'fetchRecommendations')
 - Use appropriate log levels
 
 ### ❌ Don't:
+
 - Log sensitive data (passwords, tokens, PII)
 - Use string concatenation in log messages
 - Log in tight loops without throttling
@@ -168,11 +177,11 @@ if (import.meta.env.PROD) {
   // Send to external logging service
   logger.addDestination({
     dest: {
-      write: (log) => {
+      write: log => {
         // Send to Datadog, Sentry, CloudWatch, etc.
         externalLoggingService.send(JSON.parse(log));
-      }
-    }
+      },
+    },
   });
 }
 ```
@@ -180,7 +189,8 @@ if (import.meta.env.PROD) {
 ## 📈 Monitoring
 
 Key metrics you can extract from logs:
+
 - API response times (`duration` field)
 - Error rates by operation (`phase: 'error'`)
 - Service call patterns (`service` field)
-- Request volume by endpoint (`endpoint` field) 
+- Request volume by endpoint (`endpoint` field)

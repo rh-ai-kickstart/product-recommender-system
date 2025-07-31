@@ -6,14 +6,17 @@ export const useLogInteraction = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (interaction: InteractionRequest) => logInteraction(interaction),
+    mutationFn: (interaction: InteractionRequest) =>
+      logInteraction(interaction),
     onSuccess: (_, interaction) => {
       // Interactions might affect recommendations
       queryClient.invalidateQueries({ queryKey: ['recommendations'] });
 
       // If it's a rating interaction, update product cache
       if (interaction.rating) {
-        queryClient.invalidateQueries({ queryKey: ['products', interaction.item_id] });
+        queryClient.invalidateQueries({
+          queryKey: ['products', interaction.item_id],
+        });
       }
     },
   });

@@ -9,6 +9,7 @@ The `AuthProvider` is already configured in `main.tsx` and wraps your entire app
 ## Hook
 
 ### `useAuth()`
+
 The main hook you'll use for all authentication needs:
 
 ```tsx
@@ -18,7 +19,7 @@ function MyComponent() {
   const { user, isLoading, isAuthenticated } = useAuth();
 
   if (isLoading) return <div>Loading...</div>;
-  
+
   if (!isAuthenticated) return <div>Please log in</div>;
 
   return (
@@ -52,11 +53,11 @@ function LoginComponent() {
 
   const handleSignup = async () => {
     try {
-      await signup({ 
-        email: 'user@example.com', 
+      await signup({
+        email: 'user@example.com',
         password: 'password',
         age: 25,
-        gender: 'Other'
+        gender: 'Other',
       });
       // User is now signed up and logged in
     } catch (error) {
@@ -103,9 +104,9 @@ function ProtectedPage() {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) return <div>Loading...</div>;
-  
+
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to='/login' />;
   }
 
   return <div>This is a protected page!</div>;
@@ -117,15 +118,15 @@ function ProtectedPage() {
 ```tsx
 const {
   // User data
-  user,              // Current user object or null
-  isLoading,         // Loading state for any auth operation
-  isAuthenticated,   // Boolean indicating if user is logged in
-  
+  user, // Current user object or null
+  isLoading, // Loading state for any auth operation
+  isAuthenticated, // Boolean indicating if user is logged in
+
   // Auth actions
-  login,             // Function to log in user
-  signup,            // Function to sign up user
-  logout,            // Function to log out user
-  refetchUser,       // Function to refetch user data
+  login, // Function to log in user
+  signup, // Function to sign up user
+  logout, // Function to log out user
+  refetchUser, // Function to refetch user data
 } = useAuth();
 ```
 
@@ -141,6 +142,7 @@ const {
 ## API Endpoints
 
 The auth system expects these backend endpoints:
+
 - `POST /api/auth/login` - Login with email/password
 - `POST /api/auth/signup` - Sign up with email, password, age, gender
 - The system stores user data locally after login/signup since there's no `/auth/me` endpoint
@@ -148,7 +150,8 @@ The auth system expects these backend endpoints:
 ## Storage
 
 The auth system uses localStorage to store:
+
 - `auth_token`: JWT token for authentication
 - `user_data`: User information (stored after login/signup)
 
-Both are automatically cleared on logout or token expiration. 
+Both are automatically cleared on logout or token expiration.

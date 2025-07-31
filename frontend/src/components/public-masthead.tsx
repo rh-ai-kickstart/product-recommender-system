@@ -1,4 +1,9 @@
-import { MastheadBrand, MastheadMain, Masthead as PFMasthead, Title } from '@patternfly/react-core';
+import {
+  MastheadBrand,
+  MastheadMain,
+  Masthead as PFMasthead,
+  Title,
+} from '@patternfly/react-core';
 
 import { useLocation } from '@tanstack/react-router';
 
@@ -16,7 +21,7 @@ export function PublicMasthead() {
     <PFMasthead>
       <MastheadMain>
         <MastheadBrand data-codemods>
-          <Title headingLevel="h4">{title}</Title>
+          <Title headingLevel='h4'>{title}</Title>
         </MastheadBrand>
       </MastheadMain>
     </PFMasthead>

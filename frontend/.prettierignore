@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+*.min.js
+*.min.css
+
+# Generated files
+package-lock.json
+*.lock
+.cache/
+
+# Generated files
+routeTree.gen.ts
+
+# Large data files
+*.log
+*.csv
+*.json.gz

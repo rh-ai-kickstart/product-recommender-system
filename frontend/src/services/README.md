@@ -21,16 +21,19 @@ services/
 ## Authentication Service (`auth.ts`)
 
 ### Key Features
+
 - **JWT Token Management**: Secure token storage and validation
 - **Backend Integration**: Uses `/auth/me` endpoint for proper validation
 - **Centralized Validation**: `validateToken()` utility prevents duplication
 
 ### API Endpoints
+
 - `POST /auth/login` - User authentication
-- `POST /auth/signup` - User registration  
+- `POST /auth/signup` - User registration
 - `GET /auth/me` - Get current user (server-side validation)
 
 ### Usage
+
 ```typescript
 import { authService, validateToken } from '../services/auth';
 
@@ -48,8 +51,9 @@ const { isValid, shouldRedirect } = validateToken();
 ```
 
 ### Token Flow
+
 1. **Login/Signup**: Receive JWT token from backend
-2. **Storage**: Token stored in `localStorage` as `auth_token`  
+2. **Storage**: Token stored in `localStorage` as `auth_token`
 3. **Validation**: Token validated against `/auth/me` endpoint
 4. **Expiration**: Automatic cleanup on token expiry
 5. **Logout**: Clear token and user data
@@ -57,6 +61,7 @@ const { isValid, shouldRedirect } = validateToken();
 ## API Request Utility (`api.ts`)
 
 Shared utility for all API calls with:
+
 - Automatic auth header injection
 - Centralized error handling
 - Request/response logging
@@ -72,6 +77,7 @@ const data = await apiRequest<ProductData[]>('/api/products', 'fetchProducts');
 ## Error Handling
 
 All services use consistent error handling:
+
 - **4xx errors**: Client errors (validation, auth) - no retry
 - **5xx errors**: Server errors - automatic retry with backoff
 - **Network errors**: Retry with exponential backoff
@@ -80,9 +86,10 @@ All services use consistent error handling:
 ## Service Organization
 
 Each service file corresponds to a backend route:
+
 - `auth.ts` ↔ `backend/routes/auth.py`
 - `products.ts` ↔ `backend/routes/products.py`
 - `cart.ts` ↔ `backend/routes/cart.py`
 - etc.
 
-This 1:1 mapping makes the codebase easy to navigate and maintain. 
+This 1:1 mapping makes the codebase easy to navigate and maintain.

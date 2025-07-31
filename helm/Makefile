@@ -52,11 +52,11 @@ install: namespace depend
 	@$(eval PGVECTOR_ARGS := $(call helm_pgvector_args))
 	@$(eval DATASET_ARGS := $(call dataset_args))
 	@echo "Installing $(HELM_CHART) helm chart"
+	@echo "Waiting for model services to deploy. It may take around 10-15 minutes depending on the size of the database..."
 	@helm -n $(NAMESPACE) upgrade --install $(HELM_CHART) $(HELM_CHART) -n $(NAMESPACE) \
 		$(PGVECTOR_ARGS) \
 		$(DATASET_ARGS) \
 		$(EXTRA_HELM_ARGS) --set strimzi-kafka-operator.createGlobalResources=false --timeout 300m
-	@echo "Waiting for model services to deploy. It may take around 10-15 minutes depending on the size of the database..."
 	@oc rollout status deploy
 	@echo "$(HELM_CHART) installed successfully"
 

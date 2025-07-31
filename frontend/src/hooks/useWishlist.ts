@@ -1,5 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchWishlist, addToWishlist, removeFromWishlist } from '../services/wishlist';
+import {
+  fetchWishlist,
+  addToWishlist,
+  removeFromWishlist,
+} from '../services/wishlist';
 
 export const useWishlist = (userId?: string) => {
   return useQuery({
@@ -13,8 +17,13 @@ export const useAddToWishlist = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, productId }: { userId: string; productId: string }) =>
-      addToWishlist(userId, productId),
+    mutationFn: ({
+      userId,
+      productId,
+    }: {
+      userId: string;
+      productId: string;
+    }) => addToWishlist(userId, productId),
     onSuccess: (_, { userId }) => {
       queryClient.invalidateQueries({ queryKey: ['wishlist', userId] });
     },
@@ -25,8 +34,13 @@ export const useRemoveFromWishlist = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, productId }: { userId: string; productId: string }) =>
-      removeFromWishlist(userId, productId),
+    mutationFn: ({
+      userId,
+      productId,
+    }: {
+      userId: string;
+      productId: string;
+    }) => removeFromWishlist(userId, productId),
     onSuccess: (_, { userId }) => {
       queryClient.invalidateQueries({ queryKey: ['wishlist', userId] });
     },

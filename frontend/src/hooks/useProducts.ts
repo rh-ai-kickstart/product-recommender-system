@@ -24,7 +24,11 @@ export const useProductSearch = (query: string, enabled: boolean = true) => {
   });
 };
 
-export const useProductSearchByText = (query: string, k: number = 5, enabled: boolean = true) => {
+export const useProductSearchByText = (
+  query: string,
+  k: number = 5,
+  enabled: boolean = true
+) => {
   return useQuery({
     queryKey: ['products', 'search', 'text', query, k],
     queryFn: () => searchProductsByText(query, k),

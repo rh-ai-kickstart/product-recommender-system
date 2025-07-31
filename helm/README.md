@@ -9,6 +9,7 @@ This directory contains the Helm chart and deployment configuration for the Prod
 - Access to an OpenShift cluster with necessary permissions
 
 ## Configuration
+
 The following environment variables can be configured:
 
 - `NAMESPACE` (Required): The OpenShift namespace where the system will be deployed
@@ -24,6 +25,7 @@ make install NAMESPACE=your-namespace
 ```
 
 This command will:
+
 1. Create the specified namespace if it doesn't exist
 2. Update Helm dependencies
 3. Install/upgrade the Helm chart with the configured settings
@@ -38,6 +40,7 @@ make status NAMESPACE=your-namespace
 ```
 
 This will show:
+
 - Running pods
 - Active services
 - Available routes
@@ -53,11 +56,13 @@ make uninstall NAMESPACE=your-namespace
 ```
 
 This will:
+
 1. Uninstall the Helm chart
-3. Delete all pods in the namespace
-4. Display remaining resources in the namespace
+2. Delete all pods in the namespace
+3. Display remaining resources in the namespace
 
 Note: To completely remove the namespace after uninstallation, you can run:
+
 ```bash
 oc delete project your-namespace
 ```

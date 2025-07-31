@@ -1,4 +1,10 @@
-import type { User, LoginRequest, SignUpRequest, AuthResponse, AuthError } from '../types';
+import type {
+  User,
+  LoginRequest,
+  SignUpRequest,
+  AuthResponse,
+  AuthError,
+} from '../types';
 import AuthLogger from '../utils/logging/authLogger';
 
 const API_BASE = '/api';
@@ -18,7 +24,10 @@ export const removeToken = (): void => {
 };
 
 // API call helper with auth header
-const apiCall = async (endpoint: string, options: RequestInit = {}): Promise<Response> => {
+const apiCall = async (
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<Response> => {
   const token = getToken();
   const headers = {
     'Content-Type': 'application/json',
@@ -100,7 +109,10 @@ export const authService = {
 };
 
 // Centralized token validation utility
-export const validateToken = (): { isValid: boolean; shouldRedirect: boolean } => {
+export const validateToken = (): {
+  isValid: boolean;
+  shouldRedirect: boolean;
+} => {
   const token = getToken();
 
   if (!token) {

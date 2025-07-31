@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchNewPreferences, setPreferences } from '../services/preferences';
+import { setPreferences, fetchNewPreferences } from '../services/preferences';
+import { createNewUserRecommendations } from '../services/recommendations';
 import type { PreferencesRequest } from '../services/preferences';
 import { useNavigate } from '@tanstack/react-router';
 
@@ -19,16 +20,33 @@ export const useSetPreferences = () => {
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (preferences: PreferencesRequest) => setPreferences(preferences),
-    onSuccess: (authResponse) => {
-      // Update preferences cache
-      queryClient.setQueryData(['preferences'], authResponse.user.preferences);
-
-      // Update current user data in auth context
+    mutationFn: (preferences: PreferencesRequest) =>
+      setPreferences(preferences),
+    onSuccess: async authResponse => {
+      // Update user data in cache with new preferences
       queryClient.setQueryData(['currentUser'], authResponse.user);
 
-      // Invalidate recommendations since preferences changed
-      queryClient.invalidateQueries({ queryKey: ['recommendations'] });
+      // Create new user recommendations via ML model
+      try {
+        console.log('Triggering new user recommendation generation...');
+        await createNewUserRecommendations(10);
+        console.log('New user recommendations created successfully');
+
+        // Invalidate recommendations cache to force refresh
+        queryClient.invalidateQueries({
+          queryKey: ['recommendations', 'personalized'],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['recommendations', 'new-user'],
+        });
+      } catch (error) {
+        console.warn(
+          'Failed to create initial recommendations via ML model:',
+          error
+        );
+        console.log('Will fall back to existing user recommendations endpoint');
+      }
+
       // Get redirect path from URL params or default to home
       const searchParams = new URLSearchParams(window.location.search);
       const redirectPath = searchParams.get('redirect') || '/';

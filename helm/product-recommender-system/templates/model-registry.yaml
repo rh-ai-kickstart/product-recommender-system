@@ -216,12 +216,12 @@ spec:
 {{- end }}
 ---
 {{- if .Values.modelRegistry.enabled }}
-{{- $roleBindingExists := (lookup "rbac.authorization.k8s.io/v1" "RoleBinding" .Values.modelRegistry.namespace "modelregistry-rolebinding") }}
+{{- $roleBindingExists := (lookup "rbac.authorization.k8s.io/v1" "RoleBinding" .Values.modelRegistry.namespace "modelregistry-rolebinding-{{ .Release.Namespace }}") }}
 {{- if not $roleBindingExists }}
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: modelregistry-rolebinding
+  name: modelregistry-rolebinding-{{ .Release.Namespace }}
   namespace: {{ .Values.modelRegistry.namespace }}
 subjects:
   - kind: ServiceAccount

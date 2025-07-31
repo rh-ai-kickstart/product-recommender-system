@@ -14,7 +14,11 @@ export function CatalogPage() {
         <Title headingLevel={'h1'} style={{ marginTop: '15px' }}>
           Catalog
         </Title>
-        {isLoading ? <GallerySkeleton count={12} /> : <GalleryView products={products} />}
+        {isLoading ? (
+          <GallerySkeleton count={12} />
+        ) : (
+          <GalleryView products={products} />
+        )}
       </PageSection>
     </>
   );

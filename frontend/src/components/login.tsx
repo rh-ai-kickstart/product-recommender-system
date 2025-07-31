@@ -20,7 +20,9 @@ export const SimpleLoginPage: React.FunctionComponent = () => {
     password: '',
   });
 
-  const onLoginButtonClick = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const onLoginButtonClick = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     event.preventDefault();
 
     // Simple validation
@@ -44,24 +46,30 @@ export const SimpleLoginPage: React.FunctionComponent = () => {
         password: formData.password,
       });
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Login failed. Please try again.');
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : 'Login failed. Please try again.'
+      );
     }
   };
 
   const signUpForAccountMessage = (
     <LoginMainFooterBandItem>
-      Need an account? <Link to="/signup">Sign up.</Link>
+      Need an account? <Link to='/signup'>Sign up.</Link>
     </LoginMainFooterBandItem>
   );
 
   const forgotCredentials = (
     <LoginMainFooterBandItem>
-      <div style={{ color: '#6a6e73', fontSize: '14px' }}>💡 Try: demo1@example.com / demo123</div>
+      <div style={{ color: '#6a6e73', fontSize: '14px' }}>
+        💡 Try: demo1@example.com / demo123
+      </div>
       {process.env.NODE_ENV === 'development' && (
         <div style={{ marginTop: '0.5rem' }}>
           <Button
-            variant="link"
-            size="sm"
+            variant='link'
+            size='sm'
             onClick={() => {
               setFormData({ email: 'demo1@example.com', password: 'demo123' });
             }}
@@ -78,24 +86,24 @@ export const SimpleLoginPage: React.FunctionComponent = () => {
       showHelperText={!!errorMessage}
       helperText={errorMessage || 'Please enter your credentials'}
       helperTextIcon={errorMessage ? <ExclamationCircleIcon /> : undefined}
-      usernameLabel="Email"
+      usernameLabel='Email'
       usernameValue={formData.email}
       onChangeUsername={(_event, value) => {
-        setFormData((prev) => ({ ...prev, email: value }));
+        setFormData(prev => ({ ...prev, email: value }));
         setErrorMessage(''); // Clear errors when typing
       }}
       isValidUsername={true}
-      passwordLabel="Password"
+      passwordLabel='Password'
       passwordValue={formData.password}
       onChangePassword={(_event, value) => {
-        setFormData((prev) => ({ ...prev, password: value }));
+        setFormData(prev => ({ ...prev, password: value }));
         setErrorMessage(''); // Clear errors when typing
       }}
       isValidPassword={true}
       onLoginButtonClick={onLoginButtonClick}
       loginButtonLabel={loginMutation.isPending ? 'Logging in...' : 'Log in'}
       isLoginButtonDisabled={loginMutation.isPending}
-      rememberMeLabel="Keep me logged in"
+      rememberMeLabel='Keep me logged in'
       isRememberMeChecked={false}
       onChangeRememberMe={() => {}} // Could add remember me functionality later
     />
@@ -104,8 +112,8 @@ export const SimpleLoginPage: React.FunctionComponent = () => {
   return (
     <LoginPage
       footerListVariants={ListVariant.inline}
-      loginTitle="Log in to your account"
-      loginSubtitle="Enter your credentials to access your personalized recommendations"
+      loginTitle='Log in to your account'
+      loginSubtitle='Enter your credentials to access your personalized recommendations'
       signUpForAccountMessage={signUpForAccountMessage}
       forgotCredentials={forgotCredentials}
     >

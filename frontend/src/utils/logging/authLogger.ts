@@ -42,7 +42,11 @@ export class AuthLogger {
     return null;
   }
 
-  private static getTokenInfo(): { hasToken: boolean; isExpired: boolean; expiresAt?: number } {
+  private static getTokenInfo(): {
+    hasToken: boolean;
+    isExpired: boolean;
+    expiresAt?: number;
+  } {
     try {
       const token = localStorage.getItem('auth_token');
       if (!token) return { hasToken: false, isExpired: false };
@@ -81,7 +85,12 @@ export class AuthLogger {
   }
 
   // Log successful auth events
-  static logAuthSuccess(context: AuthContext, event: AuthEvent, user?: User, details?: any) {
+  static logAuthSuccess(
+    context: AuthContext,
+    event: AuthEvent,
+    user?: User,
+    details?: any
+  ) {
     const duration = performance.now() - context.startTime;
 
     logger.info(
@@ -101,7 +110,12 @@ export class AuthLogger {
   }
 
   // Log failed auth events
-  static logAuthFailure(context: AuthContext, event: AuthEvent, error: any, details?: any) {
+  static logAuthFailure(
+    context: AuthContext,
+    event: AuthEvent,
+    error: any,
+    details?: any
+  ) {
     const duration = performance.now() - context.startTime;
 
     logger.error(
@@ -248,8 +262,14 @@ export class AuthLogger {
       {
         event: 'auth_metrics',
         hasActiveSession: !!currentUser,
-        tokenStatus: tokenInfo.hasToken ? (tokenInfo.isExpired ? 'expired' : 'valid') : 'none',
-        sessionAge: tokenInfo.expiresAt ? tokenInfo.expiresAt - Date.now() : null,
+        tokenStatus: tokenInfo.hasToken
+          ? tokenInfo.isExpired
+            ? 'expired'
+            : 'valid'
+          : 'none',
+        sessionAge: tokenInfo.expiresAt
+          ? tokenInfo.expiresAt - Date.now()
+          : null,
         timestamp: new Date().toISOString(),
       },
       `📊 Auth metrics snapshot`

@@ -1,0 +1,40 @@
+repos:
+  # Warning-only Python linting (won't block commits)
+  - repo: local
+    hooks:
+      - id: flake8-warn
+        name: Flake8
+        entry: bash -c 'cd backend && flake8 --extend-ignore=E203,W503 . || false'
+        language: system
+        files: .*\.py$
+        pass_filenames: false
+
+  # Basic file checks (these can still block for critical issues)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 'v5.0.0'
+    hooks:
+      - id: check-yaml  # Validates YAML syntax
+        args: ['--allow-multiple-documents']
+        exclude: ^helm/.*\.yaml$  # Exclude Helm templates - they're checked separately
+      - id: check-json  # Validates JSON syntax
+        exclude: ^frontend/.*$  # Exclude frontend - handled by ESLint
+      - id: trailing-whitespace
+        exclude: ^(frontend/.*\.json$|frontend/.*\.js$|frontend/.*\.jsx$|frontend/.*\.ts$|frontend/.*\.tsx$)  # Exclude frontend files - different conventions
+      - id: end-of-file-fixer
+        exclude: ^frontend/.*$  # Exclude frontend directories - React doesn't use end-of-file newlines
+
+  # Warning-only Helm linting (won't block commits)
+  - repo: local
+    hooks:
+      - id: helm-lint-warn
+        name: Helm Lint
+        entry: bash -c 'cd helm/product-recommender-system/ && helm lint . || false'
+        language: system
+
+  # Warning-only Python linting (won't block commits)
+  - repo: local
+    hooks:
+      - id: prettier-warn
+        name: prettier
+        entry: bash -c 'cd frontend && npx prettier --check . || false'
+        language: system

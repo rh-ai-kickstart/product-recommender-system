@@ -26,7 +26,7 @@ During database seeding, test users are created using **real Feast user IDs** wi
 **📁 Configuration**: Test user settings are defined in `backend/config/test_users.yaml` for easy customization.
 
 **🎯 Key Benefits:**
-- ✅ **Known passwords** for easy login 
+- ✅ **Known passwords** for easy login
 - ✅ **Rich interaction history** from Feast ML dataset
 - ✅ **Lightning-fast recommendations** via pre-computed `user_top_k_items`
 - ✅ **Authentic ML experience** with real personalization data
@@ -54,7 +54,7 @@ GET /recommendations/{user_id}
 ```
 Fast lookup of pre-computed recommendations.
 
-#### For New Users  
+#### For New Users
 ```http
 POST /recommendations
 Authorization: Bearer {token}
@@ -98,7 +98,7 @@ Real-time ML inference using user attributes.
 
 ### 🔒 Security
 
-- **Authentication**: JWT tokens with 24-hour expiry  
+- **Authentication**: JWT tokens with 24-hour expiry
 - **Password Hashing**: Bcrypt with secure salt rounds
 - **Test Users**: Known passwords for development (configurable via YAML)
 - **Token Validation**: Server-side validation via `/auth/me` endpoint

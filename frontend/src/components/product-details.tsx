@@ -9,6 +9,7 @@ import {
   Skeleton,
 } from '@patternfly/react-core';
 import StarRatings from 'react-star-ratings';
+import { useEffect } from 'react';
 import { useProductActions } from '../hooks';
 import { Route } from '../routes/_protected/product/$productId';
 
@@ -20,11 +21,12 @@ export const ProductDetails = () => {
   const { product, error, isLoading, addToCart, isAddingToCart, recordClick } =
     useProductActions(productId);
 
-  // Record that user viewed this product
-  // This could also be done automatically in the hook
-  if (product && !isLoading) {
-    recordClick();
-  }
+  // Record that user viewed this product when component mounts or productId changes
+  useEffect(() => {
+    if (product && !isLoading) {
+      recordClick();
+    }
+  }, [product, isLoading, recordClick, productId]);
 
   if (error || !product) {
     return <div>Error fetching product</div>;
@@ -32,7 +34,7 @@ export const ProductDetails = () => {
 
   // Mutation for buying product now
   const handleBuyNow = () => {
-    alert(product.title);
+    alert(product.product_name);
   };
 
   return (
@@ -45,8 +47,8 @@ export const ProductDetails = () => {
             <Card style={{ height: '100%' }}>
               <CardBody style={{ height: '100%', padding: 0 }}>
                 <img
-                  src={product.imageUrl}
-                  alt={product.title}
+                  src={product.img_link}
+                  alt={product.product_name}
                   style={{
                     width: '100%',
                     height: '100%',
@@ -60,30 +62,30 @@ export const ProductDetails = () => {
           <FlexItem style={{ flex: 1, minWidth: 0, height: '100%' }}>
             <Card isPlain style={{ height: '100%' }}>
               <CardTitle style={{ fontSize: '2rem', fontWeight: 'bold' }}>
-                {product.title}
+                {product.product_name}
               </CardTitle>
               <CardBody>
                 <Flex direction={{ default: 'column' }}>
                   <FlexItem>
                     <StarRatings
                       rating={product.rating}
-                      starRatedColor="black"
+                      starRatedColor='black'
                       numberOfStars={5}
-                      name="rating"
-                      starDimension="18px"
-                      starSpacing="1px"
+                      name='rating'
+                      starDimension='18px'
+                      starSpacing='1px'
                     />{' '}
                     {product.rating}
                   </FlexItem>
-                  <FlexItem headers="h1">${product.price}</FlexItem>
-                  <FlexItem>{product.description}</FlexItem>
+                  <FlexItem headers='h1'>${product.actual_price}</FlexItem>
+                  <FlexItem>{product.about_product}</FlexItem>
                 </Flex>
               </CardBody>
               <CardFooter>
                 <Flex>
                   <FlexItem>
                     <Button
-                      variant="secondary"
+                      variant='secondary'
                       onClick={() => addToCart(1)}
                       isLoading={isAddingToCart}
                       isDisabled={isAddingToCart}
@@ -92,7 +94,7 @@ export const ProductDetails = () => {
                     </Button>
                   </FlexItem>
                   <FlexItem>
-                    <Button variant="primary" onClick={handleBuyNow}>
+                    <Button variant='primary' onClick={handleBuyNow}>
                       Buy Now
                     </Button>
                   </FlexItem>
