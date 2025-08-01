@@ -24,6 +24,26 @@ helm_pgvector_args = \
 dataset_args = \
 	--set datasetUrl=$(DATASET_URL)
 
+# Shared function for Kafka topic cleanup
+define cleanup_kafka_topics
+	@echo "Cleaning up Kafka topics with graceful deletion..."
+	@echo "Attempting graceful deletion of Kafka topics (60s grace period)..."
+	@oc delete kafkatopic interactions -n $(NAMESPACE) --grace-period=60 ||:
+	@oc delete kafkatopic new-users -n $(NAMESPACE) --grace-period=60 ||:
+	@echo "Waiting for Kafka topics to be deleted..."
+	@oc wait --for=delete kafkatopic/interactions -n $(NAMESPACE) --timeout=30s ||:
+	@oc wait --for=delete kafkatopic/new-users -n $(NAMESPACE) --timeout=30s ||:
+	@echo "Checking if Kafka topics still exist and removing finalizers if needed..."
+	@if oc get kafkatopic interactions -n $(NAMESPACE) &>/dev/null; then \
+		echo "Removing finalizers from interactions topic..."; \
+		oc patch kafkatopic interactions -n $(NAMESPACE) -p '{"metadata":{"finalizers":[]}}' --type=merge ||:; \
+	fi
+	@if oc get kafkatopic new-users -n $(NAMESPACE) &>/dev/null; then \
+		echo "Removing finalizers from new-users topic..."; \
+		oc patch kafkatopic new-users -n $(NAMESPACE) -p '{"metadata":{"finalizers":[]}}' --type=merge ||:; \
+	fi
+endef
+
 # Default target
 .PHONY: help
 help:
@@ -31,6 +51,7 @@ help:
 	@echo "  list-models   - List available models"
 	@echo "  install       - Install the recommender system app (creates namespace, secrets, and deploys Helm chart)"
 	@echo "  uninstall     - Uninstall the recommender system app and clean up resources"
+	@echo "  delete-project - Delete the entire project with automatic Kafka topic cleanup"
 	@echo "  status        - Check status of the deployment"
 	@echo ""
 	@echo "Configuration options (set via environment variables or make arguments):"
@@ -63,13 +84,6 @@ install: namespace depend
 # Uninstall the deployment and clean up
 .PHONY: uninstall
 uninstall:
-	# Remove Kafka topic finalizers to prevent namespace deletion from getting stuck
-	# This is necessary when the Strimzi operator is removed before the topics,
-	# leaving finalizers that prevent proper cleanup. The ||: ensures the command
-	# doesn't fail if the topics don't exist.
-	@echo "Removing Kafka topic finalizers..."
-	@oc patch kafkatopic interactions -n $(NAMESPACE) -p '{"metadata":{"finalizers":[]}}' --type=merge ||:
-	@oc patch kafkatopic new-users -n $(NAMESPACE) -p '{"metadata":{"finalizers":[]}}' --type=merge ||:
 	@echo "Uninstalling $(HELM_CHART) helm chart"
 	@helm -n $(NAMESPACE) uninstall $(HELM_CHART)
 	@echo "Removing pgvector and minio PVCs from $(NAMESPACE)"
@@ -77,8 +91,9 @@ uninstall:
 	@echo "Deleting remaining pods in namespace $(NAMESPACE)"
 	@oc delete jobs -n $(NAMESPACE) --all
 	@oc delete pods -n $(NAMESPACE) --all
+	$(cleanup_kafka_topics)
 	@echo "Checking for any remaining resources in namespace $(NAMESPACE)..."
-	@echo "If you want to completely remove the namespace, run: oc delete project $(NAMESPACE)"
+	@echo "If you want to completely remove the namespace, run: make delete-project NAMESPACE=$(NAMESPACE)"
 	@echo "Remaining resources in namespace $(NAMESPACE):"
 	@$(MAKE) status
 
@@ -99,3 +114,18 @@ status:
 
 	@echo "Listing pvcs..."
 	oc get pvc -n $(NAMESPACE) || true
+
+# Delete project with automatic Kafka topic cleanup
+.PHONY: delete-project
+delete-project:
+	@echo "Deleting project $(NAMESPACE)..."
+	@oc delete project $(NAMESPACE)
+	@echo "Waiting 90 seconds to see if project deletion completes..."
+	@sleep 90
+	@if oc get project $(NAMESPACE) &>/dev/null; then \
+		echo "Project deletion is taking longer than expected. Checking for stuck Kafka topics..."; \
+		$(cleanup_kafka_topics); \
+		echo "Project $(NAMESPACE) should now be deleted. If it's still stuck, check manually."; \
+	else \
+		echo "Project $(NAMESPACE) deleted successfully!"; \
+	fi
