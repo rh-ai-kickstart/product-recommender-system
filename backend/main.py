@@ -46,18 +46,18 @@ class SPAStaticFiles(StaticFiles):
                     raise ex
 
 
-# Include Routers
-# app.include_router(test.router)
-app.include_router(preferences.router)
-app.include_router(health.router)
-app.include_router(auth.router)
-app.include_router(products.router)
-# app.include_router(interactions.router)
-app.include_router(recommendations.router)
-# app.include_router(cart.router)
-# app.include_router(orders.router)
-# app.include_router(wishlist.router)
-# app.include_router(feedback.router)
+# Include Routers with /api prefix
+# app.include_router(test.router, prefix="/api")
+app.include_router(preferences.router, prefix="/api")
+app.include_router(health.router, prefix="/api")
+app.include_router(auth.router, prefix="/api")
+app.include_router(products.router, prefix="/api")
+# app.include_router(interactions.router, prefix="/api")
+app.include_router(recommendations.router, prefix="/api")
+# app.include_router(cart.router, prefix="/api")
+# app.include_router(orders.router, prefix="/api")
+# app.include_router(wishlist.router, prefix="/api")
+# app.include_router(feedback.router, prefix="/api")
 
 
 # Mount SPA static files at the root - this should be LAST
