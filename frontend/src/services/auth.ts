@@ -6,7 +6,6 @@ import type {
   AuthError,
 } from '../types';
 
-const API_BASE = '';
 const TOKEN_KEY = 'auth_token';
 
 // Token management
@@ -34,7 +33,7 @@ const apiCall = async (
     ...options.headers,
   };
 
-  return fetch(`${API_BASE}${endpoint}`, {
+  return fetch(`${endpoint}`, {
     ...options,
     headers,
   });
