@@ -36,10 +36,10 @@ export const myService = async (param: string) => {
 
 ```typescript
 const makeApiCall = async () => {
-  const context = ApiLogger.startRequest('getUserData', '/api/users/123');
+  const context = ApiLogger.startRequest('getUserData', '/users/123');
 
   try {
-    const response = await fetch('/api/users/123');
+    const response = await fetch('/users/123');
     ApiLogger.logResponseReceived(context, response);
 
     if (!response.ok) {
@@ -68,7 +68,7 @@ import logger from '../utils/logger';
 logger.info({ userId: 123, action: 'login' }, 'User logged in');
 
 // Warning logging
-logger.warn({ route: '/api/slow' }, 'Slow API response detected');
+logger.warn({ route: '/slow' }, 'Slow API response detected');
 
 // Error logging
 logger.error(
@@ -102,7 +102,7 @@ All logs include structured data that's easy to search and filter:
   "phase": "success",
   "operation": "searchProducts",
   "requestId": "req_1705123456789_abc123def",
-  "endpoint": "/api/products/search?q=laptop",
+  "endpoint": "/products/search?q=laptop",
   "status": 200,
   "duration": 45.23,
   "dataSize": "12 items",

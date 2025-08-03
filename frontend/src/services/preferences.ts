@@ -108,7 +108,7 @@ export const setPreferences = async (
   preferences: PreferencesRequest
 ): Promise<AuthResponse> => {
   ServiceLogger.logServiceCall('setPreferences', { preferences });
-  return apiRequest<AuthResponse>('/api/users/preferences', 'setPreferences', {
+  return apiRequest<AuthResponse>('/users/preferences', 'setPreferences', {
     method: 'POST',
     body: preferences,
   });
@@ -120,5 +120,5 @@ export const fetchNewPreferences = async (): Promise<string> => {
 
 export const getPreferences = async (): Promise<string> => {
   ServiceLogger.logServiceCall('getPreferences');
-  return apiRequest<string>('/api/users/preferences', 'getPreferences');
+  return apiRequest<string>('/users/preferences', 'getPreferences');
 };

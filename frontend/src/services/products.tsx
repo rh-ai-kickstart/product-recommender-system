@@ -1,7 +1,7 @@
 import type { ProductData } from '../types';
 
 export const fetchRecommendations = async (): Promise<ProductData[]> => {
-  const response = await fetch('/api/recommendations');
+  const response = await fetch('/recommendations');
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
@@ -11,7 +11,7 @@ export const fetchRecommendations = async (): Promise<ProductData[]> => {
 
 export const fetchWishlist = async (): Promise<ProductData[]> => {
   const user_id = 'user1';
-  const response = await fetch(`/api/wishlist/${user_id}`);
+  const response = await fetch(`/wishlist/${user_id}`);
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
@@ -20,7 +20,7 @@ export const fetchWishlist = async (): Promise<ProductData[]> => {
 };
 
 export const fetchSearch = async (): Promise<ProductData[]> => {
-  const response = await fetch('/api/products/search');
+  const response = await fetch('/products/search');
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
@@ -29,7 +29,7 @@ export const fetchSearch = async (): Promise<ProductData[]> => {
 };
 
 export const fetchNewPreferences = async (): Promise<string[]> => {
-  const response = await fetch('/api/users/preferences');
+  const response = await fetch('/users/preferences');
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
@@ -41,7 +41,7 @@ export const fetchNewPreferences = async (): Promise<string[]> => {
 export const addPreferences = async (
   newPreferences: string
 ): Promise<string> => {
-  const response = await fetch('/api/users/preferences', {
+  const response = await fetch('/users/preferences', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

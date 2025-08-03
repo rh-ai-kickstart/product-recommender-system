@@ -7,9 +7,7 @@ export const fetchWishlist = async (
   ServiceLogger.logServiceCall('fetchWishlist', { userId });
 
   // Use placeholder user_id for now, similar to current implementation
-  const endpoint = userId
-    ? `/api/wishlist/${userId}`
-    : '/api/wishlist/{user_id}';
+  const endpoint = userId ? `/wishlist/${userId}` : '/wishlist/{user_id}';
 
   // const context = ServiceLogger.logServiceCall('fetchWishlist');
 
@@ -26,7 +24,7 @@ export const addToWishlist = async (
   productId: string
 ): Promise<void> => {
   ServiceLogger.logServiceCall('addToWishlist', { userId, productId });
-  return apiRequest<void>('/api/wishlist', 'addToWishlist', {
+  return apiRequest<void>('/wishlist', 'addToWishlist', {
     method: 'POST',
     body: { user_id: userId, product_id: productId },
   });
@@ -37,7 +35,7 @@ export const removeFromWishlist = async (
   productId: string
 ): Promise<void> => {
   ServiceLogger.logServiceCall('removeFromWishlist', { userId, productId });
-  return apiRequest<void>('/api/wishlist', 'removeFromWishlist', {
+  return apiRequest<void>('/wishlist', 'removeFromWishlist', {
     method: 'DELETE',
     body: { user_id: userId, product_id: productId },
   });

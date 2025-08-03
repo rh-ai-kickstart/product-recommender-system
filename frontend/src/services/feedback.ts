@@ -10,7 +10,7 @@ export interface Feedback {
 
 export const submitFeedback = async (feedback: Feedback): Promise<void> => {
   ServiceLogger.logServiceCall('submitFeedback', { feedback });
-  return apiRequest<void>('/api/feedback', 'submitFeedback', {
+  return apiRequest<void>('/feedback', 'submitFeedback', {
     method: 'POST',
     body: feedback,
   });

@@ -143,8 +143,8 @@ const {
 
 The auth system expects these backend endpoints:
 
-- `POST /api/auth/login` - Login with email/password
-- `POST /api/auth/signup` - Sign up with email, password, age, gender
+- `POST /auth/login` - Login with email/password
+- `POST /auth/signup` - Sign up with email, password, age, gender
 - The system stores user data locally after login/signup since there's no `/auth/me` endpoint
 
 ## Storage

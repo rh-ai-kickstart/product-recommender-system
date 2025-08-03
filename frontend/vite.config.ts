@@ -18,10 +18,49 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': {
+      '/auth': {
         target: 'http://localhost:8000',
         changeOrigin: true,
-        rewrite: path => path.replace(/^\/api/, ''),
+      },
+      '/products': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/recommendations': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/users': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/interactions': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/cart': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/orders': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/checkout': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/wishlist': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/feedback': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/health': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
       },
     },
   },

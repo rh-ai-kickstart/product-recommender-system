@@ -6,7 +6,7 @@ import type {
   AuthError,
 } from '../types';
 
-const API_BASE = '/api';
+const API_BASE = '';
 const TOKEN_KEY = 'auth_token';
 
 // Token management

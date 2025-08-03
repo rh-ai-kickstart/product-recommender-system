@@ -13,7 +13,7 @@ export const searchProducts = async (query: string): Promise<ProductData[]> => {
   }
 
   return apiRequest<ProductData[]>(
-    `/api/products/search?query=${encodeURIComponent(query)}`,
+    `/products/search?query=${encodeURIComponent(query)}`,
     'searchProducts'
   );
 };
@@ -24,7 +24,7 @@ export const searchProductsByText = async (
 ): Promise<ProductData[]> => {
   ServiceLogger.logServiceCall('searchProductsByText', { query, k });
   return apiRequest<ProductData[]>(
-    `/api/products/search?query=${encodeURIComponent(query)}&k=${k}`,
+    `/products/search?query=${encodeURIComponent(query)}&k=${k}`,
     'searchProductsByText'
   );
 };
@@ -35,7 +35,7 @@ export const searchProductsByImageLink = async (
 ): Promise<ProductData[]> => {
   ServiceLogger.logServiceCall('searchProductsByImageLink', { imageLink, k });
   return apiRequest<ProductData[]>(
-    `/api/products/search/image_link?image_link=${encodeURIComponent(imageLink)}&k=${k}`,
+    `/products/search/image_link?image_link=${encodeURIComponent(imageLink)}&k=${k}`,
     'searchProductsByImageLink'
   );
 };
@@ -54,7 +54,7 @@ export const searchProductsByImage = async (
   formData.append('k', k.toString());
 
   return apiRequest<ProductData[]>(
-    '/api/products/search/image',
+    '/products/search/image',
     'searchProductsByImage',
     {
       method: 'POST',
@@ -70,7 +70,7 @@ export const fetchProduct = async (productId: string): Promise<ProductData> => {
   try {
     // Make GET request to fetch single product
     const product = await apiRequest<ProductData>(
-      `/api/products/${productId}`,
+      `/products/${productId}`,
       'fetchProduct'
     );
 

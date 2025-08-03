@@ -10,7 +10,7 @@ export const fetchExistingUserRecommendations = async (
 ): Promise<ProductData[]> => {
   ServiceLogger.logServiceCall('fetchExistingUserRecommendations', { userId });
   return apiRequest<ProductData[]>(
-    `/api/recommendations/${userId}`,
+    `/recommendations/${userId}`,
     'fetchExistingUserRecommendations'
   );
 };
@@ -27,7 +27,7 @@ export const createNewUserRecommendations = async (
   });
 
   return apiRequest<ProductData[]>(
-    '/api/recommendations',
+    '/recommendations',
     'createNewUserRecommendations',
     {
       method: 'POST',
@@ -53,7 +53,7 @@ export const fetchNewUserRecommendations = async (
   try {
     // Use the same endpoint as existing users until backend creates model generated new user recommendations - backend will handle gracefully
     return await apiRequest<ProductData[]>(
-      `/api/recommendations/${userId}`,
+      `/recommendations/${userId}`,
       'fetchNewUserRecommendations'
     );
   } catch (error) {

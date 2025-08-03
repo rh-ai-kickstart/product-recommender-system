@@ -71,7 +71,7 @@ Shared utility for all API calls with:
 import { apiRequest } from './api';
 
 // Usage in service functions
-const data = await apiRequest<ProductData[]>('/api/products', 'fetchProducts');
+const data = await apiRequest<ProductData[]>('/products', 'fetchProducts');
 ```
 
 ## Error Handling

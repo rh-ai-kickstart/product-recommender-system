@@ -22,7 +22,7 @@ export interface Order {
 
 export const checkout = async (request: CheckoutRequest): Promise<Order> => {
   ServiceLogger.logServiceCall('checkout', { request });
-  return apiRequest<Order>('/api/checkout', 'checkout', {
+  return apiRequest<Order>('/checkout', 'checkout', {
     method: 'POST',
     body: request,
   });
@@ -30,5 +30,5 @@ export const checkout = async (request: CheckoutRequest): Promise<Order> => {
 
 export const fetchOrderHistory = async (userId: string): Promise<Order[]> => {
   ServiceLogger.logServiceCall('fetchOrderHistory', { userId });
-  return apiRequest<Order[]>(`/api/orders/${userId}`, 'fetchOrderHistory');
+  return apiRequest<Order[]>(`/orders/${userId}`, 'fetchOrderHistory');
 };
