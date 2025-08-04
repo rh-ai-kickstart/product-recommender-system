@@ -1,0 +1,38 @@
+[project]
+name = "recommendation_core"
+version = "0.1.1"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "einops>=0.8.1",
+    "feast[postgres]==0.49.0",
+    "grpcio>=1.71.0",
+    "numpy>=1.26.4",
+    "pandas>=2.2.3",
+    "torch>=2.6.0",
+    "transformers>=4.52.4",
+    "requests>=2.32.3",
+    "pillow>=11.2.1",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.4.1",
+]
+data-gen = [
+    "diffusers>=0.33.1",
+]
+dev = [
+    "ruff>=0.12.3",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"

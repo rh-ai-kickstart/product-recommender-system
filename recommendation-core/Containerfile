@@ -1,0 +1,22 @@
+FROM registry.access.redhat.com/ubi9/python-312
+
+USER root
+WORKDIR /app/
+
+# install and activate env
+COPY pyproject.toml pyproject.toml
+RUN pip3 install uv
+RUN dnf update -y
+
+# Copy the src directory with the new layout
+COPY src/ src/
+
+# Install the package after copying source code
+RUN uv pip install .
+
+# give premisssions 
+RUN chmod -R 777 . && ls -la
+
+ENV HF_HOME=/hf_cache
+RUN mkdir -p /hf_cache && \
+    chmod -R 777 /hf_cache
