@@ -8,7 +8,7 @@ replicaCount: 1
 # TODO: This image does not exist, check if it's needed here...
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
-  repository: quay.io/ecosystem-appeng/product-recommender-system
+  repository: quay.io/rh-ai-kickstart/product-recommender-system
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
@@ -170,9 +170,9 @@ tolerations: []
 
 affinity: {}
 
-pipelineJobImage: quay.io/rh-ai-kickstart/rec-sys-workflow:latest
-applicationImage: quay.io/rh-ai-kickstart/rec-sys-app:latest
-# Note the backend uses rec-sys-app as library.
+pipelineJobImage: quay.io/rh-ai-kickstart/recommendation-training:latest
+applicationImage: quay.io/rh-ai-kickstart/recommendation-core:latest
+# Note the backend uses recommendation_core as library.
 frontendBackendImage: quay.io/rh-ai-kickstart/product-recommender-frontend-backend:latest
 
 dbName: product_recommender_system
@@ -204,7 +204,7 @@ env:
         name: pgvector
         key: dbname
   - name: KAFKA_SERVICE_ADDR
-    value: rec-sys-cluster-kafka-bootstrap:9092
+    value: recommendation-cluster-kafka-bootstrap:9092
 
 minio:
   env:
@@ -231,12 +231,12 @@ minio:
 
 feast:
   project: feast_rec_sys
-  secret: feast-feast-rec-sys-registry-tls
-  registry: feast-feast-rec-sys-registry
+  secret: feast-feast-recommendation-registry-tls
+  registry: feast-feast-recommendation-registry
 
 kafka:
   cluster:
-    name: rec-sys-cluster
+    name: recommendation-cluster
   replicas: 3
   storage:
     type: ephemeral

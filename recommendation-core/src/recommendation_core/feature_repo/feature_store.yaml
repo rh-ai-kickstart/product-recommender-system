@@ -1,0 +1,19 @@
+# Remote config
+project: ${FEAST_PROJECT_NAME}
+
+provider: local
+registry:
+  registry_type: remote
+  path: ${FEAST_REGISTRY_URL}
+  cert: /app/feature_repo/secrets/tls.crt
+
+entity_key_serialization_version: 3   
+
+online_store:
+  type: postgres
+  host: ${DB_HOST}
+  port: ${DB_PORT}
+  database: ${DB_NAME}
+  user: ${DB_USER}     
+  password: ${DB_PASSWORD}
+  vector_enabled: true
