@@ -13,13 +13,17 @@ POSTGRES_USER ?= postgres
 POSTGRES_PASSWORD ?= recsys_password
 POSTGRES_DBNAME ?= recsys
 # HF_TOKEN ?= $(shell bash -c 'read -r -p "Enter Hugging Face Token: " HF_TOKEN; echo $$HF_TOKEN')
-HELM_CHART := product-recommender-system
+PRODUCT_RECOMMENDER_CHART := product-recommender-system
+MINIO_CHART := minio
+PIPELINE_SERVER_CHART := pipeline-server
+# Do we need this??
 TOLERATIONS_TEMPLATE=[{"key":"$(1)","effect":"NoSchedule","operator":"Exists"}]
 
+# Helm argument helpers
 helm_pgvector_args = \
-    --set pgvector.secret.user=$(POSTGRES_USER) \
-    --set pgvector.secret.password=$(POSTGRES_PASSWORD) \
-    --set pgvector.secret.dbname=$(POSTGRES_DBNAME)
+	--set pgvector.secret.user=$(POSTGRES_USER) \
+	--set pgvector.secret.password=$(POSTGRES_PASSWORD) \
+	--set pgvector.secret.dbname=$(POSTGRES_DBNAME)
 
 dataset_args = \
 	--set datasetUrl=$(DATASET_URL)
@@ -43,38 +47,117 @@ namespace:
 
 .PHONY: depend
 depend:
-	@echo "Updating Helm dependencies"
-	@helm dependency update $(HELM_CHART) &> /dev/null
+	@echo "Updating Helm dependencies for $(PRODUCT_RECOMMENDER_CHART)"
+	@helm dependency update $(PRODUCT_RECOMMENDER_CHART) &> /dev/null
+	@echo "Updating Helm dependencies for $(MINIO_CHART)"
+	@helm dependency update $(MINIO_CHART) &> /dev/null
 
+.PHONY: test-install
+test-install: namespace depend minio-install pipeline-server-install create-dynamic-secret
 
 .PHONY: install
-install: namespace depend
+install: namespace depend minio-install pipeline-server-install create-dynamic-secret product-recommender-install
+
+.PHONY: minio-install
+minio-install:
+	@echo "Installing Minio helm chart and default bucket for recommender pipeline..."
+	@helm -n $(NAMESPACE) upgrade --install minio $(MINIO_CHART) --timeout 5m
+	@echo "Waiting for Minio route 'minio-api' to become ready in namespace $(NAMESPACE)..."
+	@oc wait pod -l app=minio -n $(NAMESPACE) --for=condition=Ready --timeout=60s
+	@oc wait --for=jsonpath='{.status.ingress[0].conditions[?(@.type=="Admitted")].status}=True' \
+		route/minio-api -n $(NAMESPACE) --timeout=60s
+	@echo "Minio installation complete."
+
+.PHONY: pipeline-server-install
+pipeline-server-install:
+	@echo "Discovering Minio API endpoint..."
+	$(eval MINIO_API_HOST = $(shell oc get route minio-api -n $(NAMESPACE) -o jsonpath='{.spec.host}'))
+	@echo "Discovered Minio API Endpoint: https://$(MINIO_API_HOST)"
+	@echo "Looking up bucket and region name from config map ..."
+	$(eval DEFAULT_BUCKET= $(shell oc get configmap minio-config -n $(NAMESPACE) -o json | jq -r '.data["DEFAULT_BUCKET"]'))
+	@echo "Default bucket name: $(DEFAULT_BUCKET)"
+	$(eval DEFAULT_REGION= $(shell oc get configmap minio-config -n $(NAMESPACE) -o json | jq -r '.data["DEFAULT_REGION"]'))
+	@echo "Default region name: $(DEFAULT_REGION)"
+	@echo "Installing pipeline server chart..."
+	@helm -n $(NAMESPACE) upgrade --install pipeline-server $(PIPELINE_SERVER_CHART) \
+		--set minio.apiEndpoint=$(MINIO_API_HOST) \
+		--set minio.defaultBucket=$(DEFAULT_BUCKET) \
+		--set minio.defaultRegion=$(DEFAULT_REGION) \
+		--timeout 300m
+	@echo "Waiting for pipeline server to start in namespace $(NAMESPACE)..."
+	@for i in {1..12}; do \
+        oc get pod -l app=ds-pipeline-dspa -n $(NAMESPACE) 2>/dev/null | grep -q "Running\|ContainerCreating\|Pending" && break; \
+        echo "Pod not found yet, retrying..."; \
+        sleep 5; \
+    done
+	oc wait pod -l app=ds-pipeline-dspa -n $(NAMESPACE) --for=condition=Ready --timeout=60s
+	@echo "Pipeline server ready."
+
+.PHONY: create-dynamic-secret
+create-dynamic-secret:
+	@echo "Creating backward compatible secret for dspa settings (temporary workaround)"
+	$(eval MINIO_SERVICE_HOST = $(shell oc get svc minio-service -n $(NAMESPACE) -o=jsonpath='{.spec.clusterIP}'))
+	$(eval MINIO_SERVICE_PORT = $(shell oc get svc minio-service -n $(NAMESPACE) -o=jsonpath='{.spec.ports[?(@.name=="api")].port}'))
+	$(eval MINIO_ACCESS_KEY_VALUE = $(shell oc get secret minio-secret -n $(NAMESPACE) -o jsonpath='{.data.MINIO_ROOT_USER}' | base64 --decode))
+	$(eval MINIO_SECRET_KEY_VALUE = $(shell oc get secret minio-secret -n $(NAMESPACE) -o jsonpath='{.data.MINIO_ROOT_PASSWORD}' | base64 --decode))
+	@oc create secret generic ds-pipeline-s3-dspa -n $(NAMESPACE) \
+		--from-literal=host=$(MINIO_SERVICE_HOST) \
+		--from-literal=port=$(MINIO_SERVICE_PORT) \
+		--from-literal=accesskey=$(MINIO_ACCESS_KEY_VALUE) \
+		--from-literal=secretkey=$(MINIO_SECRET_KEY_VALUE) \
+		--from-literal=secure=false \
+		--dry-run=client -o yaml | kubectl apply -f -	
+
+.PHONY: product-recommender-install
+product-recommender-install:
 	@$(eval PGVECTOR_ARGS := $(call helm_pgvector_args))
 	@$(eval DATASET_ARGS := $(call dataset_args))
-	@echo "Installing $(HELM_CHART) helm chart"
+	@echo "Installing $(PRODUCT_RECOMMENDER_CHART) helm chart"
 	@echo "Waiting for model services to deploy. It may take around 10-15 minutes depending on the size of the database..."
-	@helm -n $(NAMESPACE) upgrade --install $(HELM_CHART) $(HELM_CHART) -n $(NAMESPACE) \
+	@helm -n $(NAMESPACE) upgrade --install $(PRODUCT_RECOMMENDER_CHART) $(PRODUCT_RECOMMENDER_CHART) -n $(NAMESPACE) \
 		$(PGVECTOR_ARGS) \
 		$(DATASET_ARGS) \
 		$(EXTRA_HELM_ARGS) --set strimzi-kafka-operator.createGlobalResources=false --timeout 300m
 	@oc rollout status deploy
-	@echo "$(HELM_CHART) installed successfully"
+	@echo "$(PRODUCT_RECOMMENDER_CHART) installed successfully"
 	@echo "Frontend URL: http://$$(oc get route product-recommender-system-frontend -o jsonpath='{.spec.host}' -n $(NAMESPACE))"
+
+# Uninstall the test-install target and clean up
+.PHONY: test-uninstall
+test-uninstall: pipeline-server-uninstall minio-uninstall delete-project
 
 # Uninstall the deployment and clean up
 .PHONY: uninstall
-uninstall:
-	@echo "Uninstalling $(HELM_CHART) helm chart"
-	@helm -n $(NAMESPACE) uninstall $(HELM_CHART)
+uninstall: product-recommender-uninstall pipeline-server-uninstall minio-uninstall delete-project
+
+.PHONY: product-recommender-uninstall
+product-recommender-uninstall:
+	@echo "Uninstalling $(PRODUCT_RECOMMENDER_CHART) helm chart"
+	@helm -n $(NAMESPACE) uninstall $(PRODUCT_RECOMMENDER_CHART) || true
+	@echo "Deleting remaining pods in namespace $(NAMESPACE) for $(PRODUCT_RECOMMENDER_CHART)"
+	@oc delete jobs -n $(NAMESPACE) --all --grace-period=60 --ignore-not-found
+	@oc delete pods -n $(NAMESPACE) --all --grace-period=60 --ignore-not-found
+
+.PHONY: minio-uninstall
+minio-uninstall:
+	@echo "Uninstalling Minio helm chart"
+	@helm -n $(NAMESPACE) uninstall minio || true
 	@echo "Removing pgvector and minio PVCs from $(NAMESPACE)"
 	@oc get pvc -n $(NAMESPACE) -o custom-columns=NAME:.metadata.name | grep -E '^(pg|minio)-data' | xargs -I {} oc delete pvc -n $(NAMESPACE) {} ||:
-	@echo "Deleting remaining pods in namespace $(NAMESPACE)"
-	@oc delete jobs -n $(NAMESPACE) --all
-	@oc delete pods -n $(NAMESPACE) --all
 	@echo "Checking for any remaining resources in namespace $(NAMESPACE)..."
 	@echo "If you want to completely remove the namespace, run: oc delete project $(NAMESPACE)"
 	@echo "Remaining resources in namespace $(NAMESPACE):"
 	@$(MAKE) status
+
+.PHONY: pipeline-server-uninstall
+pipeline-server-uninstall:
+	@echo "Uninstalling pipeline server chart"
+	@helm -n $(NAMESPACE) uninstall pipeline-server || true
+
+.PHONY: delete-project
+delete-project:
+	@echo "Attempting to delete OpenShift project $(NAMESPACE)..."
+	@oc delete project $(NAMESPACE)
 
 # Check deployment status
 .PHONY: status

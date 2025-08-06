@@ -5,8 +5,5 @@ dependencies:
 - name: strimzi-kafka-operator
   repository: https://strimzi.io/charts/
   version: 0.46.0
-- name: configure-pipeline
-  repository: https://rh-ai-kickstart.github.io/ai-architecture-charts
-  version: 0.1.0
-digest: sha256:b157b740510ef22e744b529efbf465236a7778248d3bcb88ca1ef27760e944c3
-generated: "2025-06-22T17:20:16.831038947+03:00"
+digest: sha256:c95638f7e7748d36e883f343972157efd32c2fcdca9596241367852d53b838c0
+generated: "2025-08-04T14:50:03.842583-04:00"

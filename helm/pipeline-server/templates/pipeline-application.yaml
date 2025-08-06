@@ -1,0 +1,49 @@
+apiVersion: datasciencepipelinesapplications.opendatahub.io/v1
+kind: DataSciencePipelinesApplication
+metadata:
+  finalizers:
+    - datasciencepipelinesapplications.opendatahub.io/finalizer
+  name: dspa
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: dspa
+spec:
+  apiServer:
+    artifactSignedURLExpirySeconds: 60
+    caBundleFileMountPath: ''
+    caBundleFileName: ''
+    deploy: true
+    enableOauth: true
+    enableSamplePipeline: false
+    managedPipelines:
+      instructLab:
+        state: Removed
+  database:
+    disableHealthCheck: false
+    mariaDB:
+      deploy: true
+      pipelineDBName: mlpipeline
+      pvcSize: 10Gi
+      username: mlpipeline
+  dspVersion: v2
+  objectStorage:
+    disableHealthCheck: false
+    enableExternalRoute: false
+    externalStorage:
+      basePath: ''
+      bucket:  {{ .Values.minio.defaultBucket }} #Set by make file at deployment time
+      host: {{ .Values.minio.apiEndpoint }} #This is set in the makefile at deployment time
+      port: ''
+      region: {{ .Values.minio.defaultRegion }} #Set by make file at deployment time
+      s3CredentialsSecret:
+        accessKey: MINIO_ROOT_USER
+        secretKey: MINIO_ROOT_PASSWORD
+        secretName: minio-secret
+      scheme: https
+  persistenceAgent:
+    deploy: true
+    numWorkers: 2
+  podToPodTLS: true
+  scheduledWorkflow:
+    cronScheduleTimezone: UTC
+    deploy: true
