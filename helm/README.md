@@ -21,15 +21,21 @@ The following environment variables can be configured:
 To install the product recommender system:
 
 ```bash
-make install NAMESPACE=your-namespace
+make install NAMESPACE=your-namespace minio.userId=fred minio.password=pass01
 ```
 
-This command will:
+The minio.userId and minio.password are used to set the user ID and password for the project-scoped minio instance, which is required for configuring the
+OpenShift Pipeline Application Server.
+
+IMPORTANT: The minio.userId must be at least 3 characters long and the minio.password must be at least 8 characters long, otherwise the minio installation will fail.
+
+The install command will:
 
 1. Create the specified namespace if it doesn't exist
 2. Update Helm dependencies
 3. Install/upgrade the Helm chart with the configured settings
-4. Wait for the deployment to complete (typically 10-15 minutes depending on the model size)
+4. Install supporting resources, including a project-scoped minio instance and pipeline application server.
+5. Wait for the deployment to complete (typically 10-15 minutes depending on the model size)
 
 ### Check Deployment Status
 
@@ -61,11 +67,7 @@ This will:
 2. Delete all pods in the namespace
 3. Display remaining resources in the namespace
 
-Note: To completely remove the namespace after uninstallation, you can run:
-
-```bash
-oc delete project your-namespace
-```
+CAUTION: THE UNINSTALL WILL REMOVE YOUR NAMESPACE AND ALL RESOURCES AND DATA IT CONTAINS.
 
 ## Additional Configuration
 

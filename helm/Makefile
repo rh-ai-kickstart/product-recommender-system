@@ -1,7 +1,7 @@
 # Makefile for RAG Deployment
 # Replaces the original deploy.sh script with additional uninstall functionality
 ifeq ($(NAMESPACE),)
-ifeq (,$(filter depend list-models% help,$(MAKECMDGOALS)))
+ifeq (,$(filter depend% help,$(MAKECMDGOALS)))
 $(error NAMESPACE is not set)
 endif
 endif
@@ -32,13 +32,14 @@ dataset_args = \
 .PHONY: help
 help:
 	@echo "Available targets:"
-	@echo "  list-models   - List available models"
-	@echo "  install       - Install the recommender system app (creates namespace, secrets, and deploys Helm chart)"
+	@echo "  install       - Installs recommender system and supporting resources; provide userId and password for minio; e.g., make install minio.userId=fred minio.password=pass1"
 	@echo "  uninstall     - Uninstall the recommender system app and clean up resources"
 	@echo "  status        - Check status of the deployment"
 	@echo ""
 	@echo "Configuration options (set via environment variables or make arguments):"
 	@echo "  NAMESPACE                - Target namespace (default: llama-stack-rag)"
+	@echo "  minio.userId                - User ID to use for minio installation"
+	@echo "  minio.password                - Password to use for minio installation"
 
 # Create namespace and deploy
 namespace:
@@ -52,16 +53,16 @@ depend:
 	@echo "Updating Helm dependencies for $(MINIO_CHART)"
 	@helm dependency update $(MINIO_CHART) &> /dev/null
 
-.PHONY: test-install
-test-install: namespace depend minio-install pipeline-server-install create-dynamic-secret
-
 .PHONY: install
 install: namespace depend minio-install pipeline-server-install create-dynamic-secret product-recommender-install
 
 .PHONY: minio-install
 minio-install:
 	@echo "Installing Minio helm chart and default bucket for recommender pipeline..."
-	@helm -n $(NAMESPACE) upgrade --install minio $(MINIO_CHART) --timeout 5m
+	helm -n $(NAMESPACE) upgrade --install minio $(MINIO_CHART) \
+		--set minio.userId=$(minio.userId) \
+		--set minio.password=$(minio.password) \
+		--timeout 5m
 	@echo "Waiting for Minio route 'minio-api' to become ready in namespace $(NAMESPACE)..."
 	@oc wait pod -l app=minio -n $(NAMESPACE) --for=condition=Ready --timeout=60s
 	@oc wait --for=jsonpath='{.status.ingress[0].conditions[?(@.type=="Admitted")].status}=True' \
@@ -85,12 +86,12 @@ pipeline-server-install:
 		--set minio.defaultRegion=$(DEFAULT_REGION) \
 		--timeout 300m
 	@echo "Waiting for pipeline server to start in namespace $(NAMESPACE)..."
-	@for i in {1..12}; do \
+	@for i in {1..25}; do \
         oc get pod -l app=ds-pipeline-dspa -n $(NAMESPACE) 2>/dev/null | grep -q "Running\|ContainerCreating\|Pending" && break; \
-        echo "Pod not found yet, retrying..."; \
+        echo "Pod not found yet, retrying (wait)..."; \
         sleep 5; \
     done
-	oc wait pod -l app=ds-pipeline-dspa -n $(NAMESPACE) --for=condition=Ready --timeout=60s
+	oc wait pod -l app=ds-pipeline-dspa -n $(NAMESPACE) --for=condition=Ready --timeout=180s
 	@echo "Pipeline server ready."
 
 .PHONY: create-dynamic-secret
@@ -122,13 +123,9 @@ product-recommender-install:
 	@echo "$(PRODUCT_RECOMMENDER_CHART) installed successfully"
 	@echo "Frontend URL: http://$$(oc get route product-recommender-system-frontend -o jsonpath='{.spec.host}' -n $(NAMESPACE))"
 
-# Uninstall the test-install target and clean up
-.PHONY: test-uninstall
-test-uninstall: pipeline-server-uninstall minio-uninstall delete-project
-
 # Uninstall the deployment and clean up
 .PHONY: uninstall
-uninstall: product-recommender-uninstall pipeline-server-uninstall minio-uninstall delete-project
+uninstall: delete-topics product-recommender-uninstall pipeline-server-uninstall minio-uninstall delete-project
 
 .PHONY: product-recommender-uninstall
 product-recommender-uninstall:
@@ -145,7 +142,6 @@ minio-uninstall:
 	@echo "Removing pgvector and minio PVCs from $(NAMESPACE)"
 	@oc get pvc -n $(NAMESPACE) -o custom-columns=NAME:.metadata.name | grep -E '^(pg|minio)-data' | xargs -I {} oc delete pvc -n $(NAMESPACE) {} ||:
 	@echo "Checking for any remaining resources in namespace $(NAMESPACE)..."
-	@echo "If you want to completely remove the namespace, run: oc delete project $(NAMESPACE)"
 	@echo "Remaining resources in namespace $(NAMESPACE):"
 	@$(MAKE) status
 
@@ -153,6 +149,12 @@ minio-uninstall:
 pipeline-server-uninstall:
 	@echo "Uninstalling pipeline server chart"
 	@helm -n $(NAMESPACE) uninstall pipeline-server || true
+
+.PHONY: delete-topics
+delete-topics:
+	@echo "Attempting to delete Kafka topics in project $(NAMESPACE)..."
+	@oc delete kafkatopic interactions -n $(NAMESPACE) || true
+	@oc delete kafkatopic new-users -n $(NAMESPACE) || true
 
 .PHONY: delete-project
 delete-project:
