@@ -2,6 +2,8 @@
 
 A comprehensive Python library for building production-ready recommendation systems using two-tower neural networks, multi-modal features, and Feast integration.
 
+
+
 ## 🎯 Overview
 
 The Recommendation Core library provides the foundational components for building scalable recommendation systems that:
@@ -10,6 +12,61 @@ The Recommendation Core library provides the foundational components for buildin
 - **Integrate with Feast**: Feature store for online serving
 - **Generate embeddings**: High-quality representations for similarity search
 - **Support filtering**: Rule-based recommendation refinement
+
+## 🤔 Why "recommendation-core"?
+
+The name "recommendation-core" was chosen to reflect its **central role** in the recommendation system architecture and its **foundational nature** as a reusable library.
+
+### **Core Library Pattern**
+The name follows a common software architecture pattern where "core" indicates the **foundational library** that other components depend on:
+
+```
+product-recommender-system/
+├── recommendation-core/          # 🧠 Core ML Library
+├── recommendation-training/      # 🚀 Training Pipeline  
+├── backend/                     # 🌐 API Layer
+├── frontend/                    # 🎨 UI Layer
+└── helm/                        # ☸️ Deployment
+```
+
+### **Central Role in Architecture**
+The recommendation-core serves as the **central nervous system** of the entire recommendation system:
+
+- **Backend** imports and uses it: `from recommendation_core.models import EntityTower`
+- **Training pipeline** uses it as base image: `BASE_IMAGE = "quay.io/rh-ai-kickstart/recommendation-core:latest"`
+- **All ML logic** is contained within it
+
+### **Core Capabilities**
+It provides the **essential ML capabilities** that make the recommendation system work:
+
+- **Neural Network Models** - EntityTower, UserTower, ItemTower
+- **Feature Processing** - Multi-modal data handling (text, images, numerical)
+- **Search Services** - Text and image similarity search
+- **Data Generation** - Synthetic datasets and AI image generation
+- **Model Serving** - Real-time inference capabilities
+
+### **Reusable Foundation**
+The "core" naming suggests it's designed to be:
+- **Reusable** across different recommendation applications
+- **Extensible** for different use cases
+- **Independent** of specific business logic
+- **Foundation** for building recommendation systems
+
+### **Separation of Concerns**
+The naming reflects a clean architecture where:
+- **recommendation-core** = ML algorithms and models
+- **recommendation-training** = Training workflows
+- **backend** = API and business logic
+- **frontend** = User interface
+
+### **Why This Name Works Best**
+
+1. **Clear Purpose** - Immediately indicates it's for recommendation systems
+2. **Core Concept** - Emphasizes its foundational role
+3. **Library Focus** - Indicates it's a reusable library, not a complete application
+4. **Professional Naming** - Follows industry conventions for core libraries
+
+The name effectively communicates that this is the **essential, reusable foundation** for building recommendation systems, which is exactly what it is!
 
 ## 🏗️ Architecture
 
@@ -169,6 +226,115 @@ python -m recommendation_core.generation.dataset_gen_amazon \
 - `recommendation_items.parquet`: Product catalog with features
 - `recommendation_interactions.parquet`: User-item interactions
 
+### Who Runs dataset_gen_amazon.py?
+
+**Manual Execution by Developers** (Primary Method)
+Developers run it manually during development and setup:
+
+**When this happens:**
+- **Initial setup** - When setting up the project for the first time
+- **Development** - When developers need fresh test data
+- **Testing** - When testing the recommendation system with different dataset sizes
+- **Demo preparation** - When preparing demos with specific data volumes
+
+**No Automated Generation**
+There's **no automated process** that runs `dataset_gen_amazon.py`:
+- ❌ No CI/CD pipeline runs it
+- ❌ No container startup script runs it
+- ❌ No training pipeline runs it
+- ✅ Only manual execution by developers
+
+### Where Are Parquet Files Written?
+
+**Primary Location:**
+```python
+data_path = pathlib.Path("src/recommendation_core/feature_repo/data")
+data_path.mkdir(parents=True, exist_ok=True)
+```
+
+**Full Path:** `src/recommendation_core/feature_repo/data/`
+
+**Files Generated:**
+The script writes **9 parquet files** to this location:
+
+#### **Main Dataset Files:**
+1. `recommendation_users.parquet` - User profiles and preferences
+2. `recommendation_items.parquet` - Product catalog with features  
+3. `recommendation_interactions.parquet` - User-item interactions
+
+#### **Dummy/Feature Files:**
+4. `dummy_item_embed.parquet` - Dummy item embeddings
+5. `dummy_user_embed.parquet` - Dummy user embeddings
+6. `user_items.parquet` - User-item relationships
+7. `item_textual_features_embed.parquet` - Text feature embeddings
+8. `item_clip_features_embed.parquet` - CLIP feature embeddings
+
+**Directory Structure:**
+```
+recommendation-core/
+└── src/
+    └── recommendation_core/
+        └── feature_repo/
+            └── data/                    # ← Parquet files written here
+                ├── recommendation_users.parquet
+                ├── recommendation_items.parquet
+                ├── recommendation_interactions.parquet
+                ├── dummy_item_embed.parquet
+                ├── dummy_user_embed.parquet
+                ├── user_items.parquet
+                ├── item_textual_features_embed.parquet
+                └── item_clip_features_embed.parquet
+```
+
+**Key Points:**
+- **Relative Path** - The script uses a relative path from where it's executed
+- **Auto-Creation** - The directory is created automatically if it doesn't exist
+- **Feast Integration** - This location aligns with the Feast feature store structure
+- **Training Pipeline** - The training pipeline expects these files to be in this exact location
+
+### Data Flow
+
+```
+Developer runs dataset_gen_amazon.py
+         ↓
+Creates parquet files in feature_repo/data/
+         ↓
+Training pipeline loads pre-generated files
+         ↓
+ML models train on synthetic data
+```
+
+**Training Pipeline Uses Pre-Generated Data**
+The training pipeline **doesn't run** `dataset_gen_amazon.py` directly. Instead, it uses **pre-generated parquet files**:
+
+```python
+# From train-workflow.py - load_data_from_feast()
+if dataset_url is not None and dataset_url != "":
+    logger.info("using custom remote dataset")
+    dataset_provider = RemoteDatasetProvider(dataset_url, force_load=True)
+else:
+    logger.info("using pre generated dataset")  # ← Uses existing parquet files
+    dataset_provider = LocalDatasetProvider(store)
+```
+
+**What this means:**
+- The training pipeline expects the parquet files to **already exist**
+- It loads data from `src/recommendation_core/feature_repo/data/`
+- The files are created **before** the training pipeline runs
+
+### Why This Design?
+
+**Advantages:**
+1. **Reproducible datasets** - Same data across all environments
+2. **Fast training** - No need to generate data during training
+3. **Version control** - Dataset files can be committed to git
+4. **Consistent testing** - Same test data for all tests
+
+**Disadvantages:**
+1. **Manual step** - Developers must remember to run it
+2. **Static data** - No dynamic dataset generation
+3. **Storage overhead** - Large parquet files in repository
+
 ### Image Generation
 
 ```bash
@@ -176,11 +342,53 @@ python -m recommendation_core.generation.dataset_gen_amazon \
 python -m recommendation_core.generation.generate_images
 ```
 
+**What generate_images.py Does:**
+- **Reads product data** from `src/recommendation_core/feature_repo/data/item_df_output.parquet`
+- **Uses product descriptions** as prompts for Stable Diffusion
+- **Generates synthetic product images** using AI
+- **Saves images** to `src/recommendation_core/generation/data/generated_images/`
+- **Creates realistic product visuals** for the recommendation system
+
 **Features:**
 - **Stable Diffusion v1.5**: High-quality image generation
 - **Text-to-image**: Product descriptions to images
 - **GPU acceleration**: CUDA support for faster generation
 - **Batch processing**: Efficient multi-image generation
+
+**Integration with Dataset Generation:**
+The generated images are **referenced by dataset_gen_amazon.py**:
+
+```python
+# From dataset_gen_amazon.py - Line 127
+img_link = f"https://raw.githubusercontent.com/rh-ai-kickstart/product-recommender-system/main/recommendation-core/generation/data/generated_images/item_{product_name.replace(' ', '%20')}.png"
+```
+
+**Current Status:**
+- ✅ **99 images generated** and stored in repository
+- ✅ **Images actively used** by the recommendation system
+- ✅ **Manual execution** - Run when new products are added
+- ✅ **One-time setup** - Images are committed to git for reuse
+
+**Data Flow:**
+```
+1. dataset_gen_amazon.py creates product data with descriptions
+         ↓
+2. generate_images.py reads product descriptions as prompts
+         ↓
+3. Stable Diffusion generates images from text descriptions
+         ↓
+4. Images saved to generated_images/ directory
+         ↓
+5. dataset_gen_amazon.py references these images in img_link
+         ↓
+6. Recommendation system displays generated product images
+```
+
+**Why This Design:**
+- **Synthetic data** - No need for real product images
+- **Consistent style** - All images generated with same AI model
+- **Scalable** - Can generate unlimited product images
+- **Demo-friendly** - Provides visual content for demonstrations
 
 ## 🔍 Search and Recommendation
 
@@ -247,6 +455,67 @@ pip install -e ".[data-gen,test,dev]"
 # Install in production
 pip install .
 ```
+
+## 🚀 Who Uses the Recommendation-Core Container?
+
+The recommendation-core container is used by different components in the product-recommender-system in various ways:
+
+### 1. **Training Pipeline** (Primary Container User)
+The **recommendation-training workflow** uses the recommendation-core container as a **base image** for ML training:
+
+```python
+BASE_IMAGE = os.getenv(
+    "BASE_REC_SYS_IMAGE", "quay.io/rh-ai-kickstart/recommendation-core:latest"
+)
+
+@dsl.component(base_image=BASE_IMAGE)
+def generate_candidates(...):
+    from recommendation_core.models.entity_tower import EntityTower
+    from recommendation_core.service.clip_encoder import ClipEncoder
+```
+
+**What this means:**
+- The training pipeline **uses the recommendation-core container directly**
+- It runs as a Kubeflow component with the recommendation-core container as the base image
+- It imports and uses the library within the containerized environment
+- Used for model training, feature generation, and data processing
+
+### 2. **Main Application** (Library Source)
+The **main product-recommender-system Containerfile** uses the recommendation-core container as a **library source**:
+
+```dockerfile
+# Copy recommendation-core first (needed for backend dependencies)
+COPY recommendation-core/ /app/recommendation-core/
+
+# Install the recommendation-core package first
+WORKDIR /app/recommendation-core
+RUN uv pip install .
+
+# Install the backend package
+WORKDIR /app/backend
+RUN uv pip install .
+```
+
+**What this means:**
+- The main application **doesn't use the recommendation-core container directly**
+- Instead, it **copies the source code** and installs it as a Python package
+- The backend imports and uses the library directly: `from recommendation_core.models import EntityTower`
+- Used for real-time inference and recommendation serving
+
+### 3. **Helm Chart Configuration** (Deployment Reference)
+The **Helm values.yaml** references the container image for deployment:
+
+```yaml
+pipelineJobImage: quay.io/rh-ai-kickstart/recommendation-training:latest
+applicationImage: quay.io/rh-ai-kickstart/recommendation-core:latest
+# Note the backend uses recommendation_core as library.
+frontendBackendImage: quay.io/rh-ai-kickstart/product-recommender-frontend-backend:latest
+```
+
+**What this means:**
+- The Helm chart references the container image for deployment configuration
+- Used for Kubernetes/OpenShift deployment orchestration
+- Provides consistent image references across environments
 
 ## 🧪 Testing
 
