@@ -59,6 +59,10 @@ line-length = 99
 exclude = '''
 /(
     README\.md
+    |venv
+    |\.venv
+    |env
+    |\.env
 )/
 '''
 
