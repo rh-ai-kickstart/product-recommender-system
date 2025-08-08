@@ -2,7 +2,7 @@ from datetime import date, datetime
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class InteractionType(Enum):
@@ -55,7 +55,7 @@ class LoginRequest(BaseModel):
 class SignUpRequest(BaseModel):
     email: str
     password: str
-    age: int
+    age: int = Field(gt=0, description="Age must be positive")
     gender: str
 
 

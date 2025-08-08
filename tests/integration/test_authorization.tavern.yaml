@@ -1,0 +1,210 @@
+---
+test_name: Test Authorization - Access Protected Endpoints Without Token
+
+stages:
+  - name: Try to access cart without token
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/123456"
+      method: GET
+      headers:
+        Content-Type: "application/json"
+    response:
+      status_code: 401
+      headers:
+        content-type: application/json
+      json:
+        detail: "Not authenticated"
+
+  - name: Try to add to cart without token
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      method: POST
+      headers:
+        Content-Type: "application/json"
+      json:
+        user_id: "123456"
+        product_id: "1"
+        quantity: 1
+    response:
+      status_code: 401
+      headers:
+        content-type: application/json
+      json:
+        detail: "Not authenticated"
+
+  - name: Try to update cart without token
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      method: PUT
+      headers:
+        Content-Type: "application/json"
+      json:
+        user_id: "123456"
+        product_id: "1"
+        quantity: 2
+    response:
+      status_code: 401
+      headers:
+        content-type: application/json
+      json:
+        detail: "Not authenticated"
+
+  - name: Try to delete from cart without token
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      method: DELETE
+      headers:
+        Content-Type: "application/json"
+      json:
+        user_id: "123456"
+        product_id: "1"
+        quantity: 1
+    response:
+      status_code: 401
+      headers:
+        content-type: application/json
+      json:
+        detail: "Not authenticated"
+
+  - name: Try to set preferences without token
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/users/preferences"
+      method: POST
+      headers:
+        Content-Type: "application/json"
+      json:
+        preferences: "Electronics,Books"
+    response:
+      status_code: 401
+      headers:
+        content-type: application/json
+      json:
+        detail: "Not authenticated"
+
+---
+test_name: Test Authorization - Access With Invalid Token
+
+stages:
+  - name: Try to access cart with invalid token
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/123456"
+      method: GET
+      headers:
+        Authorization: "Bearer invalid_token_12345"
+        Content-Type: "application/json"
+    response:
+      status_code: 401
+      headers:
+        content-type: application/json
+      json:
+        detail: "Could not validate credentials"
+
+  - name: Try to access cart with malformed token
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/123456"
+      method: GET
+      headers:
+        Authorization: "InvalidFormat token"
+        Content-Type: "application/json"
+    response:
+      status_code: 401
+      headers:
+        content-type: application/json
+      json:
+        detail: "Not authenticated"
+
+---
+test_name: Test Authorization - Access Other User's Resources
+
+stages:
+  - name: Signup first user
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_user1@test.com"
+        password: "password123"
+        age: 25
+        gender: "Male"
+    response:
+      status_code: 201
+      save:
+        json:
+          user1_id: "user.user_id"
+
+  - name: Login as first user
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/login"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_user1@test.com"
+        password: "password123"
+    response:
+      status_code: 200
+      save:
+        json:
+          user1_token: "token"
+
+  - name: Signup second user
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_user2@test.com"
+        password: "password456"
+        age: 30
+        gender: "Female"
+    response:
+      status_code: 201
+      save:
+        json:
+          user2_id: "user.user_id"
+
+  - name: Login as second user
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/login"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_user2@test.com"
+        password: "password456"
+    response:
+      status_code: 200
+      save:
+        json:
+          user2_token: "token"
+
+  - name: User1 adds item to their cart
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      method: POST
+      headers:
+        Authorization: "Bearer {user1_token}"
+        Content-Type: "application/json"
+      json:
+        user_id: "{user1_id}"
+        product_id: "1"
+        quantity: 2
+    response:
+      status_code: 204
+
+  - name: User2 tries to access User1's cart (should succeed but see empty cart)
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/{user1_id}"
+      method: GET
+      headers:
+        Authorization: "Bearer {user2_token}"
+        Content-Type: "application/json"
+    response:
+      status_code: 200
+      json: []  # Empty cart for user2's perspective
+
+  - name: User2 accesses their own cart (should be empty)
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/{user2_id}"
+      method: GET
+      headers:
+        Authorization: "Bearer {user2_token}"
+        Content-Type: "application/json"
+    response:
+      status_code: 200
+      json: [] 
