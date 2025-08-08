@@ -73,7 +73,7 @@ force_grid_wrap = 0
 use_parentheses = true
 line_length = 99
 profile = "black"
-skip = "README.md"
+skip = ["README.md", "venv", ".venv", "env", ".env"]
 
 [tool.bandit]
 exclude_dirs = ["tests", "test_*"]
