@@ -1,0 +1,182 @@
+name: Build, Push and Integration Test
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  BACKEND_DIR: backend
+  NAMESPACE: product-rec-integration-test
+  MINIO_USERID: testuser
+  MINIO_PASSWORD: testpassword123
+
+jobs:
+  build-image:
+    name: Build and Push container image
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.version.outputs.tag }}
+    strategy:
+      matrix:
+        include:
+          - name: product-recommender-test
+            context: .
+            image-name: product-recommender-test
+    defaults:
+      run:
+        working-directory: ${{ env.BACKEND_DIR }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Quay.io
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Set version from run number
+        id: version
+        run: |
+          echo "tag=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Build and push ${{ matrix.name }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.context }}/Containerfile
+          push: true
+          tags: |
+            quay.io/rh-ee-vli/${{ matrix.image-name }}:${{ steps.version.outputs.tag }}
+            quay.io/rh-ee-vli/${{ matrix.image-name }}:latest
+          build-args: |
+            IMAGE_TAG=${{ steps.version.outputs.tag }}
+
+  integration-tests:
+    name: Run Integration Tests on OpenShift
+    runs-on: ubuntu-latest
+    needs: [build-image]
+    # Only run if credentials are available
+    if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install OpenShift CLI
+        run: |
+          echo "Installing OpenShift CLI..."
+          curl -sSL -o oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz
+          tar -xzf oc.tar.gz
+          chmod +x oc kubectl
+          sudo mv oc kubectl /usr/local/bin/
+          oc version --client
+
+      - name: Install Helm
+        run: |
+          echo "Installing Helm..."
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          helm version
+
+      - name: Install test dependencies
+        run: |
+          echo "Installing test dependencies..."
+          pip install pytest tavern httpx
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Login to OpenShift
+        env:
+          OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_SERVER }}
+          OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
+        run: |
+          echo "Logging into OpenShift..."
+          oc login --token="${OPENSHIFT_TOKEN}" --server="${OPENSHIFT_SERVER}" --insecure-skip-tls-verify=true
+
+      - name: Deploy application with new image
+        run: |
+          echo "Deploying application to namespace ${NAMESPACE} with image tag ${{ needs.build-image.outputs.image-tag }}..."
+          cd helm
+          
+          # Update the values.yaml to use the new image tag if needed
+          # Or pass it as a Helm parameter
+          MINIMUM_OC_VERSION=0.0.0 make SHELL=/usr/bin/bash install minio.userId=${MINIO_USERID} minio.password=${MINIO_PASSWORD} \
+            EXTRA_HELM_ARGS="--set frontendBackendImage=quay.io/rh-ee-vli/product-recommender-test:${{ needs.build-image.outputs.image-tag }}"
+        continue-on-error: false
+
+      - name: Wait for deployment to be ready
+        run: |
+          echo "Waiting for all deployments to be ready..."
+          sleep 30
+          
+          oc wait --for=condition=available --timeout=900s deployment --all -n ${NAMESPACE} || true
+          
+          echo "Checking deployment status..."
+          oc get pods -n ${NAMESPACE}
+          oc get routes -n ${NAMESPACE}
+
+      - name: Run integration tests
+        id: run-tests
+        run: |
+          echo "Running integration tests..."
+          cd tests/integration
+          
+          # Export required environment variables for tests
+          export TEST_FRONTEND_URL=$(oc get routes product-recommender-system-frontend -n ${NAMESPACE} -o json | jq -r '"https://" + .spec.host')
+          export TEST_FEAST_URL=$(oc get routes feast-feast-rec-sys-ui -n ${NAMESPACE} -o json | jq -r '"https://" + .spec.host')
+          export TEST_TIMESTAMP=$(date +%s)
+          
+          echo "Frontend URL: ${TEST_FRONTEND_URL}"
+          echo "Feast URL: ${TEST_FEAST_URL}"
+          
+          # Validate URLs
+          if [[ -z "$TEST_FRONTEND_URL" || "$TEST_FRONTEND_URL" == *"null"* ]]; then
+            echo "Frontend URL is invalid"
+            exit 1
+          fi
+          
+          # Run the tests
+          PYTHONPATH=. pytest . -v --tb=short --junit-xml=../../test-results.xml
+        continue-on-error: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: test-results.xml
+
+      - name: Publish test results
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Integration Test Results
+          path: test-results.xml
+          reporter: java-junit
+          fail-on-error: false
+
+      - name: Cleanup OpenShift deployment
+        if: always()
+        run: |
+          echo "Cleaning up OpenShift deployment..."
+          cd helm
+          make uninstall || true
+        continue-on-error: true
+
+      - name: Check test results and fail if needed
+        if: steps.run-tests.outcome == 'failure'
+        run: |
+          echo "Integration tests failed"
+          exit 1 

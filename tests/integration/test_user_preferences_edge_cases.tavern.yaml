@@ -1,0 +1,233 @@
+---
+test_name: Test User Preferences Edge Cases
+
+stages:
+  - name: Signup user for preferences test
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_prefs@test.com"
+        password: "password123"
+        age: 35
+        gender: "Male"
+    response:
+      status_code: 201
+
+  - name: Login to get token
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/login"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_prefs@test.com"
+        password: "password123"
+    response:
+      status_code: 200
+      save:
+        json:
+          token: "token"
+
+  - name: Set preferences with single category
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/users/preferences"
+      method: POST
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+      json:
+        preferences: "Electronics"
+    response:
+      status_code: 200
+      json:
+        message: "Preferences updated"
+
+  - name: Update preferences with multiple categories
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/users/preferences"
+      method: POST
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+      json:
+        preferences: "Books,Electronics,Sports&Outdoors,Home&Kitchen"
+    response:
+      status_code: 200
+      json:
+        message: "Preferences updated"
+
+  - name: Set empty preferences
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/users/preferences"
+      method: POST
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+      json:
+        preferences: ""
+    response:
+      status_code: 200
+      json:
+        message: "Preferences updated"
+
+  - name: Set preferences with special characters
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/users/preferences"
+      method: POST
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+      json:
+        preferences: "Arts&Crafts,Movies&TV"
+    response:
+      status_code: 200
+      json:
+        message: "Preferences updated"
+
+  - name: Set preferences with spaces (should be handled)
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/users/preferences"
+      method: POST
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+      json:
+        preferences: "Arts & Crafts, Movies & TV"
+    response:
+      status_code: 200
+      json:
+        message: "Preferences updated"
+
+---
+test_name: Test Boundary Values for User Data
+
+stages:
+  - name: Signup with minimum age
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_minage@test.com"
+        password: "password123"
+        age: 1
+        gender: "Male"
+    response:
+      status_code: 201
+
+  - name: Signup with maximum reasonable age
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_maxage@test.com"
+        password: "password123"
+        age: 120
+        gender: "Female"
+    response:
+      status_code: 201
+
+  - name: Signup with very long email (but valid format)
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_verylongemailaddressfortesting@test.com"
+        password: "password123"
+        age: 25
+        gender: "Male"
+    response:
+      status_code: 201
+
+  - name: Login and get token for cart tests
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/login"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_minage@test.com"
+        password: "password123"
+    response:
+      status_code: 200
+      save:
+        json:
+          token: "token"
+          user_id: "user.user_id"
+
+  - name: Add maximum quantity to cart
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      method: POST
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+      json:
+        user_id: "{user_id}"
+        product_id: "1"
+        quantity: 999
+    response:
+      status_code: 204
+
+  - name: Verify large quantity in cart
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/{user_id}"
+      method: GET
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+    response:
+      status_code: 200
+      json:
+        - user_id: "{user_id}"
+          product_id: "1"
+          quantity: 999
+
+---
+test_name: Test Product Access Edge Cases
+
+stages:
+  - name: Signup user for product tests
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_prodtest@test.com"
+        password: "password123"
+        age: 40
+        gender: "Male"
+    response:
+      status_code: 201
+
+  - name: Login to get token
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/login"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_prodtest@test.com"
+        password: "password123"
+    response:
+      status_code: 200
+      save:
+        json:
+          token: "token"
+
+  - name: Access non-existent product
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/products/NONEXISTENT123"
+      method: GET
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+    response:
+      status_code: 404
+      json:
+        detail: "Product not found"
+
+  - name: Track interaction on non-existent product
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/products/NONEXISTENT123/interactions/click"
+      method: POST
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+    response:
+      status_code: 404
+      json:
+        detail: "Product not found" 

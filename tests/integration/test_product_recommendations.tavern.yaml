@@ -1,0 +1,210 @@
+---
+test_name: Test Product Recommendations Based on User Interactions
+
+stages:
+  - name: Signup user
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_reco@test.com"
+        password: "password123"
+        age: 25
+        gender: "Male"
+    response:
+      status_code: 201
+      save:
+        json:
+          user_id: "user.user_id"
+
+  - name: Login to get token
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/login"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_reco@test.com"
+        password: "password123"
+    response:
+      status_code: 200
+      save:
+        json:
+          token: "token"
+
+  - name: Set user preferences
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/users/preferences"
+      method: POST
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+      json:
+        preferences: "Electronics,Computers&Accessories"
+    response:
+      status_code: 200
+
+  - name: Get product details to track view
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/products/B00TSUGXKE"
+      method: GET
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+    response:
+      status_code: 200
+      headers:
+        content-type: application/json
+      save:
+        json:
+          product_name: "product_name"
+
+  - name: Track product click interaction
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/products/B00TSUGXKE/interactions/click"
+      method: POST
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+    response:
+      status_code: 200
+      headers:
+        content-type: application/json
+      json:
+        message: "Interaction tracked"
+
+  # Note: Recommendations would typically be available through search with personalization
+  # or a dedicated recommendations endpoint. For now, we'll test that interactions are tracked.
+
+---
+test_name: Test Product Search with Various Filters
+
+stages:
+  - name: Signup user for search tests
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_search@test.com"
+        password: "password123"
+        age: 30
+        gender: "Female"
+    response:
+      status_code: 201
+
+  - name: Login to get token
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/login"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_search@test.com"
+        password: "password123"
+    response:
+      status_code: 200
+      save:
+        json:
+          token: "token"
+
+  - name: Search products with query
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/products/search?query=laptop"
+      method: GET
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+    response:
+      status_code: 200
+      verify_response_with:
+        - function: tests_helpers:validate_product_list
+
+  - name: Search products with limit
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/products/search?query=laptop&k=5"
+      method: GET
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+    response:
+      status_code: 200
+      verify_response_with:
+        - function: tests_helpers:validate_product_list
+        
+  - name: Search with empty query
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/products/search?query="
+      method: GET
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+    response:
+      status_code: 422
+
+  - name: Search with special characters
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/products/search?query=%40%23%24%25"
+      method: GET
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+    response:
+      status_code: 200
+      json: []  # Expect empty results for special characters
+
+---
+test_name: Test Product Image Search
+
+stages:
+  - name: Signup user for image search
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_imgsearch@test.com"
+        password: "password123"
+        age: 28
+        gender: "Male"
+    response:
+      status_code: 201
+
+  - name: Login to get token
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/login"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_imgsearch@test.com"
+        password: "password123"
+    response:
+      status_code: 200
+      save:
+        json:
+          token: "token"
+
+  - name: Search by valid image URL
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/products/search/image_link?image_link=https://m.media-amazon.com/images/I/61yH2X4re6L._AC_UY218_.jpg"
+      method: GET
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+    response:
+      status_code: 200
+      verify_response_with:
+        - function: tests_helpers:validate_product_list
+
+  - name: Search by invalid image URL
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/products/search/image_link?image_link=not-a-url"
+      method: GET
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+    response:
+      status_code: 422
+
+  - name: Search without image_link parameter
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/products/search/image_link"
+      method: GET
+      headers:
+        Authorization: "Bearer {token}"
+        Content-Type: "application/json"
+    response:
+      status_code: 422 
