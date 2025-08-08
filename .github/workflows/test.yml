@@ -25,6 +25,11 @@ jobs:
         with:
           python-version-file: "${{ env.BACKEND_DIR }}/pyproject.toml"
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake pkg-config
+
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
@@ -34,6 +39,11 @@ jobs:
       - name: Install the project
         run: uv sync --extra dev
 
+      - name: Install recommendation-core dependencies
+        run: |
+          uv pip install pyarrow
+          uv pip install -e ../recommendation-core
+
       - name: Run tests
         # For example, using `pytest`
-        run: uv run -m pytest tests
+        run: PYTHONPATH=src uv run -m pytest tests

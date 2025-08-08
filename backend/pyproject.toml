@@ -24,7 +24,7 @@ dependencies = [
     "psycopg2-binary>=2.9.10",
     "python-multipart",
     "Pillow>=10.0.0",
-    "recsysapp",
+    "recommendation_core",
     "httpx>=0.28.1",
     "flake8>=7.3.0",
 ]
@@ -40,11 +40,14 @@ dev = [
     "httpx>=0.27.0",  # for async API testing
 ]
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.pytest.ini_options]
-pythonpath = "."
+pythonpath = ["src"]
 
 [tool.uv.sources]
-recsysapp = { git = "https://github.com/RHEcosystemAppEng/rec-sys-app", rev = "ef83679" }
+recommendation_core = { path = "../recommendation-core" }
 
 [tool.flake8]
 max-line-length = 99
@@ -56,6 +59,10 @@ line-length = 99
 exclude = '''
 /(
     README\.md
+    |venv
+    |\.venv
+    |env
+    |\.env
 )/
 '''
 
@@ -66,7 +73,7 @@ force_grid_wrap = 0
 use_parentheses = true
 line_length = 99
 profile = "black"
-skip = "README.md"
+skip = ["README.md", "venv", ".venv", "env", ".env"]
 
 [tool.bandit]
 exclude_dirs = ["tests", "test_*"]

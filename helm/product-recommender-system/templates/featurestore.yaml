@@ -25,14 +25,14 @@ stringData:
 apiVersion: feast.dev/v1alpha1
 kind: FeatureStore
 metadata:
-  name: feast-rec-sys
+  name: feast-recommendation
 spec:
   feastProject: {{ .Values.feast.project }}
   feastProjectDir:
     git:
-      url: https://github.com/RHEcosystemAppEng/rec-sys-app
+      url: https://github.com/rh-ai-kickstart/product-recommender-system
       ref: main
-      featureRepoPath: recsysapp
+      featureRepoPath: recommendation-core/src/recommendation_core/feature_repo
   services:
     offlineStore:
       persistence:
@@ -87,7 +87,7 @@ kind: Job
 metadata:
   name: feast-apply-job
   labels:
-    feast.dev/name: feast-rec-sys
+    feast.dev/name: feast-recommendation
     feast.dev/service-type: job
 spec:
   template:
@@ -116,7 +116,13 @@ spec:
           command:
             - /bin/bash
             - -c
-            - cd recsysapp/feature_repo && feast apply
+            - |
+              set -e
+              echo "Setting FEAST_PROJECT_NAME environment variable..."
+              export FEAST_PROJECT_NAME={{ .Values.feast.project }}
+              echo "FEAST_PROJECT_NAME: $FEAST_PROJECT_NAME"
+              echo "Applying Feast configuration..."
+              feast apply
           imagePullPolicy: IfNotPresent
           {{- with .Values.env }}
           env:
@@ -135,5 +141,5 @@ spec:
           items:
           - key: tls.crt
             path: tls.crt
-      serviceAccountName: feast-feast-rec-sys
+      serviceAccountName: feast-feast-recommendation
   backoffLimit: 4
