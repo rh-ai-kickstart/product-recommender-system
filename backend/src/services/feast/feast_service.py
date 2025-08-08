@@ -39,8 +39,8 @@ class FeastService:
     def __init__(self):
         if not self._initialized:
             # Use the correct feature repo path
-            feature_repo_path = Path("/app/recommendation-core/src/recommendation_core/feature_repo")
-            self.store = FeatureStore(str(feature_repo_path))
+            path = Path("/app/recommendation-core/src/recommendation_core/feature_repo")
+            self.store = FeatureStore(str(path))
             self._initialized = True
             self.user_encoder = self._load_user_encoder()
             self.user_service = self.store.get_feature_service("user_service")
