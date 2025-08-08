@@ -49,6 +49,7 @@ help:
 .PHONY: check-oc-version
 check-oc-version:
 	$(eval USER_OC_VERSION = $(shell oc version --client=true -o json | jq -r .clientVersion.gitVersion))
+	@echo "Detected oc version on your machine: $(USER_OC_VERSION)"
 	$(eval LOWER_OC_VERSION = $(shell echo "${MINIMUM_OC_VERSION}\n$(USER_OC_VERSION)" | sort -V | head -n 1 ))
 	@if [ $(MINIMUM_OC_VERSION) != $(LOWER_OC_VERSION) ]; then \
 		echo "Please upgrade your version of oc to at least $(MINIMUM_OC_VERSION)"; \
