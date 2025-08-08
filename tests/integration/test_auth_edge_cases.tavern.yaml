@@ -1,0 +1,134 @@
+---
+test_name: Test Authentication Edge Cases - Invalid Credentials
+
+stages:
+  - name: Try login with non-existent user
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/login"
+      method: POST
+      json:
+        email: "nonexistent@test.com"
+        password: "wrongpassword"
+    response:
+      status_code: 401
+      headers:
+        content-type: application/json
+      json:
+        detail: "Invalid email or password"
+
+  - name: Try login with wrong password
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/login"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_auth@test.com"
+        password: "wrongpassword"
+    response:
+      status_code: 401
+      headers:
+        content-type: application/json
+      json:
+        detail: "Invalid email or password"
+
+---
+test_name: Test Authentication Edge Cases - Invalid Input
+
+stages:
+  - name: Try signup without email (missing field)
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        password: "password123"
+        age: 25
+        gender: "Male"
+    response:
+      status_code: 422
+
+  - name: Try signup with missing required fields
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_missing@test.com"
+        # Missing password, age, gender
+    response:
+      status_code: 422
+
+  - name: Try signup with invalid age
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_age@test.com"
+        password: "password123"
+        age: -5
+        gender: "Female"
+    response:
+      status_code: 422
+
+---
+test_name: Test Authentication Edge Cases - Duplicate Signup
+
+stages:
+  - name: Signup first user
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_duplicate@test.com"
+        password: "password123"
+        age: 30
+        gender: "Male"
+    response:
+      status_code: 201
+      headers:
+        content-type: application/json
+
+  - name: Try to signup with same email again
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_duplicate@test.com"
+        password: "differentpassword"
+        age: 25
+        gender: "Female"
+    response:
+      status_code: 400
+      headers:
+        content-type: application/json
+      json:
+        detail: "Email already registered"
+
+---
+test_name: Test Authentication Edge Cases - Empty Credentials
+
+stages:
+  - name: Try login with empty email
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/login"
+      method: POST
+      json:
+        email: ""
+        password: "password123"
+    response:
+      status_code: 401
+      headers:
+        content-type: application/json
+      json:
+        detail: "Invalid email or password"
+
+  - name: Try login with empty password
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/login"
+      method: POST
+      json:
+        email: "test@example.com"
+        password: ""
+    response:
+      status_code: 401
+      headers:
+        content-type: application/json
+      json:
+        detail: "Invalid email or password" 
