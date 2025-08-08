@@ -4,6 +4,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from PIL import Image
+
 try:
     from PIL.UnidentifiedImageError import UnidentifiedImageError
 except ImportError:
