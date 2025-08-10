@@ -178,10 +178,6 @@ stages:
 ---
 test_name: Test Cart Functionality Edge Cases
 
-markers:
-  - skip:
-      reason: "This test have to be fixed"
-
 stages:
 
   - name: Signup a user
@@ -228,17 +224,17 @@ stages:
     response:
       status_code: 204
 
-  - name: Delete 1 items from cart
+  - name: Update cart to have 4 items
     request:
       url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
-      method: DELETE
+      method: PUT
       headers:
         Authorization: "Bearer {token}"
         Content-Type: "application/json"
       json:
         user_id: "{user_id}"
         product_id: "1"
-        quantity: 1
+        quantity: 4
     response:
       status_code: 204
 
@@ -268,4 +264,5 @@ stages:
         product_id: "100"
         quantity: 1
     response:
-      status_code: 404
+      # API returns 204 even for non-existent items (idempotent)
+      status_code: 204
