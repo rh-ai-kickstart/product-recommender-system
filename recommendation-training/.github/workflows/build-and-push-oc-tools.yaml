@@ -3,7 +3,7 @@ name: Build and push - oc-tools image
 on:
   workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
     paths:
       - 'recommendation-training/oc-tools/**'
 

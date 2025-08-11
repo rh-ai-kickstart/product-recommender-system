@@ -236,7 +236,7 @@ src/recommendation_core/feature_repo/data/
 ```
 
 **Files Generated:**
-The script creates **9 parquet files** (binary columnar format) with the following structure:
+The `dataset_gen_amazon.py` script creates **9 parquet files** (binary columnar format) with the following structure:
 
 **Main Dataset Files:**
 1. `recommendation_users.parquet` - User profiles with demographics and preferences
@@ -666,6 +666,10 @@ Real-time Results → User Interface
 ### Phase 2: Model Training & Registration
 
 #### 2.1 Training Pipeline Execution
+
+**Why Models Are Trained Periodically:**
+
+Models are trained **daily at midnight UTC** to address the dynamic nature of e-commerce environments and ensure optimal recommendation performance. **Data drift and concept drift** occur as user preferences evolve over time, new products are added to catalogs, seasonal patterns emerge, and market dynamics shift. Without periodic retraining, models would lose accuracy as they become outdated and fail to capture current user behaviors and product trends. **Continuous learning** is essential because daily user interactions—including clicks, purchases, ratings, and browsing patterns—provide valuable fresh training data that improves model accuracy and enables better cold-start recommendations for new users and items. From a **business perspective**, periodic training directly impacts revenue optimization by generating more relevant recommendations that increase conversion rates, enhances user engagement through improved personalization, provides competitive advantage by staying current with market trends, and boosts customer satisfaction through more accurate suggestions. **Technical benefits** include maintaining model freshness to reflect current data patterns, enabling regular performance monitoring against new data, supporting A/B testing to compare model versions, and providing rollback capabilities for safety. The **data pipeline integration** supports this through streaming data collection of new interactions, daily feature store updates with fresh features, periodic embedding refreshes for users and items, and model registry version control for lifecycle management.
 ```bash
 # Run Kubeflow training pipeline
 python train-workflow.py
