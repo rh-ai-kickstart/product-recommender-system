@@ -121,6 +121,11 @@ spec:
               echo "Setting FEAST_PROJECT_NAME environment variable..."
               export FEAST_PROJECT_NAME={{ .Values.feast.project }}
               echo "FEAST_PROJECT_NAME: $FEAST_PROJECT_NAME"
+              echo "Changing to feature repo directory..."
+              cd /app/recommendation-core/src/recommendation_core/feature_repo/
+              echo "Current directory: $(pwd)"
+              echo "Listing files:"
+              ls -la
               echo "Applying Feast configuration..."
               feast apply
           imagePullPolicy: IfNotPresent

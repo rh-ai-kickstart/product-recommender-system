@@ -14,6 +14,10 @@ COPY src/ src/
 # Install the package after copying source code
 RUN uv pip install .
 
+# Copy feature store files to the expected location for feast apply
+RUN mkdir -p /app/recommendation-core/src/recommendation_core/feature_repo/
+COPY src/recommendation_core/feature_repo/ /app/recommendation-core/src/recommendation_core/feature_repo/
+
 # give premisssions 
 RUN chmod -R 777 . && ls -la
 
