@@ -1,17 +1,20 @@
-name: Build and push image
+name: Build and push backend/frontend image
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
   workflow_dispatch:
 
 env:
   BACKEND_DIR: backend
 
 jobs:
-  build-image:
-    name: Build and Push container image
+  build-backend-image:
+    name: Build and Push Backend/Frontend Image
     runs-on: ubuntu-latest
     strategy:
       matrix:

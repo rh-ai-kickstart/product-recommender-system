@@ -4,14 +4,14 @@ project: feast_edb_rec_sys
 provider: local
 registry:
   registry_type: remote
-  path: feast-feast-edb-rec-sys-registry.rec-sys.svc.cluster.local
+  path: feast-feast-edb-recommendation-registry.recommendation.svc.cluster.local
   cert: /app/feature_repo/secrets/tls.crt
 
 entity_key_serialization_version: 3
 
 online_store:
   type: postgres
-  host: cluster-sample-rw.rec-sys.svc.cluster.local
+  host: cluster-sample-rw.recommendation.svc.cluster.local
   port: 5432
   database: app
   user: app
