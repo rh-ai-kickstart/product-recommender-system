@@ -28,7 +28,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake pkg-config
+          sudo apt-get install -y build-essential cmake pkg-config libarrow-dev libarrow-python-dev
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -39,11 +39,14 @@ jobs:
       - name: Install the project
         run: uv sync --extra dev
 
-      - name: Install recommendation-core dependencies
+      - name: Install pyarrow with system Arrow
         run: |
-          uv pip install pyarrow
-          uv pip install -e ../recommendation-core
+          export ARROW_HOME=/usr
+          uv pip install pyarrow --no-build-isolation
+
+      - name: Install recommendation-core
+        run: uv pip install -e ../recommendation-core
 
       - name: Run tests
-        # For example, using `pytest`
-        run: PYTHONPATH=src uv run -m pytest tests
+        # Run tests with recommendation-core available
+        run: PYTHONPATH=src uv run -m pytest tests -v
