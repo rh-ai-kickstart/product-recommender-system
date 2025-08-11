@@ -1,10 +1,12 @@
 import logging
+
 import pandas as pd
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from recommendation_core.models.data_util import UserItemMagnitudeDataset, preproccess_pipeline
+from recommendation_core.models.data_util import (UserItemMagnitudeDataset,
+                                                  preproccess_pipeline)
 from recommendation_core.models.entity_tower import EntityTower
 from recommendation_core.models.two_tower import TwoTowerModel
 

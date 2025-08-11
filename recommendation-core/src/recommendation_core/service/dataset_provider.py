@@ -1,9 +1,10 @@
+import logging
 from datetime import datetime
 from pathlib import Path
 
-import logging
 import pandas as pd
 from feast import FeatureStore
+
 from recommendation_core.models import data_util
 
 logger = logging.getLogger(__name__)
@@ -15,13 +16,15 @@ class DatasetProvider:
         self._item_df_path = Path(data_dir) / "recommendation_items.parquet"
         self._user_df_path = Path(data_dir) / "recommendation_users.parquet"
         self._interaction_df_path = (
-                Path(data_dir) / "recommendation_interactions.parquet"
+            Path(data_dir) / "recommendation_interactions.parquet"
         )
         self._loaded = False
 
         if (
-                self._item_df_path.exists() and self._user_df_path.exists()
-                and self._interaction_df_path.exists() and (force_load is False)
+            self._item_df_path.exists()
+            and self._user_df_path.exists()
+            and self._interaction_df_path.exists()
+            and (force_load is False)
         ):
             self._item_df = pd.read_parquet(self._item_df_path)
             self._user_df = pd.read_parquet(self._user_df_path)
@@ -45,7 +48,9 @@ class DatasetProvider:
 
 class LocalDatasetProvider(DatasetProvider):
 
-    def __init__(self, store=None, data_dir="./src/recommendation_core/feature_repo/data"):
+    def __init__(
+        self, store=None, data_dir="./src/recommendation_core/feature_repo/data"
+    ):
         super().__init__(data_dir, False)
         if self._loaded is False:
             assert store is not None
@@ -95,11 +100,16 @@ class LocalDatasetProvider(DatasetProvider):
 
 class RemoteDatasetProvider(DatasetProvider):
 
-    def __init__(self, url: str, data_dir="./src/recommendation_core/feature_repo/data", force_load=False):
+    def __init__(
+        self,
+        url: str,
+        data_dir="./src/recommendation_core/feature_repo/data",
+        force_load=False,
+    ):
         super().__init__(data_dir, force_load)
         if self._loaded is False:
             df = pd.read_csv(url)
-            self._item_df, self._user_df, self._interaction_df = data_util.clean_dataset(df)
+            self._item_df, self._user_df, self._interaction_df = (
+                data_util.clean_dataset(df)
+            )
             self._save_dfs_to_parquet()
-
-

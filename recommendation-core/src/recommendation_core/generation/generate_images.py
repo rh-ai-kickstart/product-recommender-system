@@ -11,7 +11,9 @@ logger = logging.getLogger(__name__)
 
 def main():
     data_directory = Path(__file__).parent.joinpath("data")
-    item_df = pd.read_parquet("src/recommendation_core/feature_repo/data/item_df_output.parquet")
+    item_df = pd.read_parquet(
+        "src/recommendation_core/feature_repo/data/item_df_output.parquet"
+    )
     pprint(item_df)
 
     # Load the Stable Diffusion pipeline (open model)

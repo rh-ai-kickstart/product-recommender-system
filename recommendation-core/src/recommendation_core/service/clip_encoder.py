@@ -32,10 +32,7 @@ class ClipEncoder:
     def create_clip_embeddings(self, item_df):
         texts = item_df["about_product"].tolist()
         image_links = item_df["img_link"].tolist()
-        images = [
-            open_image(url) if url is not None else None
-            for url in image_links
-        ]
+        images = [open_image(url) if url is not None else None for url in image_links]
         return self.encode_texts_and_images(texts, images)
 
     def encode_texts_and_images(
@@ -110,7 +107,9 @@ class ClipEncoder:
         return result, none_indices
 
     def encode_texts(self, texts: list[str]):
-        inputs = self.tokenizer(texts, padding=True, return_tensors="pt", truncation=True)
+        inputs = self.tokenizer(
+            texts, padding=True, return_tensors="pt", truncation=True
+        )
         with torch.no_grad():
             return self.model.get_text_features(**inputs)
 

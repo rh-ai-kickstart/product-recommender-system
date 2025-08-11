@@ -103,7 +103,9 @@ def generate_items():
     items = []
     # Define categories and subcategories based on sample data
 
-    item_df = pd.read_csv("src/recommendation_core/feature_repo/data/generated_amazon.csv")
+    item_df = pd.read_csv(
+        "src/recommendation_core/feature_repo/data/generated_amazon.csv"
+    )
     for item_id, item in item_df.iterrows():
         category = item.category
 
@@ -302,12 +304,8 @@ if __name__ == "__main__":
         data=[[generate_id(), [1.0, 2.0], datetime.now() + timedelta(days=365 * 7)]],
     )
 
-    dummy_item_embed_df.to_parquet(
-        data_path / "dummy_item_embed.parquet", index=False
-    )
-    dummy_user_embed_df.to_parquet(
-        data_path / "dummy_user_embed.parquet", index=False
-    )
+    dummy_item_embed_df.to_parquet(data_path / "dummy_item_embed.parquet", index=False)
+    dummy_user_embed_df.to_parquet(data_path / "dummy_user_embed.parquet", index=False)
     dummy_user_items_df.to_parquet(data_path / "user_items.parquet", index=False)
     dummy_textual_feature_df.to_parquet(
         data_path / "item_textual_features_embed.parquet", index=False
