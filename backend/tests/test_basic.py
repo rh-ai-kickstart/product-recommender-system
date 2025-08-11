@@ -19,19 +19,18 @@ def test_health_check():
     try:
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
-        
         app = FastAPI()
-        
+
         @app.get("/health")
         def health_check():
             return {"status": "ok"}
-        
+
         with TestClient(app) as client:
             response = client.get("/health")
             assert response.status_code == 200
             assert response.json() == {"status": "ok"}
-    except ImportError:
-        pytest.skip("FastAPI test dependencies not available")
+    except ImportError as e:
+        pytest.skip(f"FastAPI test dependencies not available: {e}")
 
 
 def test_python_version():
@@ -46,8 +45,9 @@ def test_recommendation_core_import():
     try:
         import recommendation_core
         assert recommendation_core is not None
-    except ImportError:
-        pytest.skip("recommendation_core not available - skipping integration test")
+        print(f"✅ recommendation_core imported successfully: {recommendation_core}")
+    except ImportError as e:
+        pytest.skip(f"recommendation_core not available - skipping integration test: {e}")
 
 
 def test_feast_import():
@@ -55,8 +55,9 @@ def test_feast_import():
     try:
         import feast
         assert feast is not None
-    except ImportError:
-        pytest.skip("feast not available - skipping integration test")
+        print(f"✅ feast imported successfully: {feast}")
+    except ImportError as e:
+        pytest.skip(f"feast not available - skipping integration test: {e}")
 
 
 def test_pyarrow_import():
@@ -64,8 +65,9 @@ def test_pyarrow_import():
     try:
         import pyarrow
         assert pyarrow is not None
-    except ImportError:
-        pytest.skip("pyarrow not available - skipping integration test")
+        print(f"✅ pyarrow imported successfully: {pyarrow}")
+    except ImportError as e:
+        pytest.skip(f"pyarrow not available - skipping integration test: {e}")
 
 
 if __name__ == "__main__":
