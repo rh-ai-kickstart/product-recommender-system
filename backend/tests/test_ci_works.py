@@ -21,7 +21,7 @@ def test_import_basic_modules():
     import os
     import json
     import pathlib
-    
+
     assert os is not None
     assert json is not None
     assert pathlib is not None

@@ -19,6 +19,7 @@ def test_health_check():
     try:
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
+
         app = FastAPI()
 
         @app.get("/health")
@@ -45,7 +46,7 @@ def test_recommendation_core_import():
     try:
         import recommendation_core
         assert recommendation_core is not None
-        print(f"✅ recommendation_core imported successfully: {recommendation_core}")
+        print("✅ recommendation_core imported successfully")
     except ImportError as e:
         pytest.skip(f"recommendation_core not available - skipping integration test: {e}")
 
@@ -55,7 +56,7 @@ def test_feast_import():
     try:
         import feast
         assert feast is not None
-        print(f"✅ feast imported successfully: {feast}")
+        print("✅ feast imported successfully")
     except ImportError as e:
         pytest.skip(f"feast not available - skipping integration test: {e}")
 
@@ -65,7 +66,7 @@ def test_pyarrow_import():
     try:
         import pyarrow
         assert pyarrow is not None
-        print(f"✅ pyarrow imported successfully: {pyarrow}")
+        print("✅ pyarrow imported successfully")
     except ImportError as e:
         pytest.skip(f"pyarrow not available - skipping integration test: {e}")
 
