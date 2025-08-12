@@ -214,7 +214,7 @@ def train_model(
     import logging
 
     logging.getLogger(__name__)
-    
+
     print("DEBUG: train_model function started")
     print(f"DEBUG: item_df_input.path = {item_df_input.path}")
     print(f"DEBUG: user_df_input.path = {user_df_input.path}")
@@ -238,7 +238,7 @@ def train_model(
     print("DEBUG: About to create database engine")
     print(f"DEBUG: DATABASE_URL = {os.getenv('DATABASE_URL', 'NOT_SET')}")
     print(f"DEBUG: uri = {os.getenv('uri', 'NOT_SET')}")
-    
+
     #
     engine = create_engine(os.getenv("uri", None))
     print("DEBUG: Database engine created successfully")
@@ -547,7 +547,18 @@ def batch_recommendation():
     # Component configurations
     load_data_task.set_caching_options(False)
 
+    # setting resource requests and limits - TODO: use from environment variables
+    load_data_task.set_cpu_request("2000m")
+    load_data_task.set_memory_request("2000Mi")
+    load_data_task.set_cpu_limit("3000m")
+    load_data_task.set_memory_limit("3000Mi")
+
     fetch_api_credentials_task = fetch_cluster_credentials()
+
+    fetch_api_credentials_task.set_caching_options(
+        False
+    )  # if set to true, the task will be cached and the credentials will not be updated.
+
     fetch_api_credentials_task.set_env_variable(
         name="MODEL_REGISTRY_NAMESPACE", value=os.getenv("MODEL_REGISTRY_NAMESPACE")
     )
@@ -560,6 +571,13 @@ def batch_recommendation():
         user_df_input=load_data_task.outputs["user_df_output"],
         interaction_df_input=load_data_task.outputs["interaction_df_output"],
     ).after(load_data_task)
+
+    # setting resource requests and limits - TODO: use from environment variables
+    train_model_task.set_cpu_request("2000m")
+    train_model_task.set_memory_request("2000Mi")
+    train_model_task.set_cpu_limit("3000m")
+    train_model_task.set_memory_limit("3000Mi")
+
     train_model_task.set_caching_options(False)
     kubernetes.use_secret_as_env(
         task=train_model_task,
@@ -599,6 +617,12 @@ def batch_recommendation():
         },
     )
 
+    # setting resource requests and limits - TODO: use from environment variables
+    create_model_registry_task.set_cpu_request("2000m")
+    create_model_registry_task.set_memory_request("2000Mi")
+    create_model_registry_task.set_cpu_limit("3000m")
+    create_model_registry_task.set_memory_limit("3000Mi")
+
     generate_candidates_task = generate_candidates(
         item_input_model=train_model_task.outputs["item_output_model"],
         user_input_model=train_model_task.outputs["user_output_model"],
@@ -636,6 +660,14 @@ def batch_recommendation():
             "feast-feast-edb-recommendation-registry.recommendation.svc.cluster.local",
         ),
     )
+    generate_candidates_task.set_caching_options(False)
+
+    # setting resource requests and limits - TODO: use from environment variables    # setting resource requests and limits - TODO: use from environment variables
+    generate_candidates_task.set_cpu_request("2000m")
+    generate_candidates_task.set_memory_request("2000Mi")
+    generate_candidates_task.set_cpu_limit("3000m")
+    generate_candidates_task.set_memory_limit("3000Mi")
+
     generate_candidates_task.set_caching_options(False)
 
 
