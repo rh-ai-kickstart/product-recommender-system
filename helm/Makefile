@@ -50,11 +50,7 @@ help:
 check-oc-version:
 	$(eval USER_OC_VERSION = $(shell oc version --client=true -o json | jq -r .clientVersion.gitVersion))
 	@echo "Detected oc version on your machine: $(USER_OC_VERSION)"
-	$(eval LOWER_OC_VERSION = $(shell echo "${MINIMUM_OC_VERSION}\n$(USER_OC_VERSION)" | sort -V | head -n 1 ))
-	@if [ $(MINIMUM_OC_VERSION) != $(LOWER_OC_VERSION) ]; then \
-		echo "Please upgrade your version of oc to at least $(MINIMUM_OC_VERSION)"; \
-		exit 1; \
-	fi
+	@echo "NOTE: This install script has only been tested for oc version $(MINIMUM_OC_VERSION) and the bash and zsh shells."
 
 # Minio internally rejects user id and password values less than 3 and 8 characters, respectively
 # The install will fail if this occurs, so let's catch it early
