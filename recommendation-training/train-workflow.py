@@ -213,12 +213,12 @@ def train_model(
     from sqlalchemy import create_engine, text
     import logging
 
-    logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
 
-    print("DEBUG: train_model function started")
-    print(f"DEBUG: item_df_input.path = {item_df_input.path}")
-    print(f"DEBUG: user_df_input.path = {user_df_input.path}")
-    print(f"DEBUG: interaction_df_input.path = {interaction_df_input.path}")
+    logger.debug("train_model function started")
+    logger.debug(f"item_df_input.path = {item_df_input.path}")
+    logger.debug(f"user_df_input.path = {user_df_input.path}")
+    logger.debug(f"interaction_df_input.path = {interaction_df_input.path}")
 
     item_df = pd.read_parquet(item_df_input.path)
     user_df = pd.read_parquet(user_df_input.path)
@@ -235,32 +235,31 @@ def train_model(
     with open(models_definition_output.path, "w") as f:
         json.dump(models_definition, f)
 
-    print("DEBUG: About to create database engine")
-    print(f"DEBUG: DATABASE_URL = {os.getenv('DATABASE_URL', 'NOT_SET')}")
-    print(f"DEBUG: uri = {os.getenv('uri', 'NOT_SET')}")
+    logger.debug("About to create database engine")
+    logger.debug(f"DATABASE_URL = {os.getenv('DATABASE_URL', 'NOT_SET')}")
+    logger.debug(f"uri = {os.getenv('uri', 'NOT_SET')}")
 
     #
     engine = create_engine(os.getenv("uri", None))
-    print("DEBUG: Database engine created successfully")
+    logger.debug("DEBUG: Database engine created successfully")
 
     # Check if table exists
     def table_exists(engine, table_name):
-        print(f"DEBUG: Checking if table '{table_name}' exists")
+        logger.debug(f"Checking if table '{table_name}' exists")
         query = text(
-            "SELECT COUNT(*) FROM information_schema.tables "
-            "WHERE table_name = :table_name"
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = :table_name"
         )
         with engine.connect() as connection:
             result = connection.execute(query, {"table_name": table_name}).scalar()
-            print(f"DEBUG: Table '{table_name}' exists: {result > 0}")
+            logger.debug(f"Table '{table_name}' exists: {result > 0}")
             return result > 0
 
-    print("DEBUG: About to check if model_version table exists")
+    logger.debug("About to check if model_version table exists")
     if not table_exists(engine, "model_version"):
-        print("DEBUG: model_version table does not exist, creating it...")
+        logger.debug("model_version table does not exist, creating it...")
         # Create table if it doesn't exist
         with engine.connect() as connection:
-            print("DEBUG: Executing CREATE TABLE model_version")
+            logger.debug("Executing CREATE TABLE model_version")
             connection.execute(
                 text(
                     """
@@ -272,17 +271,17 @@ def train_model(
             """
                 )
             )
-            print("DEBUG: CREATE TABLE executed successfully")
+            logger.debug("CREATE TABLE executed successfully")
             new_version = "1.0.0"
-            print(f"DEBUG: Inserting version '{new_version}' into model_version table")
+            logger.debug(f"Inserting version '{new_version}' into model_version table")
             connection.execute(
                 text(f"INSERT INTO model_version (version) VALUES ('{new_version}');")
             )
-            print("DEBUG: INSERT executed successfully")
+            logger.debug("INSERT executed successfully")
             connection.commit()
-            print("DEBUG: COMMIT executed successfully")
+            logger.debug("COMMIT executed successfully")
     else:
-        print("DEBUG: model_version table exists, updating version...")
+        logger.debug("DEBUG: model_version table exists, updating version...")
         # Get last version and increment minor version by 0.0.1
         with engine.connect() as connection:
             last_version = connection.execute(
@@ -340,12 +339,15 @@ def train_model(
 
 
 @dsl.component(base_image="quay.io/rh-ai-kickstart/recommendation-oc-tools:latest")
-def fetch_cluster_credentials() -> NamedTuple(
-    "ocContext", [("author", str), ("user_token", str), ("host", str)]
+def fetch_cluster_credentials() -> (
+    NamedTuple("ocContext", [("author", str), ("user_token", str), ("host", str)])
 ):
     import os
     import subprocess
     from typing import NamedTuple
+    import logging
+
+    logger = logging.getLogger(__name__)
 
     author_value = subprocess.run(
         "oc whoami", shell=True, capture_output=True, text=True, check=True
@@ -353,7 +355,7 @@ def fetch_cluster_credentials() -> NamedTuple(
     user_token_value = subprocess.run(
         "oc whoami -t", shell=True, capture_output=True, text=True, check=True
     ).stdout.strip()
-
+    logger.debug(f"author_value = {author_value}")
     mr_namespace = os.getenv("MODEL_REGISTRY_NAMESPACE", "rhoai-model-registries")
     mr_container = os.getenv("MODEL_REGISTRY_CONTAINER", "modelregistry-sample")
 
@@ -521,7 +523,9 @@ def mount_secret_feast_repository(task):
     )
     kubernetes.use_secret_as_volume(
         task=task,
-        secret_name=os.getenv("FEAST_SECRET_NAME", "feast-feast-recommendation-registry-tls"),
+        secret_name=os.getenv(
+            "FEAST_SECRET_NAME", "feast-feast-recommendation-registry-tls"
+        ),
         mount_path="/app/feature_repo/secrets",
     )
     task.set_env_variable(
