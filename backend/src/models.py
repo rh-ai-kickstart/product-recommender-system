@@ -59,6 +59,10 @@ class SignUpRequest(BaseModel):
     gender: str
 
 
+class PreferencesRequest(BaseModel):
+    preferences: str
+
+
 class AuthResponse(BaseModel):
     user: User
     token: str

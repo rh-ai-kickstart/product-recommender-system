@@ -476,11 +476,9 @@ def load_data_from_feast(
             result = connection.execute(query, {"table_name": table_name}).scalar()
             return result > 0
 
-    if table_exists(engine, "new_users"):
-        query_new_users = "SELECT * FROM new_users"
-        stream_users_df = pd.read_sql(query_new_users, engine).rename(
-            columns={"timestamp": "signup_date"}
-        )
+    if table_exists(engine, "users"):
+        query_users = "SELECT user_id, email as user_name, preferences, signup_date FROM users"
+        stream_users_df = pd.read_sql(query_users, engine)
 
         user_df = pd.concat([user_df, stream_users_df], axis=0)
 
