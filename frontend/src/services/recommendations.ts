@@ -38,8 +38,7 @@ export const createNewUserRecommendations = async (
 
 /**
  * Fetch recommendations for new users without interaction history (cold start problem)
- * Since no ML model is running, this uses the same endpoint as existing users
- * The backend will handle the lack of interaction data gracefully
+ * Uses the POST endpoint which generates ML-powered recommendations based on user preferences
  */
 export const fetchNewUserRecommendations = async (
   userId: string,
@@ -51,10 +50,14 @@ export const fetchNewUserRecommendations = async (
   });
 
   try {
-    // Use the same endpoint as existing users until backend creates model generated new user recommendations - backend will handle gracefully
+    // Use the POST endpoint which generates new user recommendations via ML model
     return await apiRequest<ProductData[]>(
-      `/recommendations/${userId}`,
-      'fetchNewUserRecommendations'
+      '/recommendations',
+      'fetchNewUserRecommendations',
+      {
+        method: 'POST',
+        body: { num_recommendations: numRecommendations },
+      }
     );
   } catch (error) {
     // If backend fails, return mock data as fallback
