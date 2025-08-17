@@ -1,7 +1,7 @@
 {{- if .Values.modelRegistry.enabled }}
-{{- $modelRegistryExists := (lookup "modelregistry.opendatahub.io/v1alpha1" "ModelRegistry" .Values.modelRegistry.namespace .Values.modelRegistry.name) }}
+{{- $modelRegistryExists := (lookup "modelregistry.opendatahub.io/v1beta1" "ModelRegistry" .Values.modelRegistry.namespace .Values.modelRegistry.name) }}
 {{- if not $modelRegistryExists }}
-apiVersion: modelregistry.opendatahub.io/v1alpha1
+apiVersion: modelregistry.opendatahub.io/v1beta1
 kind: ModelRegistry
 metadata:
   name: {{ .Values.modelRegistry.name }}
