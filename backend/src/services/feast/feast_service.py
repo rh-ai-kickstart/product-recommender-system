@@ -126,6 +126,7 @@ class FeastService:
         and querying the feature store for top-k similar items.
         """
         user_as_df = pd.DataFrame([user.model_dump()])
+        self.user_encoder.eval()
         user_embed = self.user_encoder(**data_preproccess(user_as_df))[0]
         top_k = self.store.retrieve_online_documents(
             query=user_embed.tolist(), top_k=k, features=["item_embedding:item_id"]
