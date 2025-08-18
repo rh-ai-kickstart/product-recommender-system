@@ -157,7 +157,7 @@ product-recommender-install:
 
 # Uninstall the deployment and clean up
 .PHONY: uninstall
-uninstall: check-oc-version delete-topics product-recommender-uninstall pipeline-server-uninstall minio-uninstall delete-project
+uninstall: check-oc-version product-recommender-uninstall pipeline-server-uninstall minio-uninstall delete-project
 
 .PHONY: product-recommender-uninstall
 product-recommender-uninstall:
@@ -181,12 +181,6 @@ minio-uninstall:
 pipeline-server-uninstall:
 	@echo "Uninstalling pipeline server chart"
 	@helm -n $(NAMESPACE) uninstall pipeline-server || true
-
-.PHONY: delete-topics
-delete-topics:
-	@echo "Attempting to delete Kafka topics in project $(NAMESPACE)..."
-	@oc delete kafkatopic interactions -n $(NAMESPACE) || true
-	@oc delete kafkatopic new-users -n $(NAMESPACE) || true
 
 .PHONY: delete-project
 delete-project:

@@ -196,8 +196,6 @@ env:
       secretKeyRef:
         name: pgvector
         key: dbname
-  - name: KAFKA_SERVICE_ADDR
-    value: recommendation-cluster-kafka-bootstrap:9092
 
 minio:
   env:
@@ -226,29 +224,6 @@ feast:
   project: feast_rec_sys
   secret: feast-feast-recommendation-registry-tls
   registry: feast-feast-recommendation-registry
-
-kafka:
-  cluster:
-    name: recommendation-cluster
-  replicas: 3
-  storage:
-    type: ephemeral
-  dbSecretName: pgvector
-  nodepools:
-    - name: broker
-      roles: ["broker"]
-    - name: controller
-      roles: ["controller"]
-  topics:
-    - name: new-users
-    - name: interactions
-  connectors:
-    - name: source-connector-new-users
-      topics: new-users
-      tableNameFormat: new_users
-    - name: source-connector-interactions
-      topics: interactions
-      tableNameFormat: stream_interaction
 
 configure-pipeline:
   notebook:

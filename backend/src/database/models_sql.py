@@ -1,4 +1,6 @@
-from sqlalchemy import Date, Integer, String
+from datetime import datetime
+
+from sqlalchemy import Date, DateTime, Float, Integer, String, Text
 from sqlalchemy.orm import Mapped, declarative_base, mapped_column
 
 Base = declarative_base()
@@ -25,6 +27,21 @@ class CartItem(Base):
     user_id: Mapped[str] = mapped_column(String(27), index=True)
     product_id: Mapped[str] = mapped_column(String, index=True)
     quantity: Mapped[int] = mapped_column(Integer)
+
+
+class StreamInteraction(Base):
+    __tablename__ = "stream_interaction"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(27), index=True)
+    item_id: Mapped[str] = mapped_column(String, index=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    interaction_type: Mapped[str] = mapped_column(String)
+    rating: Mapped[float] = mapped_column(Float, nullable=True)
+    quantity: Mapped[float] = mapped_column(Float, nullable=True)
+    review_title: Mapped[str] = mapped_column(Text, nullable=True)
+    review_content: Mapped[str] = mapped_column(Text, nullable=True)
+    interaction_id: Mapped[str] = mapped_column(String, unique=True, index=True)
 
 
 """

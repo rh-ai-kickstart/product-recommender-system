@@ -12,7 +12,6 @@ from database.db import get_db
 from database.models_sql import User
 from models import AuthResponse, LoginRequest, SignUpRequest
 from models import User as UserResponse
-from services.kafka_service import KafkaService  # Kafka send
 from services.security import (
     ALGORITHM,
     SECRET_KEY,
@@ -42,15 +41,14 @@ async def get_current_user(
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        sub = payload.get("sub")
-        if sub is None:
+        user_id: str = payload.get("sub")
+        if user_id is None:
             raise credentials_exception
-        user_id = str(sub)
-    except (JWTError, ValueError):
+    except JWTError:
         raise credentials_exception
     result = await db.execute(select(User).where(User.user_id == user_id))
     user = result.scalar_one_or_none()
-    if not user:
+    if user is None:
         raise credentials_exception
     return user
 
@@ -87,13 +85,6 @@ async def signup(
     await db.commit()
     await db.refresh(user)
 
-    # Send Kafka new-user event
-    KafkaService().send_new_user(
-        user_id=user.user_id,
-        user_name=user.email,
-        preferences=user.preferences,
-    )
-
     # Issue JWT
     token = create_access_token(subject=str(user.user_id))
 
@@ -121,8 +112,13 @@ async def login(
     result = await db.execute(select(User).where(User.email == payload.email))
     user = result.scalar_one_or_none()
     if not user or not verify_password(payload.password, user.hashed_password):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
+    # Issue JWT
     token = create_access_token(subject=str(user.user_id))
 
     user_response = UserResponse(
