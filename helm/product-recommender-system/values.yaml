@@ -79,11 +79,11 @@ backend:
   # Resource configuration for the backend
   resources:
     limits:
-      cpu: "1"
-      memory: "1Gi"
+      cpu: "2"
+      memory: "2Gi"
     requests:
-      cpu: "200m"
-      memory: "512Mi"
+      cpu: "500m"
+      memory: "1Gi"
 
   # Additional environment variables specific to backend
   additionalEnv:
