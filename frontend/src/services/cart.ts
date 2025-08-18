@@ -3,7 +3,7 @@ import { apiRequest, ServiceLogger } from './api';
 export interface CartItem {
   user_id: string;
   product_id: string;
-  quantity?: number;
+  quantity: number;
 }
 
 export const fetchCart = async (userId: string): Promise<CartItem[]> => {
@@ -13,7 +13,7 @@ export const fetchCart = async (userId: string): Promise<CartItem[]> => {
 
 export const addToCart = async (cartItem: CartItem): Promise<void> => {
   ServiceLogger.logServiceCall('addToCart', { cartItem });
-  return apiRequest<void>('/cart', 'addToCart', {
+  return apiRequest<void>(`/cart/${cartItem.user_id}`, 'addToCart', {
     method: 'POST',
     body: cartItem,
   });
@@ -21,7 +21,7 @@ export const addToCart = async (cartItem: CartItem): Promise<void> => {
 
 export const updateCart = async (cartItem: CartItem): Promise<void> => {
   ServiceLogger.logServiceCall('updateCart', { cartItem });
-  return apiRequest<void>('/cart', 'updateCart', {
+  return apiRequest<void>(`/cart/${cartItem.user_id}`, 'updateCart', {
     method: 'PUT',
     body: cartItem,
   });
@@ -29,7 +29,7 @@ export const updateCart = async (cartItem: CartItem): Promise<void> => {
 
 export const removeFromCart = async (cartItem: CartItem): Promise<void> => {
   ServiceLogger.logServiceCall('removeFromCart', { cartItem });
-  return apiRequest<void>('/cart', 'removeFromCart', {
+  return apiRequest<void>(`/cart/${cartItem.user_id}`, 'removeFromCart', {
     method: 'DELETE',
     body: cartItem,
   });
@@ -38,7 +38,7 @@ export const removeFromCart = async (cartItem: CartItem): Promise<void> => {
 // Keep the original editCart function for backward compatibility
 export const editCart = async (cartItem: any): Promise<any> => {
   ServiceLogger.logServiceCall('editCart', { cartItem });
-  return apiRequest<any>('/cart', 'editCart', {
+  return apiRequest<any>(`/cart/${cartItem.user_id}`, 'editCart', {
     method: 'POST',
     body: cartItem,
   });
