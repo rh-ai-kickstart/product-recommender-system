@@ -43,27 +43,28 @@ async def get_cart(
     ]
 
 
-@router.post("/cart", status_code=204)
+@router.post("/cart/{user_id}", status_code=204)
 async def add_to_cart(
+    user_id: str,
     item: CartItem,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     # Users can only add to their own cart
-    if current_user.user_id != item.user_id:
+    if current_user.user_id != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="You can only add items to your own cart"
         )
 
     KafkaService().send_interaction(
-        user_id=item.user_id,
+        user_id=user_id,
         item_id=item.product_id,
-        interaction_type=InteractionType.CART,
+        interaction_type=InteractionType.CART.value,
     )
 
     # Check if item already exists in cart
     stmt = select(CartItemDB).where(
-        CartItemDB.user_id == item.user_id,
+        CartItemDB.user_id == user_id,
         CartItemDB.product_id == item.product_id,
     )
     result = await db.execute(stmt)
@@ -75,7 +76,7 @@ async def add_to_cart(
     else:
         # Add new item
         new_item = CartItemDB(
-            user_id=item.user_id,
+            user_id=user_id,
             product_id=item.product_id,
             quantity=item.quantity or 1,
         )
@@ -84,21 +85,22 @@ async def add_to_cart(
     await db.commit()
 
 
-@router.put("/cart", status_code=204)
+@router.put("/cart/{user_id}", status_code=204)
 async def update_cart(
+    user_id: str,
     item: CartItem,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     # Users can only update their own cart
-    if current_user.user_id != item.user_id:
+    if current_user.user_id != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="You can only update your own cart"
         )
 
     # Find existing item
     stmt = select(CartItemDB).where(
-        CartItemDB.user_id == item.user_id, CartItemDB.product_id == item.product_id
+        CartItemDB.user_id == user_id, CartItemDB.product_id == item.product_id
     )
     result = await db.execute(stmt)
     existing_item = result.scalar_one_or_none()
@@ -107,35 +109,37 @@ async def update_cart(
         if item.quantity <= 0:
             # If quantity is 0 or less, delete the item
             await db.delete(existing_item)
-            logger.info(
-                f"🗑️ Deleted item (quantity 0): user={item.user_id}, product={item.product_id}"
-            )
+            logger.info(f"🗑️ Deleted item (quantity 0): user={user_id}, product={item.product_id}")
         else:
             # Update quantity
             existing_item.quantity = item.quantity
             logger.info(
-                f"📝 Updated quantity: user={item.user_id}, product={item.product_id}, \
+                f"📝 Updated quantity: user={user_id}, product={item.product_id}, \
                     quantity={item.quantity}"
             )
 
         await db.commit()
     else:
         logger.info(
-            f"⚠️ Item not found for update: user={item.user_id}, \
+            f"⚠️ Item not found for update: user={user_id}, \
             product={item.product_id}"
         )
 
     return
 
 
-@router.delete("/cart", status_code=204)
+@router.delete("/cart/{user_id}", status_code=204)
 async def remove_from_cart(
+    user_id: str,
     item: CartItem,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     # Users can only delete from their own cart
-    if current_user.user_id != item.user_id:
+    if current_user.user_id != user_id:
+        logger.error(
+            f"User {current_user.user_id} tried to delete item from cart of user {user_id}"
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can only remove items from your own cart",
@@ -143,12 +147,12 @@ async def remove_from_cart(
 
     # Delete entire item regardless of quantity (for trash button)
     stmt = delete(CartItemDB).where(
-        CartItemDB.user_id == item.user_id, CartItemDB.product_id == item.product_id
+        CartItemDB.user_id == user_id, CartItemDB.product_id == item.product_id
     )
     result = await db.execute(stmt)
     await db.commit()
 
     logger.info(
-        f"🗑️ Deleted entire item: user={item.user_id}, \
+        f"🗑️ Deleted entire item: user={user_id}, \
             product={item.product_id}, rows_affected={result.rowcount}"
     )
