@@ -20,7 +20,7 @@ class DatabaseService:
 
     def __init__(self):
         # Only initialize once
-        if not hasattr(self, '_initialized'):
+        if not hasattr(self, "_initialized"):
             self._initialized = True
 
     async def log_interaction(

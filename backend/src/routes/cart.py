@@ -27,9 +27,7 @@ async def get_cart(
             status_code=status.HTTP_403_FORBIDDEN, detail="You can only access your own cart"
         )
 
-    result = await db.execute(
-        select(CartItemDB).where(CartItemDB.user_id == user_id)
-    )
+    result = await db.execute(select(CartItemDB).where(CartItemDB.user_id == user_id))
     cart_items = result.scalars().all()
 
     return [
@@ -123,9 +121,7 @@ async def update_cart(
             f"⚠️ Item not found for update: user={user_id}, \
             product={item.product_id}"
         )
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Item not found in cart"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found in cart")
 
 
 @router.delete("/cart/{user_id}", status_code=204)
@@ -143,8 +139,13 @@ async def remove_from_cart(
         # Users can only remove items from their own cart
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
+<<<<<<< HEAD
             detail="You can only remove items from your own cart"
         )          
+=======
+            detail="You can only remove items from your own cart",
+        )
+>>>>>>> f31ca29 (Black tool formatting)
 
     # Delete entire item regardless of quantity (for trash button)
     stmt = delete(CartItemDB).where(
@@ -160,6 +161,4 @@ async def remove_from_cart(
             product={item.product_id}, rows_affected={result.rowcount}"
         )
     else:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Item not found in cart"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found in cart")

@@ -79,19 +79,14 @@ async def search_products_by_image(image: UploadFile = File(...), k: int = 5):
 
 @router.get("/products/{product_id}", response_model=Product)
 async def get_product(
-    product_id: str, 
-    user_id=Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    product_id: str, user_id=Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     Get product details by ID
     """
     # Log view interaction to database (replaces Kafka)
     await db_service.log_interaction(
-        db=db,
-        user_id=user_id.user_id,
-        item_id=product_id,
-        interaction_type="negative_view"
+        db=db, user_id=user_id.user_id, item_id=product_id, interaction_type="negative_view"
     )
 
     try:
@@ -103,18 +98,13 @@ async def get_product(
 
 @router.post("/products/{product_id}/interactions/click", status_code=204)
 async def record_product_click(
-    product_id: str, 
-    user_id=Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    product_id: str, user_id=Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     Records a product click interaction event
     """
     # Log click interaction to database (replaces Kafka)
     await db_service.log_interaction(
-        db=db,
-        user_id=user_id.user_id,
-        item_id=product_id,
-        interaction_type="positive_view"
+        db=db, user_id=user_id.user_id, item_id=product_id, interaction_type="positive_view"
     )
     return
