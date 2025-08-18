@@ -6,7 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from database.db import get_db
-from database.models_sql import CartItem as CartItemDB, User
+from database.models_sql import CartItem as CartItemDB
+from database.models_sql import User
 from models import CartItem, InteractionType
 from routes.auth import get_current_user
 from services.database_service import db_service  # Use global instance

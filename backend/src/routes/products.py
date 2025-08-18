@@ -10,12 +10,13 @@ try:
 except ImportError:
     UnidentifiedImageError = Exception
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from database.db import get_db
 from models import Product
 from routes.auth import get_current_user  # to resolve JWT user
-from services.feast.feast_service import FeastService
 from services.database_service import db_service  # Use global instance
-from database.db import get_db
-from sqlalchemy.ext.asyncio import AsyncSession
+from services.feast.feast_service import FeastService
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, timezone
 from typing import Optional
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models_sql import StreamInteraction

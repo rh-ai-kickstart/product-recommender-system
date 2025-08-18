@@ -3,8 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.db import get_db
 from database.models_sql import User
-from models import AuthResponse, PreferencesRequest, User as UserResponse
-from routes.auth import get_current_user, create_access_token
+from models import AuthResponse, PreferencesRequest
+from models import User as UserResponse
+from routes.auth import create_access_token, get_current_user
 
 router = APIRouter(prefix="/users", tags=["users"])
 

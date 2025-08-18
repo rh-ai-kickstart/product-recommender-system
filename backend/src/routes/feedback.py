@@ -2,8 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.db import get_db
-from models import Feedback
-from models import InteractionType
+from models import Feedback, InteractionType
 from routes.auth import get_current_user
 from services.database_service import db_service  # Use global instance
 
