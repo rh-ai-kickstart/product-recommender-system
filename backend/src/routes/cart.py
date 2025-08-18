@@ -3,7 +3,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
+from sqlalchemy.future import delete, select
 
 from database.db import get_db
 from database.models_sql import CartItem as CartItemDB
@@ -13,10 +13,10 @@ from routes.auth import get_current_user
 from services.database_service import db_service  # Use global instance
 
 logger = logging.getLogger(__name__)
-router = APIRouter()
+router = APIRouter(prefix="/cart", tags=["cart"])
 
 
-@router.get("/cart/{user_id}", response_model=List[CartItem])
+@router.get("/{user_id}", response_model=List[CartItem])
 async def get_cart(
     user_id: str,
     db: AsyncSession = Depends(get_db),
@@ -41,7 +41,7 @@ async def get_cart(
     ]
 
 
-@router.post("/cart/{user_id}", status_code=204)
+@router.post("/{user_id}", status_code=204)
 async def add_to_cart(
     user_id: str,
     item: CartItem,
@@ -85,7 +85,7 @@ async def add_to_cart(
     await db.commit()
 
 
-@router.put("/cart/{user_id}", status_code=204)
+@router.put("/{user_id}", status_code=204)
 async def update_cart(
     user_id: str,
     item: CartItem,
@@ -125,7 +125,7 @@ async def update_cart(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found in cart")
 
 
-@router.delete("/cart/{user_id}", status_code=204)
+@router.delete("/{user_id}", status_code=204)
 async def remove_from_cart(
     user_id: str,
     item: CartItem,
@@ -140,13 +140,8 @@ async def remove_from_cart(
         # Users can only remove items from their own cart
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-<<<<<<< HEAD
-            detail="You can only remove items from your own cart"
-        )          
-=======
             detail="You can only remove items from your own cart",
         )
->>>>>>> f31ca29 (Black tool formatting)
 
     # Delete entire item regardless of quantity (for trash button)
     stmt = delete(CartItemDB).where(
@@ -158,7 +153,8 @@ async def remove_from_cart(
     if existing_item:
         await db.delete(existing_item)
         await db.commit()
-            logger.info(f"🗑️ Deleted entire item: user={user_id}, 
+        logger.info(
+            f"🗑️ Deleted entire item: user={user_id}, \
             product={item.product_id}, rows_affected={result.rowcount}"
         )
     else:
