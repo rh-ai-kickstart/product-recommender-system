@@ -28,7 +28,10 @@ async def get_cart(
             status_code=status.HTTP_403_FORBIDDEN, detail="You can only access your own cart"
         )
 
-    result = await db.execute(select(CartItemDB).where(CartItemDB.user_id == user_id))
+    # Add order_by(CartItemDB.id) to maintain insertion order
+    result = await db.execute(
+        select(CartItemDB).where(CartItemDB.user_id == user_id).order_by(CartItemDB.id)
+    )
     cart_items = result.scalars().all()
 
     return [
