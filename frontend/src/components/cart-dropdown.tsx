@@ -187,6 +187,23 @@ export const CartDropdown = ({ isOpen, onClose }: CartDropdownProps) => {
     Record<string, { price: number; quantity: number }>
   >({});
 
+  // Reset itemPrices when cart changes
+  useEffect(() => {
+    if (cartItems) {
+      // Remove prices for items that are no longer in the cart
+      setItemPrices(prev => {
+        const newPrices = { ...prev };
+        // Keep only prices for items that are still in the cart
+        Object.keys(newPrices).forEach(productId => {
+          if (!cartItems.find(item => item.product_id === productId)) {
+            delete newPrices[productId];
+          }
+        });
+        return newPrices;
+      });
+    }
+  }, [cartItems]);
+
   const handlePriceCalculated = (
     productId: string,
     price: number,
@@ -198,10 +215,17 @@ export const CartDropdown = ({ isOpen, onClose }: CartDropdownProps) => {
     }));
   };
 
-  // Calculate total using real prices
+  // Calculate total using real prices and current cart quantities
   const calculateRealCartTotal = (): number => {
-    return Object.values(itemPrices).reduce((total, { price, quantity }) => {
-      return total + price * quantity;
+    if (!cartItems) return 0;
+
+    return cartItems.reduce((total, cartItem) => {
+      const priceInfo = itemPrices[cartItem.product_id];
+      if (priceInfo) {
+        // Use the current cart quantity, not the stored quantity
+        return total + priceInfo.price * cartItem.quantity;
+      }
+      return total;
     }, 0);
   };
 
