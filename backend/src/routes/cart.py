@@ -2,8 +2,8 @@ import logging
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import delete, select
 
 from database.db import get_db
 from database.models_sql import CartItem as CartItemDB

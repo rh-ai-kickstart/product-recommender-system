@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 import yaml
-from sqlalchemy.future import select
+from sqlalchemy import select
 
 from database.db import get_db
 from database.models_sql import User
