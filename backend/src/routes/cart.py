@@ -137,7 +137,6 @@ async def remove_from_cart(
         logger.error(
             f"User {current_user.user_id} tried to delete item from cart of user {user_id}"
         )
-        # Users can only remove items from their own cart
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can only remove items from your own cart",
@@ -148,14 +147,12 @@ async def remove_from_cart(
         CartItemDB.user_id == user_id, CartItemDB.product_id == item.product_id
     )
     result = await db.execute(stmt)
-    existing_item = result.scalar_one_or_none()
+    await db.commit()
 
-    if existing_item:
-        await db.delete(existing_item)
-        await db.commit()
+    if result.rowcount > 0:
         logger.info(
-            f"🗑️ Deleted entire item: user={user_id}, \
-            product={item.product_id}, rows_affected={result.rowcount}"
+            f"🗑️ Deleted entire item: user={user_id}, "
+            f"product={item.product_id}, rows_affected={result.rowcount}"
         )
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found in cart")
