@@ -1,0 +1,45 @@
+---
+test_name: Test Get Recommendations
+marks:
+  - flaky: "This test is flaky implementation might change"
+
+stages:
+  - name: Login and get token
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/login"
+      method: POST
+      json:
+        email: "demo1@example.com"
+        password: "demo123"
+    response:
+      status_code: 200
+      save:
+        json:
+          token: "token"
+          user_id: "user.user_id"
+
+  - name: Test Get Recommendations
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/recommendations/{user_id}"
+      method: GET
+      headers:
+        Authorization: "Bearer {token}"
+    response:
+      status_code: 200
+      headers:
+        content-type: application/json
+      verify_response_with:
+        function: tests_helpers:validate_product_list
+        extra_kwargs:
+          required_fields:
+            - item_id
+            - product_name
+            - category
+            - about_product
+            - img_link
+            - discount_percentage
+            - discounted_price
+            - actual_price
+            - product_link
+            - rating_count
+            - rating
