@@ -120,11 +120,26 @@ class FeastService:
         top_item_ids = suggested_item_ids.to_df().iloc[0]["top_k_item_ids"]
         return self._item_ids_to_product_list(top_item_ids)
 
+    def _load_random_items(self, k: int = 10):
+        """
+        This function is called when a user has no prefereces.
+        It'll return a list of random k items from the dataset.
+        """
+        items_df = self.dataset_provider.item_df()
+        item_ids = items_df["item_id"].sample(k).tolist()
+        return self._item_ids_to_product_list(item_ids)
+
     def load_items_new_user(self, user: User, k: int = 10):
         """
         Generate recommendations for a new user by encoding their features
         and querying the feature store for top-k similar items.
         """
+
+        if user.preferences == "" or user.preferences is None:
+            logger.info(f"User {user.user_id} has no preferences, returning random items")
+            print(f"User {user.user_id} has no preferences, returning random items")
+            return self._load_random_items(k)
+
         user_as_df = pd.DataFrame([user.model_dump()])
         self.user_encoder.eval()
         user_embed = self.user_encoder(**data_preproccess(user_as_df))[0]
