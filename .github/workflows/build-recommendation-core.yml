@@ -42,4 +42,4 @@ jobs:
             quay.io/rh-ai-kickstart/recommendation-core:${{ steps.version.outputs.tag }}
             quay.io/rh-ai-kickstart/recommendation-core:latest
           build-args: |
-            IMAGE_TAG=${{ steps.version.outputs.tag }} 
+            IMAGE_TAG=${{ steps.version.outputs.tag }}

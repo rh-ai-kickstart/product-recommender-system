@@ -58,7 +58,7 @@ The containers are automatically built and pushed via GitHub Actions when:
 - **Base Image**: `registry.access.redhat.com/ubi9/python-311`
 - **User**: `root`
 - **Working Directory**: `/app`
-- **Dependencies**: 
+- **Dependencies**:
   - Python packages via `uv`
   - ML training libraries
   - Training scripts
@@ -66,7 +66,7 @@ The containers are automatically built and pushed via GitHub Actions when:
 ### OC Tools Image (`recommendation-oc-tools`)
 - **Base Image**: `python:3.11-slim`
 - **Working Directory**: `/app`
-- **Dependencies**: 
+- **Dependencies**:
   - OpenShift CLI (`oc`)
   - `curl`, `tar`, `jq` utilities
   - `model_registry==0.2.21` Python package

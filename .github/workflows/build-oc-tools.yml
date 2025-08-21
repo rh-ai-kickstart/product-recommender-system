@@ -50,4 +50,4 @@ jobs:
             quay.io/rh-ai-kickstart/${{ matrix.image-name }}:${{ steps.version.outputs.tag }}
             quay.io/rh-ai-kickstart/${{ matrix.image-name }}:latest
           build-args: |
-            IMAGE_TAG=${{ steps.version.outputs.tag }} 
+            IMAGE_TAG=${{ steps.version.outputs.tag }}

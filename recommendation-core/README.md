@@ -23,7 +23,7 @@ The name follows a common software architecture pattern where "core" indicates t
 ```
 product-recommender-system/
 ├── recommendation-core/          # 🧠 Core ML Library
-├── recommendation-training/      # 🚀 Training Pipeline  
+├── recommendation-training/      # 🚀 Training Pipeline
 ├── backend/                     # 🌐 API Layer
 ├── frontend/                    # 🎨 UI Layer
 └── helm/                        # ☸️ Deployment
@@ -259,7 +259,7 @@ The script writes **9 parquet files** to this location:
 
 #### **Main Dataset Files:**
 1. `recommendation_users.parquet` - User profiles and preferences
-2. `recommendation_items.parquet` - Product catalog with features  
+2. `recommendation_items.parquet` - Product catalog with features
 3. `recommendation_interactions.parquet` - User-item interactions
 
 #### **Dummy/Feature Files:**

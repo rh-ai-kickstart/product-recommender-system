@@ -1,1 +1,1 @@
-# Recommendation Core package initialization 
+# Recommendation Core package initialization
