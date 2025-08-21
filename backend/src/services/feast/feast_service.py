@@ -135,11 +135,11 @@ class FeastService:
         and querying the feature store for top-k similar items.
         """
 
-        if user.preferences == "" or user.preferences is None:
+        if not user.preferences or user.preferences.strip() == "" or user.preferences is None:
             logger.info(f"User {user.user_id} has no preferences, returning random items")
-            print(f"User {user.user_id} has no preferences, returning random items")
             return self._load_random_items(k)
 
+        logger.info(f"User {user.user_id} has preferences, returning recommendations")
         user_as_df = pd.DataFrame([user.model_dump()])
         self.user_encoder.eval()
         user_embed = self.user_encoder(**data_preproccess(user_as_df))[0]
