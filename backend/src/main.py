@@ -61,4 +61,4 @@ app.include_router(cart.router)
 
 
 # Mount SPA static files at the root - this should be LAST
-app.mount("/", SPAStaticFiles(directory="public", html=True), name="spa-static-files")
+app.mount("/", SPAStaticFiles(directory="../public", html=True), name="spa-static-files")
