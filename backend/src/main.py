@@ -1,3 +1,4 @@
+import logging
 import sys
 
 import httpx
@@ -11,7 +12,10 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from routes import auth, cart, health, preferences, products, recommendations
 
-# from routes import test
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 app = FastAPI()
 

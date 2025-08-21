@@ -42,6 +42,7 @@ COPY --from=frontend-builder /app/frontend/dist ./public
 
 # Set Hugging Face cache directory
 ENV HF_HOME=/hf_cache
+
 RUN mkdir -p /hf_cache && \
     chmod -R 777 /hf_cache
 
@@ -53,7 +54,7 @@ RUN python3 -c "from transformers import CLIPProcessor, CLIPModel; \
 # Fix permissions again after download
 RUN chmod -R 777 /hf_cache
 RUN chmod -R +r . && ls -la
-
+ENV PYTHONUNBUFFERED=1
 EXPOSE 8000
 WORKDIR /app/backend/src
 ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
