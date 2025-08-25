@@ -139,7 +139,7 @@ create-dynamic-secret:
 		--from-literal=accesskey=$(MINIO_ACCESS_KEY_VALUE) \
 		--from-literal=secretkey=$(MINIO_SECRET_KEY_VALUE) \
 		--from-literal=secure=false \
-		--dry-run=client -o yaml | kubectl apply -f -	
+		--dry-run=client -o yaml | oc apply -f -
 
 .PHONY: product-recommender-install
 product-recommender-install:

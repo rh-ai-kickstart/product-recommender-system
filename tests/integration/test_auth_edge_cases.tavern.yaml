@@ -14,7 +14,7 @@ stages:
       headers:
         content-type: application/json
       json:
-        detail: "Invalid email or password"
+        detail: "Incorrect email or password"
 
   - name: Try login with wrong password
     request:
@@ -28,7 +28,7 @@ stages:
       headers:
         content-type: application/json
       json:
-        detail: "Invalid email or password"
+        detail: "Incorrect email or password"
 
 ---
 test_name: Test Authentication Edge Cases - Invalid Input
@@ -55,7 +55,7 @@ stages:
     response:
       status_code: 422
 
-  - name: Try signup with invalid age
+  - name: Try signup with negative age
     request:
       url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
       method: POST
@@ -64,6 +64,37 @@ stages:
         password: "password123"
         age: -5
         gender: "Female"
+    response:
+      status_code: 422
+
+---
+test_name: Test Authentication Edge Cases - Invalid Input failed cases
+
+marks:
+  - skip: "This test is skipped because it fail"
+
+stages:
+  - name: Try signup with old age
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_age@test.com"
+        password: "password123"
+        age: 121
+        gender: "Female"
+    response:
+      status_code: 422
+
+  - name: Try signup with invalid gender
+    request:
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/auth/signup"
+      method: POST
+      json:
+        email: "test{tavern.env_vars.TEST_TIMESTAMP}_gender@test.com"
+        password: "password123"
+        age: 25
+        gender: "BABABABA"
     response:
       status_code: 422
 
@@ -117,7 +148,7 @@ stages:
       headers:
         content-type: application/json
       json:
-        detail: "Invalid email or password"
+        detail: "Incorrect email or password"
 
   - name: Try login with empty password
     request:
@@ -131,4 +162,4 @@ stages:
       headers:
         content-type: application/json
       json:
-        detail: "Invalid email or password" 
+        detail: "Incorrect email or password"

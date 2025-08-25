@@ -26,20 +26,19 @@ stages:
         product_id: "1"
         quantity: 1
     response:
-      status_code: 401
+      status_code: 405
       headers:
         content-type: application/json
       json:
-        detail: "Not authenticated"
+        detail: "Method Not Allowed"
 
   - name: Try to update cart without token
     request:
-      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/123456"
       method: PUT
       headers:
         Content-Type: "application/json"
       json:
-        user_id: "123456"
         product_id: "1"
         quantity: 2
     response:
@@ -51,12 +50,11 @@ stages:
 
   - name: Try to delete from cart without token
     request:
-      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/123456"
       method: DELETE
       headers:
         Content-Type: "application/json"
       json:
-        user_id: "123456"
         product_id: "1"
         quantity: 1
     response:
@@ -175,7 +173,7 @@ stages:
 
   - name: User1 adds item to their cart
     request:
-      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/{user1_id}"
       method: POST
       headers:
         Authorization: "Bearer {user1_token}"
@@ -195,8 +193,9 @@ stages:
         Authorization: "Bearer {user2_token}"
         Content-Type: "application/json"
     response:
-      status_code: 200
-      json: []  # Empty cart for user2's perspective
+      status_code: 403
+      json:
+        detail: "You can only access your own cart"
 
   - name: User2 accesses their own cart (should be empty)
     request:
@@ -207,4 +206,4 @@ stages:
         Content-Type: "application/json"
     response:
       status_code: 200
-      json: [] 
+      json: []

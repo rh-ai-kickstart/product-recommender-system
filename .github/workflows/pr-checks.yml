@@ -3,6 +3,9 @@ name: PR Quality Checks
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
 
 jobs:
   code-quality-check:
@@ -27,7 +30,7 @@ jobs:
         run: |
           pip install flake8 black isort
 
-      - name: Run flake8 (warning only)
+      - name: Run flake8
         run: |
           echo "🔍 Running flake8 checks..."
           cd backend && flake8 --max-line-length=99 --extend-ignore=E203,W503 . || {
@@ -61,3 +64,51 @@ jobs:
             echo "Run 'cd frontend && npx prettier --write .' locally to fix formatting."
             exit 1
           }
+
+      - name: Install pre-commit
+        run: |
+          pip install pre-commit
+
+      - name: Check trailing whitespace
+        run: |
+          echo "🔍 Checking trailing whitespace in modified files..."
+          git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | xargs -r pre-commit run trailing-whitespace --files || {
+            echo "::warning::Trailing whitespace found in modified files"
+            echo "Run 'pre-commit run trailing-whitespace --all-files' locally to fix"
+            exit 1
+          }
+
+      - name: Check end-of-file fixer
+        run: |
+          echo "🔍 Checking end-of-file fixer in modified files..."
+          git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | xargs -r pre-commit run end-of-file-fixer --files || {
+            echo "::warning::End-of-file issues found in modified files"
+            echo "Run 'pre-commit run end-of-file-fixer --all-files' locally to fix"
+            exit 1
+          }
+
+      - name: Install Helm
+        run: |
+          curl https://get.helm.sh/helm-v3.14.0-linux-amd64.tar.gz | tar xz
+          sudo mv linux-amd64/helm /usr/local/bin/helm
+
+      - name: Check Helm lint
+        run: |
+          echo "🔍 Checking Helm lint in modified files..."
+          # Get list of modified Helm chart directories
+          MODIFIED_HELM_DIRS=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep '^helm/' | sed 's|helm/\([^/]*\).*|helm/\1|' | sort -u)
+
+          if [ -n "$MODIFIED_HELM_DIRS" ]; then
+            for dir in $MODIFIED_HELM_DIRS; do
+              if [ -f "$dir/Chart.yaml" ]; then
+                echo "Linting Helm chart: $dir"
+                helm lint "$dir" || {
+                  echo "::warning::Helm lint issues found in $dir"
+                  echo "Run 'helm lint $dir' locally to see details"
+                  exit 1
+                }
+              fi
+            done
+          else
+            echo "No Helm charts modified"
+          fi

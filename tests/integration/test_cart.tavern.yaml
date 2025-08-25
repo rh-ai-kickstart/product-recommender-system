@@ -34,7 +34,7 @@ stages:
 
   - name: Add to cart
     request:
-      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/{user_id}"
       method: POST
       headers:
         Authorization: "Bearer {token}"
@@ -62,7 +62,7 @@ stages:
 
   - name: Update cart with same product
     request:
-      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/{user_id}"
       method: POST
       headers:
         Authorization: "Bearer {token}"
@@ -90,7 +90,7 @@ stages:
 
   - name: Update cart PUT
     request:
-      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/{user_id}"
       method: PUT
       headers:
         Authorization: "Bearer {token}"
@@ -118,7 +118,7 @@ stages:
 
   - name: Add a different product to cart
     request:
-      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/{user_id}"
       method: POST
       headers:
         Authorization: "Bearer {token}"
@@ -149,7 +149,7 @@ stages:
 
   - name: Delete item from cart
     request:
-      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/{user_id}"
       method: DELETE
       headers:
         Authorization: "Bearer {token}"
@@ -212,7 +212,7 @@ stages:
 
   - name: Add to cart 5 items
     request:
-      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/{user_id}"
       method: POST
       headers:
         Authorization: "Bearer {token}"
@@ -226,7 +226,7 @@ stages:
 
   - name: Update cart to have 4 items
     request:
-      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/{user_id}"
       method: PUT
       headers:
         Authorization: "Bearer {token}"
@@ -254,7 +254,7 @@ stages:
 
   - name: Delete non existing item from cart
     request:
-      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart"
+      url: "{tavern.env_vars.TEST_FRONTEND_URL}/cart/{user_id}"
       method: DELETE
       headers:
         Authorization: "Bearer {token}"
@@ -264,5 +264,6 @@ stages:
         product_id: "100"
         quantity: 1
     response:
-      # API returns 204 even for non-existent items (idempotent)
-      status_code: 204
+      status_code: 404
+      json:
+        detail: "Item not found in cart"

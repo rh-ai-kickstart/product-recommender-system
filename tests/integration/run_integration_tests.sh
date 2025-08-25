@@ -17,7 +17,7 @@ validate_url() {
 
 # Get URLs dynamically
 export TEST_FRONTEND_URL=$(oc get routes product-recommender-system-frontend -o json | jq -r '"https://" + .spec.host')
-export TEST_FEAST_URL=$(oc get routes feast-feast-rec-sys-ui -o json | jq -r '"https://" + .spec.host')
+export TEST_FEAST_URL=$(oc get routes feast-feast-recommendation-ui -o json | jq -r '"https://" + .spec.host')
 
 # Generate unique timestamp for test emails
 export TEST_TIMESTAMP=$(date +%s)

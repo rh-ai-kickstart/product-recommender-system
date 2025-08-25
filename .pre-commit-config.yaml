@@ -38,14 +38,14 @@ repos:
       - id: trailing-whitespace
         exclude: .*\.svg$  # Exclude all SVG files
       - id: end-of-file-fixer
-        exclude: .*\.svg$  # Exclude all SVG files
+        exclude: .*\.svg$|.*\.csv$|.*\.txt$  # Exclude SVG, CSV, and TXT files
 
   # Warning-only Helm linting (won't block commits)
   - repo: local
     hooks:
       - id: helm-lint-warn
         name: Helm Lint
-        entry: bash -c 'cd helm/product-recommender-system/ && helm lint . || false'
+        entry: bash -c 'cd helm/product-recommender-system/ && helm lint . && cd ../minio/ && helm lint . && cd ../pipeline-server/ && helm lint . || false'
         language: system
 
   # Warning-only Python linting (won't block commits)
