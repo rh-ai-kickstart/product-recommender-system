@@ -167,7 +167,7 @@ pipelineJobImage: quay.io/rh-ai-kickstart/recommendation-training:latest
 applicationImage: quay.io/rh-ai-kickstart/recommendation-core:latest
 # Note the backend uses recommendation_core as library.
 #frontendBackendImage: quay.io/rh-ai-kickstart/product-recommender-frontend-backend:latest
-frontendBackendImage: docker.io/psamouelian/product-recomemender-frontend-backend:latest
+frontendBackendImage: quay.io/rh-ai-kickstart/product-recommender-frontend-backend:latest
 
 dbName: product_recommender_system
 
