@@ -1,4 +1,4 @@
-minio: 
+minio:
   defaultRegion: #set by make file
   defaultBucket: #set by make file
   apiEndpoint: #set by make file dynamically during deployment; do not set here.

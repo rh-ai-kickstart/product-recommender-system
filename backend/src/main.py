@@ -1,3 +1,4 @@
+import logging
 import sys
 
 import httpx
@@ -11,7 +12,10 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from routes import auth, cart, health, preferences, products, recommendations
 
-# from routes import test
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 app = FastAPI()
 
@@ -61,4 +65,4 @@ app.include_router(cart.router)
 
 
 # Mount SPA static files at the root - this should be LAST
-app.mount("/", SPAStaticFiles(directory="public", html=True), name="spa-static-files")
+app.mount("/", SPAStaticFiles(directory="../public", html=True), name="spa-static-files")

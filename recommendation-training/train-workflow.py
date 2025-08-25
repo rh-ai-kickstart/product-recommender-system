@@ -5,6 +5,10 @@ from kfp import Client, compiler, dsl, kubernetes
 from kfp.dsl import Artifact, Dataset, Input, Model, Output
 import logging
 
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+
 logger = logging.getLogger(__name__)
 
 BASE_IMAGE = os.getenv(
@@ -44,14 +48,11 @@ def generate_candidates(
         text=True,  # Return output as strings (not bytes)
         # check=True           # Raise an error if the command fails
     )
-
     # logger.info the stdout
-    logger.info("Standard Output:")
-    logger.info(result.stdout)
+    logger.info(f"Standard Output: {result.stdout}")
 
     # logger.info the stderr (if any)
-    logger.info("Standard Error:")
-    logger.info(result.stderr)
+    logger.info(f"Standard Error: {result.stderr}")
     with open("src/recommendation_core/feature_repo/feature_store.yaml", "r") as file:
         logger.info(file.read())
 
@@ -93,12 +94,8 @@ def generate_candidates(
         key: value.to(device) if isinstance(value, torch.Tensor) else value
         for key, value in proccessed_users.items()
     }
-    item_embed_df["embedding"] = (
-        item_encoder(**proccessed_items).detach().numpy().tolist()
-    )
-    user_embed_df["embedding"] = (
-        user_encoder(**proccessed_users).detach().numpy().tolist()
-    )
+    item_embed_df["embedding"] = item_encoder(**proccessed_items).detach().numpy().tolist()
+    user_embed_df["embedding"] = user_encoder(**proccessed_users).detach().numpy().tolist()
 
     # Add the currnet timestamp
     current_time = datetime.now()
@@ -299,9 +296,7 @@ def train_model(
             connection.commit()
 
     minio_client = Minio(
-        endpoint=os.getenv("MINIO_HOST", "endpoint")
-        + ":"
-        + os.getenv("MINIO_PORT", "9000"),
+        endpoint=os.getenv("MINIO_HOST", "endpoint") + ":" + os.getenv("MINIO_PORT", "9000"),
         access_key=os.getenv("MINIO_ACCESS_KEY", "access-key"),
         secret_key=os.getenv("MINIO_SECRET_KEY", "secret-key"),
         secure=False,  # Set to True if using HTTPS
@@ -339,8 +334,8 @@ def train_model(
 
 
 @dsl.component(base_image="quay.io/rh-ai-kickstart/recommendation-oc-tools:latest")
-def fetch_cluster_credentials() -> (
-    NamedTuple("ocContext", [("author", str), ("user_token", str), ("host", str)])
+def fetch_cluster_credentials() -> NamedTuple(
+    "ocContext", [("author", str), ("user_token", str), ("host", str)]
 ):
     import os
     import subprocess
@@ -368,9 +363,7 @@ def fetch_cluster_credentials() -> (
     ).stdout.strip()
     host_value = f"https://{host_output[1:-5]}"  # Remove quotes and :443
 
-    ocContext = NamedTuple(
-        "ocContext", [("author", str), ("user_token", str), ("host", str)]
-    )
+    ocContext = NamedTuple("ocContext", [("author", str), ("user_token", str), ("host", str)])
     return ocContext(author_value, user_token_value, host_value)
 
 
@@ -437,12 +430,10 @@ def load_data_from_feast(
     )
 
     # logger.info the stdout
-    logger.info("Standard Output:")
-    logger.info(result.stdout)
+    logger.info(f"Standard Output: {result.stdout}")
 
     # logger.info the stderr (if any)
-    logger.info("Standard Error:")
-    logger.info(result.stderr)
+    logger.info(f"Standard Error: {result.stderr}")
 
     with open("src/recommendation_core/feature_repo/feature_store.yaml", "r") as file:
         logger.info(file.read())
@@ -450,8 +441,8 @@ def load_data_from_feast(
     store.refresh_registry()
     logger.info("registry refreshed")
 
-    dataset_url = os.getenv("DATASET_URL")
-    logger.info("DATASET_URL:", dataset_url)
+    dataset_url = os.getenv("DATASET_URL", None)
+    logger.info(f"DATASET_URL: {dataset_url}")
     if dataset_url is not None and dataset_url != "":
         logger.info("using custom remote dataset")
         # with force_load true, to align the parquet files
@@ -521,9 +512,7 @@ def mount_secret_feast_repository(task):
     )
     kubernetes.use_secret_as_volume(
         task=task,
-        secret_name=os.getenv(
-            "FEAST_SECRET_NAME", "feast-feast-recommendation-registry-tls"
-        ),
+        secret_name=os.getenv("FEAST_SECRET_NAME", "feast-feast-recommendation-registry-tls"),
         mount_path="/app/feature_repo/secrets",
     )
     task.set_env_variable(
@@ -562,10 +551,10 @@ def batch_recommendation():
     )  # if set to true, the task will be cached and the credentials will not be updated.
 
     fetch_api_credentials_task.set_env_variable(
-        name="MODEL_REGISTRY_NAMESPACE", value=os.getenv("MODEL_REGISTRY_NAMESPACE")
+        name="MODEL_REGISTRY_NAMESPACE", value=os.getenv("MODEL_REGISTRY_NAMESPACE", "rhoai-model-registries")
     )
     fetch_api_credentials_task.set_env_variable(
-        name="MODEL_REGISTRY_CONTAINER", value=os.getenv("MODEL_REGISTRY_CONTAINER")
+        name="MODEL_REGISTRY_CONTAINER", value=os.getenv("MODEL_REGISTRY_CONTAINER", "modelregistry-sample")
     )
 
     train_model_task = train_model(
@@ -646,9 +635,7 @@ def batch_recommendation():
     )
     kubernetes.use_secret_as_volume(
         task=generate_candidates_task,
-        secret_name=os.getenv(
-            "FEAST_SECRET_NAME", "feast-feast-edb-recommendation-registry-tls"
-        ),
+        secret_name=os.getenv("FEAST_SECRET_NAME", "feast-feast-edb-recommendation-registry-tls"),
         mount_path="/app/feature_repo/secrets",
     )
     generate_candidates_task.set_env_variable(
@@ -676,18 +663,14 @@ def batch_recommendation():
 if __name__ == "__main__":
     pipeline_yaml = __file__.replace(".py", ".yaml")
 
-    compiler.Compiler().compile(
-        pipeline_func=batch_recommendation, package_path=pipeline_yaml
-    )
+    compiler.Compiler().compile(pipeline_func=batch_recommendation, package_path=pipeline_yaml)
 
     client = Client(host=os.environ["DS_PIPELINE_URL"], verify_ssl=False)
 
     pipelines = client.list_pipelines().pipelines
     pipeline_name = os.environ["PIPELINE_NAME"]
     pipeline_exists = (
-        False
-        if pipelines is None
-        else any(p.display_name == pipeline_name for p in pipelines)
+        False if pipelines is None else any(p.display_name == pipeline_name for p in pipelines)
     )
     if not pipeline_exists:
         uploaded_pipeline = client.upload_pipeline(

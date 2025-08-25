@@ -390,8 +390,8 @@ dataset_provider = LocalDatasetProvider(store, data_dir="/app/backend/src/servic
 **Data Flow Through the System:**
 
 ```
-Parquet Files Created → Feast Feature Store → Training Pipeline → 
-Model Training → Embedding Generation → Model Registry → 
+Parquet Files Created → Feast Feature Store → Training Pipeline →
+Model Training → Embedding Generation → Model Registry →
 Backend API → Frontend Display → User Interactions
 ```
 
@@ -600,8 +600,8 @@ interaction_df = dataset_provider.interaction_df()
 ```python
 # Vector similarity search with PGVector
 similar_items = store.retrieve_online_documents(
-    query=user_embedding, 
-    top_k=10, 
+    query=user_embedding,
+    top_k=10,
     features=["item_embedding:item_id"]
 )
 ```
@@ -642,7 +642,7 @@ def get_item_by_id(self, item_id: int) -> Product:
 
 **Real-time Recommendation Flow:**
 ```
-User Request → Feast API → PostgreSQL+PGVector → Vector Similarity Search → 
+User Request → Feast API → PostgreSQL+PGVector → Vector Similarity Search →
 Real-time Results → User Interface
 ```
 
@@ -1089,7 +1089,7 @@ store.push(
 ### Data Flow Summary
 
 ```
-Data Generation → Feature Store → Model Training → Model Registry → 
+Data Generation → Feature Store → Model Training → Model Registry →
 Deployment → User Interaction → Interaction Tracking → Model Retraining
 ```
 
@@ -1518,4 +1518,3 @@ This project is licensed under the same terms as the Red Hat AI Kickstart progra
 ---
 
 **Note**: This is a comprehensive recommendation system designed for production use. Always test thoroughly in development environments before deploying to production. For component-specific questions, refer to the individual README files in each subdirectory.
-

@@ -19,8 +19,20 @@ export function PreferencePage() {
 
   const { data, isLoading, isError } = usePreferences();
 
-  const handleCancel = () => {
-    setSelected([]);
+  const handleSkip = async () => {
+    try {
+      setErrorMessage('');
+      // Save empty preferences (skip selection)
+      await preferencesMutation.mutateAsync({
+        preferences: '',
+      });
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : 'Failed to skip preferences. Please try again.'
+      );
+    }
   };
 
   // const handleSubmit = useMutation<string, void>({
@@ -111,8 +123,8 @@ export function PreferencePage() {
                 <Button variant='primary' type='submit' onClick={handleSubmit}>
                   Submit
                 </Button>
-                <Button variant='link' onClick={handleCancel}>
-                  Cancel
+                <Button variant='link' onClick={handleSkip}>
+                  Skip
                 </Button>
               </ActionGroup>
             </FlexItem>

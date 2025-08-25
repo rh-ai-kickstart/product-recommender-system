@@ -9,4 +9,4 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 # Install Python dependencies
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir model_registry==0.2.21 
+    pip install --no-cache-dir model_registry==0.2.21

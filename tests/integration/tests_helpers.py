@@ -2,7 +2,7 @@
 Helper functions for testing. If complex logic is needed, add the function here in this file.
 """
 
-def validate_product_list(response, expected_length, required_fields=None):
+def validate_product_list(response, expected_length=None, required_fields=None):
     """
     Validate that response is a list of product dictionaries with required fields
 
@@ -18,7 +18,8 @@ def validate_product_list(response, expected_length, required_fields=None):
 
     # Check if response is a list
     assert isinstance(data, list), f"Response is not a list, got: {type(data)}"
-    assert len(data) == expected_length, f"Expected {expected_length} items, got {len(data)}"
+    if expected_length:
+        assert len(data) == expected_length, f"Expected {expected_length} items, got {len(data)}"
     assert all(isinstance(item, dict) for item in data), "All items must be dictionaries"
 
     # Fix the syntax error - check required fields if provided
