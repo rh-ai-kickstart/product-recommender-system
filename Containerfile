@@ -25,7 +25,6 @@ FROM quay.io/rh-ai-kickstart/recommendation-core:latest
 USER root
 WORKDIR /app/backend
 
-RUN dnf update -y
 
 # Install uv and install dependencies
 RUN pip3 install uv
