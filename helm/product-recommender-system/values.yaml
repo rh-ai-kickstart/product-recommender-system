@@ -159,7 +159,7 @@ volumeMounts: []
 
 nodeSelector: {}
 
-tolerations: [odh-notebook: true]
+tolerations: {}
 
 affinity: {}
 
