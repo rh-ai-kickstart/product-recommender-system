@@ -237,7 +237,7 @@ strimzi-kafka-operator:
 # Model Registry Configuration
 modelRegistry:
   enabled: true
-  name: model-registry-server01-https
+  name: modelregistry-sample
   namespace: rhoai-model-registries
   accessrole: registry-user-modelregistry-sample
 

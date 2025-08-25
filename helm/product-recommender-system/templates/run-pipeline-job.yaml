@@ -1,3 +1,4 @@
+---
 {{- $jobName := "kfp-run-job" }}
 {{- $existingJob := (lookup "batch/v1" "Job" .Release.Namespace $jobName) }}
 {{- if not $existingJob }}
@@ -11,8 +12,9 @@ spec:
   template:
     {{- include "product-recommender-system.pipeline-job-template" . | nindent 4 }}
 {{- end }}
+
 ---
-{{- $cronJobName := "kfp-run-job" }}
+{{- $cronJobName := "kfp-run-cronjob" }}
 {{- $existingCronJob := (lookup "batch/v1" "CronJob" .Release.Namespace $cronJobName) }}
 {{- if not $existingCronJob }}
 apiVersion: batch/v1
