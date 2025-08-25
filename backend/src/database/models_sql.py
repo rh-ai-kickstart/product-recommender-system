@@ -108,8 +108,7 @@ class UserPreference(Base):
     )
 
 
-
-#class Feedback(Base):
+# class Feedback(Base):
 #    __tablename__ = "feedback"
 #    id: Mapped[int] = mapped_column(Integer, primary_key=True)
 #    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
@@ -117,7 +116,7 @@ class UserPreference(Base):
 #    rating: Mapped[float] = mapped_column(Float)
 #    comment: Mapped[str] = mapped_column(String, nullable=True)
 
-#class Order(Base):
+# class Order(Base):
 #    __tablename__ = "orders"
 #    order_id: Mapped[int] = mapped_column(Integer, primary_key=True)
 #    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
@@ -125,14 +124,14 @@ class UserPreference(Base):
 #    order_date: Mapped[datetime.datetime] = mapped_column(DateTime)
 #    status: Mapped[str] = mapped_column(String)
 
-#class WishlistItem(Base):
+# class WishlistItem(Base):
 #    __tablename__ = "wishlist"
 #    id: Mapped[int] = mapped_column(Integer, primary_key=True)
 #    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
 #    product_id: Mapped[int] = mapped_column(ForeignKey("products.item_id"))
 
 
-#class Interactions(Base):
+# class Interactions(Base):
 #    __tablename__ = "interactions"
 #    id: Mapped[int] = mapped_column(Integer, primary_key=True)
 #    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
@@ -140,7 +139,7 @@ class UserPreference(Base):
 #    rating: Mapped[float] = mapped_column(Float)
 #    quantity: Mapped[int] = mapped_column(Integer)
 
-#class NegInteractions(Base):
+# class NegInteractions(Base):
 #    __tablename__ = "neg_interactions"
 #    id: Mapped[int] = mapped_column(Integer, primary_key=True)
 #    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
