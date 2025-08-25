@@ -9,7 +9,11 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
-BASE_IMAGE = os.getenv("BASE_REC_SYS_IMAGE", "quay.io/rh-ai-kickstart/recommendation-core:latest")
+logger = logging.getLogger(__name__)
+
+BASE_IMAGE = os.getenv(
+    "BASE_REC_SYS_IMAGE", "quay.io/rh-ai-kickstart/recommendation-core:latest"
+)
 
 
 @dsl.component(base_image=BASE_IMAGE)
@@ -547,10 +551,10 @@ def batch_recommendation():
     )  # if set to true, the task will be cached and the credentials will not be updated.
 
     fetch_api_credentials_task.set_env_variable(
-        name="MODEL_REGISTRY_NAMESPACE", value=os.getenv("MODEL_REGISTRY_NAMESPACE")
+        name="MODEL_REGISTRY_NAMESPACE", value=os.getenv("MODEL_REGISTRY_NAMESPACE", "rhoai-model-registries")
     )
     fetch_api_credentials_task.set_env_variable(
-        name="MODEL_REGISTRY_CONTAINER", value=os.getenv("MODEL_REGISTRY_CONTAINER")
+        name="MODEL_REGISTRY_CONTAINER", value=os.getenv("MODEL_REGISTRY_CONTAINER", "modelregistry-sample")
     )
 
     train_model_task = train_model(
