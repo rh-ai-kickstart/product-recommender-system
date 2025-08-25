@@ -53,7 +53,7 @@ class Category(Base):
     __tablename__ = "category"
     category_id: Mapped[uuid.UUID] = mapped_column(UUIDType, primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String)
-    parent_id: Mapped[uuid.UUID] = mapped_column(UUIDType, ForeignKey('category.category_id'), 
+    parent_id: Mapped[uuid.UUID] = mapped_column(UUIDType, ForeignKey('category.category_id'),
                                                  nullable=True)
 
     parent: Mapped["Category"] = relationship(
@@ -97,15 +97,16 @@ class UserPreference(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUIDType, primary_key=True, default=uuid.uuid4)
     user_id: Mapped[str] = mapped_column(String(27), ForeignKey("users.user_id"))
     category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("category.category_id"))
-        
+
     user: Mapped["User"] = relationship(
-        "User", 
+        "User",
         back_populates="user_preferences"
     )
 
     category: Mapped["Category"] = relationship(
         "Category"
     )
+
 
 """
 class Feedback(Base):
