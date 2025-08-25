@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
+from urllib.parse import quote
 
 logger = logging.getLogger(__name__)
 
@@ -127,7 +128,8 @@ def generate_items():
         about_product = item.item_description
 
         # Generate URLs
-        img_link = f"https://raw.githubusercontent.com/rh-ai-kickstart/product-recommender-system/main/recommendation-core/generation/data/generated_images/item_{product_name.replace(' ', '%20')}.png"
+        safe_name = quote(product_name, safe="")
+        img_link = f"/images/item_{safe_name}.png"
         product_link = (
             f"https://www.amazon.in/Wayona-Braided-WN{np.random.randint(1000, 9999)}..."
         )
