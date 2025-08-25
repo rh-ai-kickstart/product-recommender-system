@@ -22,7 +22,7 @@ class User(Base):
     signup_date: Mapped[Date] = mapped_column(Date, nullable=True)
     preferences: Mapped[str] = mapped_column(String, nullable=True)
     user_preferences : Mapped[list["UserPreference"]] = relationship(
-        "UserPreference", 
+        "UserPreference",
         back_populates="user"
     )
 
@@ -37,7 +37,6 @@ class CartItem(Base):
 
 class StreamInteraction(Base):
     __tablename__ = "stream_interaction"
-
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[str] = mapped_column(String(27), index=True)
     item_id: Mapped[str] = mapped_column(String, index=True)
@@ -49,11 +48,13 @@ class StreamInteraction(Base):
     review_content: Mapped[str] = mapped_column(Text, nullable=True)
     interaction_id: Mapped[str] = mapped_column(String, unique=True, index=True)
 
+
 class Category(Base):
     __tablename__ = "category"
     category_id: Mapped[uuid.UUID] = mapped_column(UUIDType, primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String)
-    parent_id: Mapped[uuid.UUID] = mapped_column(UUIDType, ForeignKey('category.category_id'), nullable=True)
+    parent_id: Mapped[uuid.UUID] = mapped_column(UUIDType, ForeignKey('category.category_id'), 
+                                                 nullable=True)
 
     parent: Mapped["Category"] = relationship(
         "Category",
@@ -61,18 +62,19 @@ class Category(Base):
         back_populates="sub_categories",
         foreign_keys="Category.parent_id"
     )
-    
+
     sub_categories: Mapped[list["Category"]] = relationship(
-        "Category", 
-        back_populates="parent", 
+        "Category",
+        back_populates="parent",
         lazy="dynamic",
         foreign_keys="Category.parent_id"
     )
-    
+
     products: Mapped[list["Product"]] = relationship(
         "Product",
         back_populates="category"
     )
+
 
 class Product(Base):
     __tablename__ = "products"
@@ -87,8 +89,8 @@ class Product(Base):
     new_arrival: Mapped[float] = mapped_column(Float)
     on_sale: Mapped[float] = mapped_column(Float)
     arrival_date: Mapped[Date] = mapped_column(Date)
-
     category: Mapped["Category"] = relationship("Category", back_populates="products")
+
 
 class UserPreference(Base):
     __tablename__ = "user_preferences"
@@ -100,7 +102,7 @@ class UserPreference(Base):
         "User", 
         back_populates="user_preferences"
     )
-    
+
     category: Mapped["Category"] = relationship(
         "Category"
     )
