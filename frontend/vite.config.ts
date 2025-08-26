@@ -50,10 +50,7 @@ export default defineConfig({
         target: 'http://localhost:8000',
         changeOrigin: true,
       },
-      '/wishlist': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
+
       '/feedback': {
         target: 'http://localhost:8000',
         changeOrigin: true,

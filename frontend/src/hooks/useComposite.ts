@@ -4,18 +4,13 @@ import { useProduct, useProductSearch } from './useProducts';
 import { usePersonalizedRecommendations } from './useRecommendations';
 import type { ProductData } from '../types';
 import { useCart, useAddToCart } from './useCart';
-import {
-  useWishlist,
-  useAddToWishlist,
-  useRemoveFromWishlist,
-} from './useWishlist';
 import { useRecordProductClick } from './useInteractions';
 import { useCallback } from 'react';
 
 /**
  * Hook that provides all product-related actions for a specific product
- * Combines product data, cart operations, wishlist operations, and interaction tracking
- * Requires an authenticated user for cart/wishlist operations
+ * Combines product data, cart operations, and interaction tracking
+ * Requires an authenticated user for cart operations
  */
 export const useProductActions = (productId: string) => {
   const { user } = useAuth();
@@ -24,21 +19,14 @@ export const useProductActions = (productId: string) => {
   // Data hooks
   const productQuery = useProduct(productId);
   const cartQuery = useCart(userId);
-  const wishlistQuery = useWishlist(userId);
 
   // Mutation hooks
   const addToCartMutation = useAddToCart();
-  const addToWishlistMutation = useAddToWishlist();
-  const removeFromWishlistMutation = useRemoveFromWishlist();
   const recordClickMutation = useRecordProductClick();
 
   // Derived state
   const isInCart =
     cartQuery.data?.some(item => item.product_id === productId) ?? false;
-  const isInWishlist =
-    wishlistQuery.data?.some(
-      product => product.item_id.toString() === productId
-    ) ?? false;
 
   // Composite actions - memoized to prevent infinite loops
   const addToCart = useCallback(
@@ -54,23 +42,6 @@ export const useProductActions = (productId: string) => {
     [userId, productId, addToCartMutation]
   );
 
-  const toggleWishlist = useCallback(() => {
-    if (!userId)
-      throw new Error('User must be authenticated to modify wishlist');
-
-    if (isInWishlist) {
-      return removeFromWishlistMutation.mutate({ userId, productId });
-    } else {
-      return addToWishlistMutation.mutate({ userId, productId });
-    }
-  }, [
-    userId,
-    productId,
-    isInWishlist,
-    addToWishlistMutation,
-    removeFromWishlistMutation,
-  ]);
-
   const recordClick = useCallback(() => {
     recordClickMutation.mutate(productId);
   }, [productId, recordClickMutation]);
@@ -83,23 +54,17 @@ export const useProductActions = (productId: string) => {
 
     // State
     isInCart,
-    isInWishlist,
 
     // Actions
     addToCart,
-    toggleWishlist,
     recordClick,
 
     // Loading states
     isAddingToCart: addToCartMutation.isPending,
-    isTogglingWishlist:
-      addToWishlistMutation.isPending || removeFromWishlistMutation.isPending,
 
     // Raw mutations for advanced use
     mutations: {
       addToCart: addToCartMutation,
-      addToWishlist: addToWishlistMutation,
-      removeFromWishlist: removeFromWishlistMutation,
       recordClick: recordClickMutation,
     },
   };
@@ -107,30 +72,23 @@ export const useProductActions = (productId: string) => {
 
 /**
  * Lightweight hook for product cards in lists (homepage, search results, catalog)
- * Provides cart/wishlist actions without fetching product data (assumes you already have it)
+ * Provides cart actions without fetching product data (assumes you already have it)
  * Optimized for use in multiple product cards simultaneously
  */
 export const useProductCardActions = (productId: string) => {
   const { user } = useAuth();
   const userId = user?.user_id || '';
 
-  // Only fetch user's cart and wishlist data (shared across all cards)
+  // Only fetch user's cart data (shared across all cards)
   const cartQuery = useCart(userId);
-  const wishlistQuery = useWishlist(userId);
 
   // Mutation hooks (can be used by multiple cards simultaneously)
   const addToCartMutation = useAddToCart();
-  const addToWishlistMutation = useAddToWishlist();
-  const removeFromWishlistMutation = useRemoveFromWishlist();
   const recordClickMutation = useRecordProductClick();
 
   // Derived state for this specific product
   const isInCart =
     cartQuery.data?.some(item => item.product_id === productId) ?? false;
-  const isInWishlist =
-    wishlistQuery.data?.some(
-      product => product.item_id.toString() === productId
-    ) ?? false;
 
   // Lightweight actions (no product data fetching)
   const addToCart = (quantity: number = 1) => {
@@ -143,17 +101,6 @@ export const useProductCardActions = (productId: string) => {
     });
   };
 
-  const toggleWishlist = () => {
-    if (!userId)
-      throw new Error('User must be authenticated to modify wishlist');
-
-    if (isInWishlist) {
-      return removeFromWishlistMutation.mutate({ userId, productId });
-    } else {
-      return addToWishlistMutation.mutate({ userId, productId });
-    }
-  };
-
   const recordClick = () => {
     recordClickMutation.mutate(productId);
   };
@@ -161,22 +108,17 @@ export const useProductCardActions = (productId: string) => {
   return {
     // State (no product data - you already have it from the list)
     isInCart,
-    isInWishlist,
     isAuthenticated: !!userId,
 
     // Actions
     addToCart,
-    toggleWishlist,
     recordClick,
 
     // Loading states
     isAddingToCart: addToCartMutation.isPending,
-    isTogglingWishlist:
-      addToWishlistMutation.isPending || removeFromWishlistMutation.isPending,
 
     // User-specific loading states (useful for showing which card is being acted upon)
     isCartLoading: cartQuery.isLoading,
-    isWishlistLoading: wishlistQuery.isLoading,
   };
 };
 
@@ -185,7 +127,7 @@ export const useProductCardActions = (productId: string) => {
 // ============================
 
 /**
- * Hook for recommendations with built-in cart/wishlist actions
+ * Hook for recommendations with built-in cart actions
  * Perfect for homepage - gets recommendations AND provides actions for each product
  */
 export const useRecommendationsWithActions = () => {
@@ -195,28 +137,20 @@ export const useRecommendationsWithActions = () => {
   // Get personalized recommendations
   const recommendationsQuery = usePersonalizedRecommendations();
 
-  // Get user's cart/wishlist data once for the entire list
+  // Get user's cart data once for the entire list
   const cartQuery = useCart(userId);
-  const wishlistQuery = useWishlist(userId);
 
   // Shared mutation hooks
   const addToCartMutation = useAddToCart();
-  const addToWishlistMutation = useAddToWishlist();
-  const removeFromWishlistMutation = useRemoveFromWishlist();
   const recordClickMutation = useRecordProductClick();
 
   // Factory function to create actions for any product in the list
   const createProductActions = (productId: string) => {
     const isInCart =
       cartQuery.data?.some(item => item.product_id === productId) ?? false;
-    const isInWishlist =
-      wishlistQuery.data?.some(
-        product => product.item_id.toString() === productId
-      ) ?? false;
 
     return {
       isInCart,
-      isInWishlist,
       isAuthenticated: !!userId,
       addToCart: (quantity: number = 1) => {
         if (!userId)
@@ -227,19 +161,8 @@ export const useRecommendationsWithActions = () => {
           quantity,
         });
       },
-      toggleWishlist: () => {
-        if (!userId)
-          throw new Error('User must be authenticated to modify wishlist');
-        if (isInWishlist) {
-          return removeFromWishlistMutation.mutate({ userId, productId });
-        } else {
-          return addToWishlistMutation.mutate({ userId, productId });
-        }
-      },
       recordClick: () => recordClickMutation.mutate(productId),
       isAddingToCart: addToCartMutation.isPending,
-      isTogglingWishlist:
-        addToWishlistMutation.isPending || removeFromWishlistMutation.isPending,
     };
   };
 
@@ -261,12 +184,11 @@ export const useRecommendationsWithActions = () => {
 
     // Global loading states
     isCartLoading: cartQuery.isLoading,
-    isWishlistLoading: wishlistQuery.isLoading,
   };
 };
 
 /**
- * Hook for search results with built-in cart/wishlist actions
+ * Hook for search results with built-in cart actions
  * Perfect for search pages - gets search results AND provides actions for each product
  */
 export const useSearchWithActions = (
@@ -279,28 +201,20 @@ export const useSearchWithActions = (
   // Get the search results
   const searchQuery = useProductSearch(query, enabled);
 
-  // Get user's cart/wishlist data once for the entire list
+  // Get user's cart data once for the entire list
   const cartQuery = useCart(userId);
-  const wishlistQuery = useWishlist(userId);
 
   // Shared mutation hooks
   const addToCartMutation = useAddToCart();
-  const addToWishlistMutation = useAddToWishlist();
-  const removeFromWishlistMutation = useRemoveFromWishlist();
   const recordClickMutation = useRecordProductClick();
 
   // Factory function to create actions for any product in the list
   const createProductActions = (productId: string) => {
     const isInCart =
       cartQuery.data?.some(item => item.product_id === productId) ?? false;
-    const isInWishlist =
-      wishlistQuery.data?.some(
-        product => product.item_id.toString() === productId
-      ) ?? false;
 
     return {
       isInCart,
-      isInWishlist,
       isAuthenticated: !!userId,
       addToCart: (quantity: number = 1) => {
         if (!userId)
@@ -311,19 +225,8 @@ export const useSearchWithActions = (
           quantity,
         });
       },
-      toggleWishlist: () => {
-        if (!userId)
-          throw new Error('User must be authenticated to modify wishlist');
-        if (isInWishlist) {
-          return removeFromWishlistMutation.mutate({ userId, productId });
-        } else {
-          return addToWishlistMutation.mutate({ userId, productId });
-        }
-      },
       recordClick: () => recordClickMutation.mutate(productId),
       isAddingToCart: addToCartMutation.isPending,
-      isTogglingWishlist:
-        addToWishlistMutation.isPending || removeFromWishlistMutation.isPending,
     };
   };
 
@@ -345,6 +248,5 @@ export const useSearchWithActions = (
 
     // Global loading states
     isCartLoading: cartQuery.isLoading,
-    isWishlistLoading: wishlistQuery.isLoading,
   };
 };

@@ -23,10 +23,6 @@ const options: TreeViewDataItem[] = [
         name: 'Profile',
         id: 'profile',
       },
-      {
-        name: 'Wishlist',
-        id: 'saved-products',
-      },
     ],
     defaultExpanded: true,
   },

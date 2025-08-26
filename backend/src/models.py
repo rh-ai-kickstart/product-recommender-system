@@ -88,8 +88,3 @@ class Order(BaseModel):
     total_amount: float
     order_date: datetime
     status: str
-
-
-class WishlistItem(BaseModel):
-    user_id: str
-    product_id: str

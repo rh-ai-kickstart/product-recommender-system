@@ -14,8 +14,7 @@ services/
 ├── orders.ts           # Order management
 ├── preferences.ts      # User preference management
 ├── products.ts         # Product search and details
-├── recommendations.ts  # Product recommendations
-└── wishlist.ts         # Wishlist management
+└── recommendations.ts  # Product recommendations
 ```
 
 ## Authentication Service (`auth.ts`)

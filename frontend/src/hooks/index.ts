@@ -5,7 +5,6 @@ export {
   useNewUserRecommendations,
 } from './useRecommendations';
 export * from './useProducts';
-export * from './useWishlist';
 export * from './useCart';
 export * from './useOrders';
 export * from './useFeedback';
