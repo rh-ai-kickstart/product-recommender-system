@@ -90,37 +90,22 @@ async def recommend_for_image_link(payload: ImageRecommendationRequest_link):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-class ImageRecommendationRequest_file(BaseModel):
-    image_file: UploadFile
-    num_recommendations: int = 10
-
-
-async def image_file_request_dependency(
-    image_file: UploadFile = File(...), num_recommendations: int = Form(10)
-) -> ImageRecommendationRequest_file:
-    return ImageRecommendationRequest_file(
-        image_file=image_file, num_recommendations=num_recommendations
-    )
-
-
 @router.post("/products/search/image-file", response_model=List[Product])
 async def recommend_for_image_file(
-    payload: ImageRecommendationRequest_file = Depends(image_file_request_dependency),
+    image_file: UploadFile = File(...), num_recommendations: int = Form(10)
 ):
-    if not payload.image_file:
+    if not image_file:
         raise HTTPException(status_code=400, detail="image_file is required")
 
     try:
-        contents = await payload.image_file.read()
+        contents = await image_file.read()
         image = Image.open(BytesIO(contents))
         image.load()
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid image file")
 
     try:
-        recommendations = FeastService().search_item_by_image_file(
-            image, k=payload.num_recommendations
-        )
+        recommendations = FeastService().search_item_by_image_file(image, k=num_recommendations)
         return recommendations
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
