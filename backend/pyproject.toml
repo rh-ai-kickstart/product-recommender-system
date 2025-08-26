@@ -27,6 +27,7 @@ dependencies = [
     "recommendation_core",
     "httpx>=0.28.1",
     "flake8>=7.3.0",
+    "sqlalchemy-utils==0.41.2",
 ]
 
 [project.optional-dependencies]
