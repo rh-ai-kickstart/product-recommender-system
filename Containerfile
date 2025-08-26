@@ -8,7 +8,6 @@ WORKDIR /app/frontend
 # Copy only package files first to leverage Docker cache
 COPY frontend/package*.json ./
 
-RUN npm install --debug
 
 # Now copy the rest of the frontend code
 COPY frontend/ ./
@@ -16,7 +15,7 @@ COPY frontend/ ./
 # Set node memory limit if needed
 ENV NODE_OPTIONS=--max-old-space-size=2048
 
-RUN npm run build
+RUN npm install --debug && npm run build
 
 # ---------- Backend Build ----------
 FROM quay.io/rh-ai-kickstart/recommendation-core:latest
@@ -38,10 +37,9 @@ COPY recommendation-core/src/recommendation_core/generation/data/generated_image
 # Set Hugging Face cache directory
 ENV HF_HOME=/hf_cache
 
-# Pre-download the model and fix permissions again (?) after download
-RUN dnf update -y && pip3 install uv && uv pip install -r pyproject.toml && \
+# Pre-download the model and fix permissions again after download
+RUN  pip3 install uv && uv pip install -r pyproject.toml && \
     mkdir -p /hf_cache && \
-    chmod -R 777 /hf_cache && \
     python3 -c "from transformers import CLIPProcessor, CLIPModel; \
                 CLIPProcessor.from_pretrained('openai/clip-vit-base-patch32'); \
                 CLIPModel.from_pretrained('openai/clip-vit-base-patch32')" && \
