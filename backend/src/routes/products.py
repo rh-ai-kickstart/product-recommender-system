@@ -14,7 +14,7 @@ except ImportError:
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.db import get_db
-from models import Product
+from models import InteractionType, Product
 from routes.auth import get_current_user  # to resolve JWT user
 from services.database_service import db_service  # Use global instance
 from services.feast.feast_service import FeastService
@@ -44,7 +44,10 @@ async def get_product(
     """
     # Log view interaction to database (replaces Kafka)
     await db_service.log_interaction(
-        db=db, user_id=user_id.user_id, item_id=product_id, interaction_type="negative_view"
+        db=db,
+        user_id=user_id.user_id,
+        item_id=product_id,
+        interaction_type=InteractionType.POSITIVE_VIEW_VIEW.value,
     )
 
     try:
@@ -63,7 +66,10 @@ async def record_product_click(
     """
     # Log click interaction to database (replaces Kafka)
     await db_service.log_interaction(
-        db=db, user_id=user_id.user_id, item_id=product_id, interaction_type="positive_view"
+        db=db,
+        user_id=user_id.user_id,
+        item_id=product_id,
+        interaction_type=InteractionType.POSITIVE_VIEW.value,
     )
     return
 
