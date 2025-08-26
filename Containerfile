@@ -32,6 +32,8 @@ COPY backend/ ./
 
 # Copy the frontend build output to backend/public
 COPY --from=frontend-builder /app/frontend/dist ./public
+# Copy product images into public/images
+COPY recommendation-core/src/recommendation_core/generation/data/generated_images ./public/images
 
 # Set Hugging Face cache directory
 ENV HF_HOME=/hf_cache
