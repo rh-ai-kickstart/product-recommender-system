@@ -32,11 +32,6 @@ export const ProductDetails = () => {
     return <div>Error fetching product</div>;
   }
 
-  // Mutation for buying product now
-  const handleBuyNow = () => {
-    alert(product.product_name);
-  };
-
   return (
     <>
       {isLoading ? (
@@ -91,11 +86,6 @@ export const ProductDetails = () => {
                       isDisabled={isAddingToCart}
                     >
                       {isAddingToCart ? 'Adding...' : 'Add to Cart'}
-                    </Button>
-                  </FlexItem>
-                  <FlexItem>
-                    <Button variant='primary' onClick={handleBuyNow}>
-                      Buy Now
                     </Button>
                   </FlexItem>
                 </Flex>

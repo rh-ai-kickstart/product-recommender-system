@@ -16,7 +16,6 @@ hooks/
 ├── usePreferences.ts   # User preference management
 ├── useProducts.ts      # Product search and details
 ├── useRecommendations.ts # PERSONALIZED product recommendations
-└── useWishlist.ts      # Wishlist management
 ```
 
 ## 🔐 Authentication Hooks (`useAuth.ts`)
@@ -213,7 +212,6 @@ Unlike traditional e-commerce sites, this app **requires authentication** for th
 - ✅ **Better recommendations** from day one
 - ✅ **Preference-driven discovery** instead of generic popular items
 - ✅ **Personalized learning** that improves over time
-- ✅ **Seamless cart/wishlist** integration
 
 ## 🎯 Product Action Hooks
 
@@ -229,11 +227,11 @@ import { useProductActions } from '../hooks/useComposite';
 const ProductDetailPage = ({ productId }) => {
   const {
     // State
-    isInCart, isInWishlist, isAuthenticated,
+    isInCart, isAuthenticated,
     // Actions
-    addToCart, toggleWishlist, recordClick,
+    addToCart, recordClick,
     // Loading states
-    isAddingToCart, isTogglingWishlist
+    isAddingToCart
   } = useProductActions(productId);
 
   return (
@@ -243,13 +241,6 @@ const ProductDetailPage = ({ productId }) => {
         isLoading={isAddingToCart}
       >
         {isInCart ? 'In Cart' : 'Add to Cart'}
-      </Button>
-
-      <Button
-        onClick={toggleWishlist}
-        isLoading={isTogglingWishlist}
-      >
-        {isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
       </Button>
     </div>
   );
@@ -278,11 +269,7 @@ const ProductCard = ({ product }) => {
         Add to Cart
       </Button>
 
-      <IconButton
-        onClick={actions.toggleWishlist}
-        isLoading={actions.isTogglingWishlist}
-        icon={actions.isInWishlist ? FilledHeartIcon : HeartIcon}
-      />
+
     </div>
   );
 };
@@ -292,9 +279,9 @@ const ProductCard = ({ product }) => {
 
 `useProductCardActions` is optimized for lists:
 
-- **Shared queries**: Cart/wishlist data fetched once for entire list
+- **Shared queries**: Cart data fetched once for entire list
 - **Lightweight**: Only essential actions for card interactions
-- **Efficient**: Minimal re-renders when cart/wishlist updates
+- **Efficient**: Minimal re-renders when cart updates
 
 ## 🔗 List-Level Hooks
 
@@ -337,7 +324,7 @@ const HomePage = () => {
 const SearchResults = ({ query }) => {
   const { productsWithActions, isLoading } = useSearchWithActions(query);
 
-  // Each product has pre-attached cart/wishlist actions
+  // Each product has pre-attached cart actions
   return <ProductGrid products={productsWithActions} />;
 };
 ```

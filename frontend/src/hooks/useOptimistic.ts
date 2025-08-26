@@ -1,7 +1,7 @@
 // Optimistic update hooks for better UX
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { addToCart, removeFromCart } from '../services/cart';
-import { addToWishlist, removeFromWishlist } from '../services/wishlist';
+
 import type { CartItem } from '../services/cart';
 import type { ProductData } from '../types';
 
@@ -88,91 +88,5 @@ export const useOptimisticCart = () => {
   return {
     addToCart: addToCartOptimistic,
     removeFromCart: removeFromCartOptimistic,
-  };
-};
-
-/**
- * Optimistic wishlist operations
- */
-export const useOptimisticWishlist = () => {
-  const queryClient = useQueryClient();
-
-  const addToWishlistOptimistic = useMutation({
-    mutationFn: ({
-      userId,
-      productId,
-    }: {
-      userId: string;
-      productId: string;
-    }) => addToWishlist(userId, productId),
-    onMutate: async ({ userId, productId }) => {
-      await queryClient.cancelQueries({ queryKey: ['wishlist', userId] });
-      const previousWishlist = queryClient.getQueryData(['wishlist', userId]);
-
-      // We'd need the full product data for this to work properly
-      // In practice, you might fetch it from the products cache
-      const productData = queryClient.getQueryData([
-        'products',
-        productId,
-      ]) as ProductData;
-
-      if (productData) {
-        queryClient.setQueryData(
-          ['wishlist', userId],
-          (old: ProductData[] = []) => [...old, productData]
-        );
-      }
-
-      return { previousWishlist };
-    },
-    onError: (_err, { userId }, context) => {
-      if (context?.previousWishlist) {
-        queryClient.setQueryData(
-          ['wishlist', userId],
-          context.previousWishlist
-        );
-      }
-    },
-    onSettled: (_data, _error, { userId }) => {
-      queryClient.invalidateQueries({ queryKey: ['wishlist', userId] });
-    },
-  });
-
-  const removeFromWishlistOptimistic = useMutation({
-    mutationFn: ({
-      userId,
-      productId,
-    }: {
-      userId: string;
-      productId: string;
-    }) => removeFromWishlist(userId, productId),
-    onMutate: async ({ userId, productId }) => {
-      await queryClient.cancelQueries({ queryKey: ['wishlist', userId] });
-      const previousWishlist = queryClient.getQueryData(['wishlist', userId]);
-
-      queryClient.setQueryData(
-        ['wishlist', userId],
-        (old: ProductData[] = []) =>
-          old.filter(product => product.item_id.toString() !== productId)
-      );
-
-      return { previousWishlist };
-    },
-    onError: (_err, { userId }, context) => {
-      if (context?.previousWishlist) {
-        queryClient.setQueryData(
-          ['wishlist', userId],
-          context.previousWishlist
-        );
-      }
-    },
-    onSettled: (_data, _error, { userId }) => {
-      queryClient.invalidateQueries({ queryKey: ['wishlist', userId] });
-    },
-  });
-
-  return {
-    addToWishlist: addToWishlistOptimistic,
-    removeFromWishlist: removeFromWishlistOptimistic,
   };
 };

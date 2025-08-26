@@ -8,4 +8,3 @@ export * from './orders';
 export * from './preferences';
 export * from './products';
 export * from './recommendations';
-export * from './wishlist';
