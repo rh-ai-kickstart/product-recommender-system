@@ -20,14 +20,20 @@ export async function apiRequest<T>(
     const requestOptions: RequestInit = {
       method,
       headers: {
-        'Content-Type': 'application/json',
+        ...(!(body instanceof FormData) && {
+          'Content-Type': 'application/json',
+        }),
         ...(token && { Authorization: `Bearer ${token}` }),
         ...headers,
       },
     };
 
     if (body && method !== 'GET') {
-      requestOptions.body = JSON.stringify(body);
+      if (body instanceof FormData) {
+        requestOptions.body = body;
+      } else {
+        requestOptions.body = JSON.stringify(body);
+      }
     }
 
     ApiLogger.logRequest(context, requestOptions);
