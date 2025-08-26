@@ -25,15 +25,8 @@ FROM quay.io/rh-ai-kickstart/recommendation-core:latest
 USER root
 WORKDIR /app/backend
 
-RUN dnf update -y
-
-# Install uv and install dependencies
-RUN pip3 install uv
-
 COPY backend/pyproject.toml pyproject.toml
 COPY recommendation-core/ /app/recommendation-core/
-
-RUN uv pip install -r pyproject.toml
 
 COPY backend/ ./
 
@@ -43,17 +36,16 @@ COPY --from=frontend-builder /app/frontend/dist ./public
 # Set Hugging Face cache directory
 ENV HF_HOME=/hf_cache
 
-RUN mkdir -p /hf_cache && \
-    chmod -R 777 /hf_cache
-
-# Pre-download the model
-RUN python3 -c "from transformers import CLIPProcessor, CLIPModel; \
+# Pre-download the model and fix permissions again (?) after download
+RUN dnf update -y && pip3 install uv && uv pip install -r pyproject.toml && \
+    mkdir -p /hf_cache && \
+    chmod -R 777 /hf_cache && \
+    python3 -c "from transformers import CLIPProcessor, CLIPModel; \
                 CLIPProcessor.from_pretrained('openai/clip-vit-base-patch32'); \
-                CLIPModel.from_pretrained('openai/clip-vit-base-patch32')"
+                CLIPModel.from_pretrained('openai/clip-vit-base-patch32')" && \
+    chmod -R 777 /hf_cache && \
+    chmod -R +r . 
 
-# Fix permissions again after download
-RUN chmod -R 777 /hf_cache
-RUN chmod -R +r . && ls -la
 ENV PYTHONUNBUFFERED=1
 EXPOSE 8000
 
