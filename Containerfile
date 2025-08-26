@@ -8,7 +8,6 @@ WORKDIR /app/frontend
 # Copy only package files first to leverage Docker cache
 COPY frontend/package*.json ./
 
-RUN npm install --debug
 
 # Now copy the rest of the frontend code
 COPY frontend/ ./
@@ -16,7 +15,7 @@ COPY frontend/ ./
 # Set node memory limit if needed
 ENV NODE_OPTIONS=--max-old-space-size=2048
 
-RUN npm run build
+RUN npm install --debug && npm run build
 
 # ---------- Backend Build ----------
 FROM quay.io/rh-ai-kickstart/recommendation-core:latest
@@ -26,13 +25,12 @@ USER root
 WORKDIR /app/backend
 
 
-# Install uv and install dependencies
-RUN pip3 install uv
 
 COPY backend/pyproject.toml pyproject.toml
 COPY recommendation-core/ /app/recommendation-core/
 
-RUN uv pip install -r pyproject.toml
+# Install uv and install dependencies
+RUN pip3 install uv && uv pip install -r pyproject.toml
 
 COPY backend/ ./
 
@@ -45,14 +43,12 @@ ENV HF_HOME=/hf_cache
 RUN mkdir -p /hf_cache && \
     chmod -R 777 /hf_cache
 
-# Pre-download the model
+# Pre-download the model and fix permissions
 RUN python3 -c "from transformers import CLIPProcessor, CLIPModel; \
                 CLIPProcessor.from_pretrained('openai/clip-vit-base-patch32'); \
-                CLIPModel.from_pretrained('openai/clip-vit-base-patch32')"
+                CLIPModel.from_pretrained('openai/clip-vit-base-patch32')" \
+                && chmod -R 777 /hf_cache && chmod -R +r . && ls -la
 
-# Fix permissions again after download
-RUN chmod -R 777 /hf_cache
-RUN chmod -R +r . && ls -la
 ENV PYTHONUNBUFFERED=1
 EXPOSE 8000
 
