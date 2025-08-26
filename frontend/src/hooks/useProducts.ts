@@ -4,6 +4,7 @@ import {
   searchProducts,
   searchProductsByText,
   searchProductsByImageLink,
+  searchProductsByImage,
 } from '../services/products';
 
 export const useProduct = (productId: string) => {
@@ -39,12 +40,33 @@ export const useProductSearchByText = (
 
 export const useProductSearchByImageLink = (
   imageLink: string,
-  k: number = 5,
+  k: number = 10,
   enabled: boolean = true
 ) => {
   return useQuery({
     queryKey: ['products', 'search', 'image-link', imageLink, k],
     queryFn: () => searchProductsByImageLink(imageLink, k),
-    enabled: enabled && !!imageLink,
+    enabled: enabled && !!imageLink && imageLink.trim().length > 0,
+    staleTime: 2 * 60 * 1000,
+  });
+};
+
+export const useProductSearchByImage = (
+  imageFile: File | null,
+  k: number = 10,
+  enabled: boolean = true
+) => {
+  return useQuery({
+    queryKey: [
+      'products',
+      'search',
+      'image-file',
+      imageFile?.name,
+      imageFile?.size,
+      k,
+    ],
+    queryFn: () => searchProductsByImage(imageFile!, k),
+    enabled: enabled && !!imageFile,
+    staleTime: 2 * 60 * 1000,
   });
 };

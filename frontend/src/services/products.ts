@@ -30,13 +30,35 @@ export const searchProductsByText = async (
 };
 
 export const searchProductsByImageLink = async (
-  imageLink: string,
-  k: number = 5
+  imageUrl: string,
+  numRecommendations: number = 10
 ): Promise<ProductData[]> => {
-  ServiceLogger.logServiceCall('searchProductsByImageLink', { imageLink, k });
+  ServiceLogger.logServiceCall('searchProductsByImageLink', {
+    imageUrl,
+    numRecommendations,
+  });
+
+  if (!imageUrl || imageUrl.trim().length === 0) {
+    ServiceLogger.logServiceWarning(
+      'searchProductsByImageLink',
+      'Empty image URL provided'
+    );
+    return [];
+  }
+
   return apiRequest<ProductData[]>(
-    `/products/search/image_link?image_link=${encodeURIComponent(imageLink)}&k=${k}`,
-    'searchProductsByImageLink'
+    '/products/search/image-link',
+    'searchProductsByImageLink',
+    {
+      method: 'POST',
+      body: {
+        image_url: imageUrl,
+        num_recommendations: numRecommendations,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
   );
 };
 
@@ -50,11 +72,11 @@ export const searchProductsByImage = async (
   });
 
   const formData = new FormData();
-  formData.append('image', imageFile);
-  formData.append('k', k.toString());
+  formData.append('image_file', imageFile);
+  formData.append('num_recommendations', k.toString());
 
   return apiRequest<ProductData[]>(
-    '/products/search/image',
+    '/products/search/image-file',
     'searchProductsByImage',
     {
       method: 'POST',

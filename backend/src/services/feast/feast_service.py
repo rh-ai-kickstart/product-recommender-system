@@ -7,6 +7,7 @@ from typing import List
 
 import pandas as pd
 import requests
+import tabulate as tb
 import torch
 from feast import FeatureStore
 from minio import Minio
@@ -159,7 +160,7 @@ class FeastService:
             entity_rows=[{"item_id": item_id} for item_id in top_item_ids],
         ).to_df()
         logger.info(suggested_item.columns)
-        logger.info(suggested_item)
+        logger.info(tb.tabulate(suggested_item, headers="keys", tablefmt="grid"))
         suggested_item = [
             Product(
                 item_id=row.item_id,
@@ -185,7 +186,8 @@ class FeastService:
         """
         search_service = SearchService(self.store)
         results_df = search_service.search_by_text(text, k)
-        logger.info(results_df)
+        logger.info(f"Got {len(results_df)} results:")
+        logger.info(tb.tabulate(results_df, headers="keys", tablefmt="grid"))
         top_item_ids = results_df["item_id"].tolist()
         results = self._item_ids_to_product_list(top_item_ids)
         return results
@@ -209,7 +211,8 @@ class FeastService:
             raise ValueError("Invalid or unreachable image URL.")
         try:
             results_df = self.search_by_image_service.search_by_image_link(image_link, k)
-            logger.info(results_df)
+            logger.info(f"Got {len(results_df)} results:")
+            logger.info(tb.tabulate(results_df, headers="keys", tablefmt="grid"))
             top_item_ids = results_df["item_id"].tolist()
             return self._item_ids_to_product_list(top_item_ids)
         except Exception as e:
@@ -221,11 +224,12 @@ class FeastService:
         try:
             results_df = self.search_by_image_service.search_by_image(image, k)
             logger.info("[Feast] search_by_image() completed")
-            logger.info(results_df)
 
             if results_df.empty or "item_id" not in results_df:
                 raise ValueError("No valid item_id results returned from image search.")
 
+            logger.info(f"Got {len(results_df)} results:")
+            logger.info(tb.tabulate(results_df, headers="keys", tablefmt="grid"))
             top_item_ids = results_df["item_id"].tolist()
             return self._item_ids_to_product_list(top_item_ids)
 

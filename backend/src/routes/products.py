@@ -2,8 +2,9 @@ import logging
 from io import BytesIO
 from typing import List
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from PIL import Image
+from pydantic import BaseModel
 
 try:
     from PIL.UnidentifiedImageError import UnidentifiedImageError
@@ -32,50 +33,6 @@ async def search_products_by_text(query: str, k: int = 5):
         return feast.search_item_by_text(query, k)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.get("/products/search/image_link", response_model=List[Product])
-async def search_products_by_image_link(image_link: str, k: int = 5):
-    """
-    Search products by image_link
-    """
-    try:
-        feast = FeastService()
-        return feast.search_item_by_image_link(image_link, k)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/products/search/image", response_model=List[Product])
-async def search_products_by_image(image: UploadFile = File(...), k: int = 5):
-    """
-    Search products by image - Not fully ready yet
-    """
-    try:
-        contents = await image.read()
-        try:
-            # Try decoding the image in memory
-            pil_image = Image.open(BytesIO(contents))
-            pil_image.verify()  # Just checks integrity
-            pil_image = Image.open(BytesIO(contents))  # Reopen after verify
-            logger.info(
-                f"Image mode: {pil_image.mode}, size: {pil_image.size}, format: {pil_image.format}"
-            )
-        except UnidentifiedImageError as e:
-            logger.error(f"[ImageError] Cannot identify image: {e}")
-            raise HTTPException(status_code=400, detail="Unsupported or invalid image format.")
-        except Exception as e:
-            logger.error(f"[ImageError] General image load error: {e}")
-            raise HTTPException(status_code=400, detail="Failed to process uploaded image.")
-
-        feast = FeastService()
-        return feast.search_item_by_image_file(pil_image, k)
-
-    except HTTPException:
-        raise  # Pass through
-    except Exception as e:
-        logger.error(f"[InternalError] {e}")
-        raise HTTPException(status_code=500, detail="Unexpected server error during image search.")
 
 
 @router.get("/products/{product_id}", response_model=Product)
@@ -109,3 +66,54 @@ async def record_product_click(
         db=db, user_id=user_id.user_id, item_id=product_id, interaction_type="positive_view"
     )
     return
+
+
+class ImageRecommendationRequest_link(BaseModel):
+    image_url: str
+    num_recommendations: int = 10
+
+
+@router.post("/products/search/image-link", response_model=List[Product])
+async def recommend_for_image_link(payload: ImageRecommendationRequest_link):
+    assert payload.image_url is not None and payload.image_url != "", "image_url is required"
+    assert (
+        payload.num_recommendations is not None and payload.num_recommendations > 0
+    ), "num_recommendations is required"
+
+    try:
+        logger.info(f"Recommendations for image link: {payload.image_url}")
+        recommendations = FeastService().search_item_by_image_link(
+            payload.image_url, k=payload.num_recommendations
+        )
+        return recommendations
+    except ValueError as e:
+        logger.error(f"Error getting recommendations for image link {payload.image_url}: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error getting recommendations for image link {payload.image_url}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/products/search/image-file", response_model=List[Product])
+async def recommend_for_image_file(
+    image_file: UploadFile = File(...), num_recommendations: int = Form(10)
+):
+    assert image_file is not None and image_file != "", "image_file is required"
+    assert (
+        num_recommendations is not None and num_recommendations > 0
+    ), "num_recommendations is required"
+    logger.info(f"Recommendations for image file: {image_file.filename}")
+    try:
+        contents = await image_file.read()
+        image = Image.open(BytesIO(contents))
+        image.load()
+    except Exception as e:
+        logger.error(f"Error opening image file {image_file.filename}: {e}")
+        raise HTTPException(status_code=400, detail="Invalid image file")
+
+    try:
+        recommendations = FeastService().search_item_by_image_file(image, k=num_recommendations)
+        return recommendations
+    except Exception as e:
+        logger.error(f"Error getting recommendations for image file {image_file.filename}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
