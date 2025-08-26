@@ -1,7 +1,6 @@
 name: Build and push - training pipeline image
 
 on:
-  workflow_dispatch:
   push:
     branches: [ main ]
     paths:
@@ -14,6 +13,9 @@ jobs:
   build-and-push-image:
     name: Build and Push container image
     runs-on: ubuntu-latest
+    if: >
+      (github.repository == 'rh-ai-kickstart/product-recommender-system') &&
+      (github.event_name == 'push')
     strategy:
       matrix:
         include:
