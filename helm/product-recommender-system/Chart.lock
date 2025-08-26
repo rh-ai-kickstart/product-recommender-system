@@ -3,4 +3,8 @@ dependencies:
   repository: https://rh-ai-quickstart.github.io/ai-architecture-charts
   version: 0.1.0
 digest: sha256:87569d605b56520095b631a29f2205e8a3fee30d1a9a723dc81b4adbd50e89c6
+<<<<<<< HEAD
 generated: "2025-08-27T10:30:55.314647+03:00"
+=======
+generated: "2025-08-26T14:44:49.291063569-04:00"
+>>>>>>> 97338ef (APPENG-3670: Replaced occurences of rh-ai-kickstart with rh-ai-quickstart)

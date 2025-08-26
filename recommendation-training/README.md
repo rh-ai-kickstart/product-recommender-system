@@ -22,24 +22,24 @@ This directory contains the container images for the recommendation training wor
 
 ```bash
 cd recommendation-training
-podman build -t quay.io/rh-ai-kickstart/recommendation-training:latest .
+podman build -t quay.io/rh-ai-quickstart/recommendation-training:latest .
 ```
 
 ### Local Build - OC Tools Image
 
 ```bash
 cd recommendation-training/oc-tools
-podman build -t quay.io/rh-ai-kickstart/recommendation-oc-tools:latest .
+podman build -t quay.io/rh-ai-quickstart/recommendation-oc-tools:latest .
 ```
 
 ### Push to Registry
 
 ```bash
 # Push training image
-podman push quay.io/rh-ai-kickstart/recommendation-training:latest
+podman push quay.io/rh-ai-quickstart/recommendation-training:latest
 
 # Push oc-tools image
-podman push quay.io/rh-ai-kickstart/recommendation-oc-tools:latest
+podman push quay.io/rh-ai-quickstart/recommendation-oc-tools:latest
 ```
 
 ### Automated Build
@@ -89,14 +89,14 @@ The containers are automatically built and pushed via GitHub Actions when:
 ```yaml
 containers:
 - name: kfp-runner
-  image: quay.io/rh-ai-kickstart/recommendation-training:latest
+  image: quay.io/rh-ai-quickstart/recommendation-training:latest
   command: ['/bin/sh']
   args: ['-c', './entrypoint.sh']
 ```
 
 ### Cluster Operations
 ```python
-@dsl.component(base_image="quay.io/rh-ai-kickstart/recommendation-oc-tools:latest")
+@dsl.component(base_image="quay.io/rh-ai-quickstart/recommendation-oc-tools:latest")
 def fetch_cluster_credentials():
     # OC CLI operations
 ```

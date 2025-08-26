@@ -33,7 +33,7 @@ product-recommender-system/
 The recommendation-core serves as the **central nervous system** of the entire recommendation system:
 
 - **Backend** imports and uses it: `from recommendation_core.models import EntityTower`
-- **Training pipeline** uses it as base image: `BASE_IMAGE = "quay.io/rh-ai-kickstart/recommendation-core:latest"`
+- **Training pipeline** uses it as base image: `BASE_IMAGE = "quay.io/rh-ai-quickstart/recommendation-core:latest"`
 - **All ML logic** is contained within it
 
 ### **Core Capabilities**
@@ -359,8 +359,8 @@ python -m recommendation_core.generation.generate_images
 The generated images are **referenced by dataset_gen_amazon.py**:
 
 ```python
-# From dataset_gen_amazon.py - Line 127
-img_link = f"https://raw.githubusercontent.com/rh-ai-kickstart/product-recommender-system/main/recommendation-core/generation/data/generated_images/item_{product_name.replace(' ', '%20')}.png"
+# From dataset_gen_amazon.py
+img_link = f"/images/item_{safe_name}.png"
 ```
 
 **Current Status:**
@@ -437,10 +437,10 @@ filtered_recommendations = apply_filters(
 
 ```bash
 # Build the container image
-podman build -t quay.io/rh-ai-kickstart/recommendation-core:latest .
+podman build -t quay.io/rh-ai-quickstart/recommendation-core:latest .
 
 # Push to registry
-podman push quay.io/rh-ai-kickstart/recommendation-core:latest
+podman push quay.io/rh-ai-quickstart/recommendation-core:latest
 ```
 
 ### Package Installation
@@ -465,7 +465,7 @@ The **recommendation-training workflow** uses the recommendation-core container 
 
 ```python
 BASE_IMAGE = os.getenv(
-    "BASE_REC_SYS_IMAGE", "quay.io/rh-ai-kickstart/recommendation-core:latest"
+    "BASE_REC_SYS_IMAGE", "quay.io/rh-ai-quickstart/recommendation-core:latest"
 )
 
 @dsl.component(base_image=BASE_IMAGE)
@@ -506,10 +506,10 @@ RUN uv pip install .
 The **Helm values.yaml** references the container image for deployment:
 
 ```yaml
-pipelineJobImage: quay.io/rh-ai-kickstart/recommendation-training:latest
-applicationImage: quay.io/rh-ai-kickstart/recommendation-core:latest
+pipelineJobImage: quay.io/rh-ai-quickstart/recommendation-training:latest
+applicationImage: quay.io/rh-ai-quickstart/recommendation-core:latest
 # Note the backend uses recommendation_core as library.
-frontendBackendImage: quay.io/rh-ai-kickstart/product-recommender-frontend-backend:latest
+frontendBackendImage: quay.io/rh-ai-quickstart/product-recommender-frontend-backend:latest
 ```
 
 **What this means:**

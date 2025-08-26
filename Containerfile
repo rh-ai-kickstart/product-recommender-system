@@ -18,7 +18,7 @@ ENV NODE_OPTIONS=--max-old-space-size=2048
 RUN npm install --debug && npm run build
 
 # ---------- Backend Build ----------
-FROM quay.io/rh-ai-kickstart/recommendation-core:latest
+FROM quay.io/rh-ai-quickstart/recommendation-core:latest
 
 
 USER root

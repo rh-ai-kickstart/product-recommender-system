@@ -30,7 +30,7 @@ spec:
   feastProject: {{ .Values.feast.project }}
   feastProjectDir:
     git:
-      url: https://github.com/rh-ai-kickstart/product-recommender-system
+      url: https://github.com/rh-ai-quickstart/product-recommender-system
       ref: main
       featureRepoPath: recommendation-core/src/recommendation_core/feature_repo
   services:

@@ -12,7 +12,7 @@ jobs:
     name: Build and Push Recommendation Core Image
     runs-on: ubuntu-latest
     if: >
-      (github.repository == 'rh-ai-kickstart/product-recommender-system') &&
+      (github.repository == 'rh-ai-quickstart/product-recommender-system') &&
       (github.event_name == 'push')
 
     steps:
@@ -41,7 +41,7 @@ jobs:
           file: recommendation-core/Containerfile
           push: true
           tags: |
-            quay.io/rh-ai-kickstart/recommendation-core:${{ steps.version.outputs.tag }}
-            quay.io/rh-ai-kickstart/recommendation-core:latest
+            quay.io/rh-ai-quickstart/recommendation-core:${{ steps.version.outputs.tag }}
+            quay.io/rh-ai-quickstart/recommendation-core:latest
           build-args: |
             IMAGE_TAG=${{ steps.version.outputs.tag }}
