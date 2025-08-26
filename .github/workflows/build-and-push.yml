@@ -13,7 +13,6 @@ on:
       - completed
     branches:
     - main
-  workflow_dispatch:
 
 env:
   BACKEND_DIR: backend
@@ -23,8 +22,9 @@ jobs:
     name: Build and Push Backend/Frontend Image
     runs-on: ubuntu-latest
     if: >
-      (github.event_name == 'push') ||
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+      (github.repository == 'rh-ai-kickstart/product-recommender-system') &&
+      ((github.event_name == 'push') ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'))
     strategy:
       matrix:
         include:

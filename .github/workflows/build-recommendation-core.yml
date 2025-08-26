@@ -6,12 +6,14 @@ on:
       - main
     paths:
       - 'recommendation-core/**'
-  workflow_dispatch:
 
 jobs:
   build-recommendation-core-image:
     name: Build and Push Recommendation Core Image
     runs-on: ubuntu-latest
+    if: >
+      (github.repository == 'rh-ai-kickstart/product-recommender-system') &&
+      (github.event_name == 'push')
 
     steps:
       - name: Checkout repository
