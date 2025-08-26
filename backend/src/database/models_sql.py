@@ -1,7 +1,9 @@
 from datetime import datetime
 
-from sqlalchemy import Date, DateTime, Float, Integer, String, Text
-from sqlalchemy.orm import Mapped, declarative_base, mapped_column
+from sqlalchemy import Date, DateTime, Float, Integer, String, Text, ForeignKey
+from sqlalchemy.orm import Mapped, declarative_base, mapped_column, relationship
+from sqlalchemy_utils import UUIDType
+import uuid
 
 Base = declarative_base()
 
@@ -19,6 +21,10 @@ class User(Base):
     gender: Mapped[str] = mapped_column(String, nullable=True)
     signup_date: Mapped[Date] = mapped_column(Date, nullable=True)
     preferences: Mapped[str] = mapped_column(String, nullable=True)
+    user_preferences : Mapped[list["UserPreference"]] = relationship(
+        "UserPreference",
+        back_populates="user"
+    )
 
 
 class CartItem(Base):
@@ -31,7 +37,6 @@ class CartItem(Base):
 
 class StreamInteraction(Base):
     __tablename__ = "stream_interaction"
-
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[str] = mapped_column(String(27), index=True)
     item_id: Mapped[str] = mapped_column(String, index=True)
@@ -44,14 +49,39 @@ class StreamInteraction(Base):
     interaction_id: Mapped[str] = mapped_column(String, unique=True, index=True)
 
 
-"""
+class Category(Base):
+    __tablename__ = "category"
+    category_id: Mapped[uuid.UUID] = mapped_column(UUIDType, primary_key=True, default=uuid.uuid4)
+    name: Mapped[str] = mapped_column(String)
+    parent_id: Mapped[uuid.UUID] = mapped_column(UUIDType, ForeignKey('category.category_id'),
+                                                 nullable=True)
+
+    parent: Mapped["Category"] = relationship(
+        "Category",
+        remote_side="Category.category_id",
+        back_populates="sub_categories",
+        foreign_keys="Category.parent_id"
+    )
+
+    sub_categories: Mapped[list["Category"]] = relationship(
+        "Category",
+        back_populates="parent",
+        lazy="dynamic",
+        foreign_keys="Category.parent_id"
+    )
+
+    products: Mapped[list["Product"]] = relationship(
+        "Product",
+        back_populates="category"
+    )
+
+
 class Product(Base):
     __tablename__ = "products"
-    item_id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    category: Mapped[str] = mapped_column(String)
+    item_id: Mapped[uuid.UUID] = mapped_column(UUIDType, primary_key=True, default=uuid.uuid4)
+    category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("category.category_id"))
     name: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(String)
-    subcategory: Mapped[str] = mapped_column(String)
     price: Mapped[float] = mapped_column(Float)
     avg_rating: Mapped[float] = mapped_column(Float)
     num_ratings: Mapped[int] = mapped_column(Integer)
@@ -59,43 +89,20 @@ class Product(Base):
     new_arrival: Mapped[float] = mapped_column(Float)
     on_sale: Mapped[float] = mapped_column(Float)
     arrival_date: Mapped[Date] = mapped_column(Date)
-
-class Feedback(Base):
-    __tablename__ = "feedback"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
-    product_id: Mapped[int] = mapped_column(ForeignKey("products.item_id"))
-    rating: Mapped[float] = mapped_column(Float)
-    comment: Mapped[str] = mapped_column(String, nullable=True)
-
-class Order(Base):
-    __tablename__ = "orders"
-    order_id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
-    total_amount: Mapped[float] = mapped_column(Float)
-    order_date: Mapped[datetime.datetime] = mapped_column(DateTime)
-    status: Mapped[str] = mapped_column(String)
-
-class WishlistItem(Base):
-    __tablename__ = "wishlist"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
-    product_id: Mapped[int] = mapped_column(ForeignKey("products.item_id"))
+    category: Mapped["Category"] = relationship("Category", back_populates="products")
 
 
-class Interactions(Base):
-    __tablename__ = "interactions"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
-    product_id: Mapped[int] = mapped_column(ForeignKey("products.item_id"))
-    rating: Mapped[float] = mapped_column(Float)
-    quantity: Mapped[int] = mapped_column(Integer)
+class UserPreference(Base):
+    __tablename__ = "user_preferences"
+    id: Mapped[uuid.UUID] = mapped_column(UUIDType, primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[str] = mapped_column(String(27), ForeignKey("users.user_id"))
+    category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("category.category_id"))
 
-class NegInteractions(Base):
-    __tablename__ = "neg_interactions"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"))
-    product_id: Mapped[int] = mapped_column(ForeignKey("products.item_id"))
-    rating: Mapped[float] = mapped_column(Float)
+    user: Mapped["User"] = relationship(
+        "User",
+        back_populates="user_preferences"
+    )
 
-"""
+    category: Mapped["Category"] = relationship(
+        "Category"
+    )
