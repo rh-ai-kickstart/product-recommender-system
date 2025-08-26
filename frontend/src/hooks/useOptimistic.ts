@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { addToCart, removeFromCart } from '../services/cart';
 
 import type { CartItem } from '../services/cart';
-import type { ProductData } from '../types';
 
 /**
  * Optimistic cart operations that immediately update the UI
