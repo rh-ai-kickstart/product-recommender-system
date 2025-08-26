@@ -1,9 +1,9 @@
+import uuid
 from datetime import datetime
 
-from sqlalchemy import Date, DateTime, Float, Integer, String, Text, ForeignKey
+from sqlalchemy import Date, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, declarative_base, mapped_column, relationship
 from sqlalchemy_utils import UUIDType
-import uuid
 
 Base = declarative_base()
 
@@ -21,9 +21,8 @@ class User(Base):
     gender: Mapped[str] = mapped_column(String, nullable=True)
     signup_date: Mapped[Date] = mapped_column(Date, nullable=True)
     preferences: Mapped[str] = mapped_column(String, nullable=True)
-    user_preferences : Mapped[list["UserPreference"]] = relationship(
-        "UserPreference",
-        back_populates="user"
+    user_preferences: Mapped[list["UserPreference"]] = relationship(
+        "UserPreference", back_populates="user"
     )
 
 
@@ -53,27 +52,22 @@ class Category(Base):
     __tablename__ = "category"
     category_id: Mapped[uuid.UUID] = mapped_column(UUIDType, primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String)
-    parent_id: Mapped[uuid.UUID] = mapped_column(UUIDType, ForeignKey('category.category_id'),
-                                                 nullable=True)
+    parent_id: Mapped[uuid.UUID] = mapped_column(
+        UUIDType, ForeignKey("category.category_id"), nullable=True
+    )
 
     parent: Mapped["Category"] = relationship(
         "Category",
         remote_side="Category.category_id",
         back_populates="sub_categories",
-        foreign_keys="Category.parent_id"
+        foreign_keys="Category.parent_id",
     )
 
     sub_categories: Mapped[list["Category"]] = relationship(
-        "Category",
-        back_populates="parent",
-        lazy="dynamic",
-        foreign_keys="Category.parent_id"
+        "Category", back_populates="parent", lazy="dynamic", foreign_keys="Category.parent_id"
     )
 
-    products: Mapped[list["Product"]] = relationship(
-        "Product",
-        back_populates="category"
-    )
+    products: Mapped[list["Product"]] = relationship("Product", back_populates="category")
 
 
 class Product(Base):
@@ -98,11 +92,6 @@ class UserPreference(Base):
     user_id: Mapped[str] = mapped_column(String(27), ForeignKey("users.user_id"))
     category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("category.category_id"))
 
-    user: Mapped["User"] = relationship(
-        "User",
-        back_populates="user_preferences"
-    )
+    user: Mapped["User"] = relationship("User", back_populates="user_preferences")
 
-    category: Mapped["Category"] = relationship(
-        "Category"
-    )
+    category: Mapped["Category"] = relationship("Category")
