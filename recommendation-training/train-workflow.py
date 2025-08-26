@@ -361,6 +361,13 @@ def fetch_cluster_credentials() -> NamedTuple(
     host_output = subprocess.run(
         cmd, shell=True, capture_output=True, text=True, check=True
     ).stdout.strip()
+
+    if not host_output:
+        error_message = (f"Model registry service '{mr_container}' is not available in namespace '{mr_namespace}'. "
+                         f"Please ensure the service is properly deployed and accessible.")
+        logger.info(error_message)
+        raise RuntimeError(error_message)
+
     host_value = f"https://{host_output[1:-5]}"  # Remove quotes and :443
 
     ocContext = NamedTuple("ocContext", [("author", str), ("user_token", str), ("host", str)])

@@ -44,7 +44,7 @@ RUN dnf update -y && pip3 install uv && uv pip install -r pyproject.toml && \
                 CLIPProcessor.from_pretrained('openai/clip-vit-base-patch32'); \
                 CLIPModel.from_pretrained('openai/clip-vit-base-patch32')" && \
     chmod -R 777 /hf_cache && \
-    chmod -R +r . 
+    chmod -R +r .
 
 ENV PYTHONUNBUFFERED=1
 EXPOSE 8000
