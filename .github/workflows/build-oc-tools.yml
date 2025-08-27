@@ -14,7 +14,7 @@ jobs:
     name: Build and Push container image
     runs-on: ubuntu-latest
     if: >
-      (github.repository == 'rh-ai-kickstart/product-recommender-system') &&
+      (github.repository == 'rh-ai-quickstart/product-recommender-system') &&
       (github.event_name == 'push')
     strategy:
       matrix:
@@ -49,7 +49,7 @@ jobs:
           file: ${{ matrix.context }}/Containerfile
           push: true
           tags: |
-            quay.io/rh-ai-kickstart/${{ matrix.image-name }}:${{ steps.version.outputs.tag }}
-            quay.io/rh-ai-kickstart/${{ matrix.image-name }}:latest
+            quay.io/rh-ai-quickstart/${{ matrix.image-name }}:${{ steps.version.outputs.tag }}
+            quay.io/rh-ai-quickstart/${{ matrix.image-name }}:latest
           build-args: |
             IMAGE_TAG=${{ steps.version.outputs.tag }}

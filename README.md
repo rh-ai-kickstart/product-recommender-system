@@ -296,8 +296,8 @@ dummy_clip_feature_df.to_parquet(data_path / "item_clip_features_embed.parquet",
 **Integration with Image Generation:**
 The dataset generation script **references generated images**:
 ```python
-# Line 127 in dataset_gen_amazon.py
-img_link = f"https://raw.githubusercontent.com/rh-ai-kickstart/product-recommender-system/main/recommendation-core/generation/data/generated_images/item_{product_name.replace(' ', '%20')}.png"
+# From dataset_gen_amazon.py
+img_link = f"/images/item_{safe_name}.png"
 ```
 
 **Directory Structure Created:**
@@ -447,8 +447,8 @@ python -m recommendation_core.generation.generate_images
 The generated images are **referenced by dataset_gen_amazon.py**:
 
 ```python
-# From dataset_gen_amazon.py - Line 127
-img_link = f"https://raw.githubusercontent.com/rh-ai-kickstart/product-recommender-system/main/recommendation-core/generation/data/generated_images/item_{product_name.replace(' ', '%20')}.png"
+# From dataset_gen_amazon.py
+img_link = f"/images/item_{safe_name}.png"
 ```
 
 **Current Status:**

@@ -12,7 +12,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 BASE_IMAGE = os.getenv(
-    "BASE_REC_SYS_IMAGE", "quay.io/rh-ai-kickstart/recommendation-core:latest"
+    "BASE_REC_SYS_IMAGE", "quay.io/rh-ai-quickstart/recommendation-core:latest"
 )
 
 
@@ -333,7 +333,7 @@ def train_model(
     return modelMetadata(bucket_name, new_version, object_name, torch.__version__[0:5])
 
 
-@dsl.component(base_image="quay.io/rh-ai-kickstart/recommendation-oc-tools:latest")
+@dsl.component(base_image="quay.io/rh-ai-quickstart/recommendation-oc-tools:latest")
 def fetch_cluster_credentials() -> NamedTuple(
     "ocContext", [("author", str), ("user_token", str), ("host", str)]
 ):

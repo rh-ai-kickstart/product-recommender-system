@@ -27,4 +27,4 @@ maintainers:
   - name: Peter Samouelian
     email: psamouel@redhat.com
 sources:
-  - https://github.com/rh-ai-kickstart/product-recommender-system
+  - https://github.com/rh-ai-quickstart/product-recommender-system
