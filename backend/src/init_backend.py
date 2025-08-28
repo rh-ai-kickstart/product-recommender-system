@@ -10,8 +10,21 @@ import subprocess
 from database.db import get_engine, get_db
 from database.fetch_feast_users import seed_users
 from database.models_sql import Base, Category
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+import pandas as pd
+import os
+from sqlalchemy import select
+from collections import deque
+from dataclasses import dataclass
+import uuid
 
 logger = logging.getLogger(__name__)
+
+@dataclass
+class category_dc:
+   category_id:uuid
+   name: str
+   parent_id: uuid
 
 
 async def create_tables():
@@ -29,35 +42,29 @@ async def create_tables():
 
 async def populate_categories():
     try:
-        async with get_db() as session:
-            # Create a parent category
-            parent_category_name = "Electronics"
-            parent_category = Category(name=parent_category_name)
-            session.add(parent_category)
-            session.commit()
-            
-            # Assert it was created successfully
-            retrieved_parent = session.get(Category, parent_category.category_id)
-            assert retrieved_parent is not None
-            assert retrieved_parent.name == parent_category_name
-            print(f"✅ Successfully created parent category: {retrieved_parent.name}")
+        #Read parquet file containing categories in Category, Parent Category format
+        raw_categories_file = "/app/recommendation-core/src/recommendation_core/feature_repo/data/category_relationships.parquet"
+        df = pd.read_parquet(raw_categories_file)
 
-            # Create a sub-category with a parent
-            sub_category_name = "Laptops"
-            sub_category = Category(name=sub_category_name, parent_id=parent_category.category_id)
-            session.add(sub_category)
-            session.commit()
+        engine = get_engine()
+        SessionLocal = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
-            # Assert the sub-category was created and has the correct parent
-            retrieved_sub = session.get(Category, sub_category.category_id)
-            assert retrieved_sub is not None
-            assert retrieved_sub.name == sub_category_name
-            assert retrieved_sub.parent_id == parent_category.category_id
-            assert retrieved_sub.parent.name == parent_category_name
-            print(f"✅ Successfully created sub-category: {retrieved_sub.name} under {retrieved_sub.parent.name}")
+        root_categories_df = df[df['Parent Category'].isnull()]
+        root_categories = [category_dc(uuid.uuid4(), row['Category'], None) for _, row in root_categories_df.iterrows()]
+        q = deque(root_categories)
 
+        async with SessionLocal() as session:
+            while (len(q)):
+                 next_category = q.popleft()
+                 children_of_next_df = df[df['Parent Category'] == next_category.name]
+                 children_of_next = [category_dc(uuid.uuid4(), row['Category'], next_category.category_id) for _, row in children_of_next_df.iterrows()]
+                 q.extend(children_of_next)
+                 session.add(Category(category_id=next_category.category_id, name=next_category.name, parent_id=next_category.parent_id))
+
+            await session.commit()
     except Exception as e:
-        logger.error(f"❌ Error populating categories: {e}")
+        await session.rollback()
+        logger.error(f"Unexpected error loading categories in init_backend: {e}")
         raise
 
 
