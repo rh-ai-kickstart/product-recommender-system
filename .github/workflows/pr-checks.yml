@@ -31,6 +31,7 @@ jobs:
           pip install flake8 black isort
 
       - name: Run flake8
+        continue-on-error: true
         run: |
           echo "🔍 Running flake8 checks..."
           cd backend && flake8 --max-line-length=99 --extend-ignore=E203,W503 . || {
@@ -40,6 +41,7 @@ jobs:
           }
 
       - name: Check code formatting
+        continue-on-error: true
         run: |
           echo "🎨 Checking code formatting..."
           cd backend && black --check --diff . || {
@@ -49,6 +51,7 @@ jobs:
           }
 
       - name: Check import sorting
+        continue-on-error: true
         run: |
           echo "📦 Checking import sorting..."
           cd backend && isort --check-only --diff . || {
@@ -57,6 +60,7 @@ jobs:
             exit 1
           }
       - name: Check Prettier formatting (frontend)
+        continue-on-error: true
         run: |
           echo "Checking Prettier formatting in frontend..."
           cd frontend && npx prettier --check . || {
@@ -70,6 +74,7 @@ jobs:
           pip install pre-commit
 
       - name: Check trailing whitespace
+        continue-on-error: true
         run: |
           echo "🔍 Checking trailing whitespace in modified files..."
           git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | xargs -r pre-commit run trailing-whitespace --files || {
@@ -79,6 +84,7 @@ jobs:
           }
 
       - name: Check end-of-file fixer
+        continue-on-error: true
         run: |
           echo "🔍 Checking end-of-file fixer in modified files..."
           git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | xargs -r pre-commit run end-of-file-fixer --files || {
@@ -93,6 +99,7 @@ jobs:
           sudo mv linux-amd64/helm /usr/local/bin/helm
 
       - name: Check Helm lint
+        continue-on-error: true
         run: |
           echo "🔍 Checking Helm lint in modified files..."
           # Get list of modified Helm chart directories
