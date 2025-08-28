@@ -5,17 +5,15 @@ This should be run by a job once per cluster.
 
 import asyncio
 import logging
-import os
 import subprocess
 import uuid
 from collections import deque
 from dataclasses import dataclass
 
 import pandas as pd
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from database.db import get_db, get_engine
+from database.db import get_engine
 from database.fetch_feast_users import seed_users
 from database.models_sql import Base, Category
 
@@ -45,7 +43,7 @@ async def create_tables():
 async def populate_categories():
     try:
         # Read parquet file containing categories in Category, Parent Category format
-        raw_categories_file = "/app/recommendation-core/src/recommendation_core/feature_repo/data/category_relationships.parquet"
+        raw_categories_file = "/app/recommendation-core/src/recommendation_core/feature_repo/data/category_relationships.parquet"  # noqa: E501
         df = pd.read_parquet(raw_categories_file)
 
         engine = get_engine()
