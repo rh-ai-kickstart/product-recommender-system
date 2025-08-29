@@ -1,12 +1,12 @@
-# AI Kickstart - Product Recommender System
+# AI Quickstart - Product Recommender System
 
-Welcome to the Product Recommender System Kickstart!
+Welcome to the Product Recommender System Quickstart!
 Use this to quickly get a recommendation engine with user-item relationships up and running in your environment.
 
 To see how it's done, jump straight to [installation](#install).
 
 ## 🎯 Description
-The Product Recommender System Kickstart enables the rapid establishment of a scalable and personalized product recommendation service.
+The Product Recommender System Quickstart enables the rapid establishment of a scalable and personalized product recommendation service.
 
 The system recommends items to users based on their previous interactions with products and the behavior of similar users.
 
@@ -1411,7 +1411,7 @@ spec:
    cd helm/
    ```
 
-3. Set the namespace environment variable to define on which namespace the kickstart will be installed:
+3. Set the namespace environment variable to define on which namespace the quickstart will be installed:
    ```bash
    # Replace <namespace> with your desired namespace
    export NAMESPACE=<namespace>
@@ -1504,7 +1504,7 @@ To uninstall the recommender system and clean up resources:
 
 ## 📄 License
 
-This project is licensed under the same terms as the Red Hat AI Kickstart program.
+This project is licensed under the same terms as the Red Hat AI Quickstart program.
 
 ## 🔗 References
 
